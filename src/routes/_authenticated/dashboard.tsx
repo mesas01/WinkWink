@@ -34,6 +34,15 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { AdminPanel } from "@/components/admin-panel";
+import { WorkspaceTabs, viewTitle } from "@/components/workspace-tabs";
+import {
+  InvoiceLedger,
+  LedgerFilters,
+  filterInvoices,
+  type LedgerFilter,
+} from "@/components/invoice-ledger";
+import { Stamp } from "@/components/stamp";
+import { invoiceStampTone } from "@/lib/stamp";
 import { ScanChecklist, SecurityBadge } from "@/components/security-scan";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -53,24 +62,6 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   }),
   component: Dashboard,
 });
-const statusText = {
-  es: {
-    pending: "Pendiente",
-    processing: "Evaluando",
-    approved: "Aprobada · simulación",
-    review: "Revisión humana",
-    rejected: "Rechazada",
-    error: "Error de evaluación",
-  },
-  en: {
-    pending: "Pending",
-    processing: "Evaluating",
-    approved: "Approved · simulated",
-    review: "Human review",
-    rejected: "Rejected",
-    error: "Evaluation error",
-  },
-};
 function Dashboard() {
   const { data: w } = useSuspenseQuery(workspaceOptions);
   const qc = useQueryClient();
@@ -80,7 +71,7 @@ function Dashboard() {
   const employeePreview = useApp((s) => s.employeePreview);
   const setEmployeePreview = useApp((s) => s.setEmployeePreview);
   const [view, setView] = useState<"history" | "rules" | "privacy" | "demo">("demo");
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState<LedgerFilter>("all");
   const [uploadOpen, setUploadOpen] = useState(false);
   const [ruleOpen, setRuleOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
@@ -93,11 +84,7 @@ function Dashboard() {
   const adminUi = adminUiVisible(w.isAdmin, employeePreview);
   const own = inboxFor(w.invoices, w.isAdmin, employeePreview, w.user.id);
   const inv = own.find((i) => i.id === selected);
-  const list = own.filter(
-    (i) =>
-      filter === "all" ||
-      (filter === "security" ? i.security_status === "blocked" : i.status === filter),
-  );
+  const list = filterInvoices(own, filter);
   const [events, setEvents] = useState<
     { message_es: string; message_en: string; created_at: string }[]
   >([]);
@@ -234,12 +221,24 @@ function Dashboard() {
   }
   return (
     <div className="min-h-dvh bg-background">
-      <header className="border-b">
-        <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-4 sm:px-8">
+      <header className="border-b-2 border-rule bg-background">
+        <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-8">
           <Logo />
           <div className="flex shrink-0 items-center gap-2">
-            <ThemeToggle />
+            <span className="mr-2 hidden text-right text-xs leading-tight md:block">
+              <span className="block font-semibold">{w.profile?.display_name || w.user.email}</span>
+              <span className="text-muted-foreground">
+                {adminUi
+                  ? es
+                    ? "Admin financiero"
+                    : "Finance admin"
+                  : es
+                    ? "Empleado"
+                    : "Employee"}
+              </span>
+            </span>
             <LangSwitch />
+            <ThemeToggle />
             <Button
               variant="ghost"
               size="icon"
@@ -253,39 +252,14 @@ function Dashboard() {
         </div>
       </header>
       <div className="mx-auto max-w-7xl px-4 py-7 sm:px-8">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-          <div className="min-w-0">
-            <p className="text-sm text-muted-foreground">
-              {w.profile?.display_name || w.user.email} ·{" "}
-              {adminUi ? (es ? "Administración" : "Administration") : es ? "Empleado" : "Employee"}
-            </p>
-            <h1 className="mt-2 text-3xl font-semibold">
-              {view === "demo"
-                ? es
-                  ? "Transferencias · demo"
-                  : "Transfers · demo"
-                : view === "rules"
-                  ? es
-                    ? "Panel administrativo"
-                    : "Administration panel"
-                  : view === "privacy"
-                    ? es
-                      ? "Privacidad"
-                      : "Privacy"
-                    : adminUi
-                      ? es
-                        ? "Todas las facturas"
-                        : "All invoices"
-                      : es
-                        ? "Mis facturas"
-                        : "My invoices"}
-            </h1>
-          </div>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <h1 className="text-3xl font-extrabold tracking-[-0.025em] sm:text-4xl">
+            {viewTitle(view, adminUi, es)}
+          </h1>
           {w.consent && view === "history" && (
             <Button onClick={() => setUploadOpen(true)} disabled={busy} className="shrink-0">
               <Upload />
-              <span className="hidden sm:inline">{es ? "Subir factura" : "Upload invoice"}</span>
-              <span className="sr-only sm:hidden">{es ? "Subir factura" : "Upload invoice"}</span>
+              {es ? "Subir factura" : "Upload invoice"}
             </Button>
           )}
         </div>
@@ -326,52 +300,17 @@ function Dashboard() {
                 </Button>
               </div>
             )}
-            <nav
-              aria-label={es ? "Espacio de trabajo" : "Workspace"}
-              className="mt-7 flex flex-wrap gap-2 border-b pb-4"
-            >
-              <Button
-                variant={view === "demo" ? "secondary" : "ghost"}
-                onClick={() => setView("demo")}
-              >
-                <FileText />
-                {es ? "Demo de transferencias" : "Transfer demo"}
-              </Button>
-              <Button
-                variant={view === "history" ? "secondary" : "ghost"}
-                onClick={() => setView("history")}
-              >
-                <FolderOpen />
-                {es ? "Historial" : "History"}
-              </Button>
-              {adminUi && (
-                <Button
-                  variant={view === "rules" ? "secondary" : "ghost"}
-                  onClick={() => setView("rules")}
-                >
-                  <Settings />
-                  {es ? "Administración" : "Administration"}
-                </Button>
-              )}
-              <Button
-                variant={view === "privacy" ? "secondary" : "ghost"}
-                onClick={() => setView("privacy")}
-              >
-                <ShieldCheck />
-                {es ? "Privacidad" : "Privacy"}
-              </Button>
-              {w.isAdmin && (
-                <Button
-                  variant={employeePreview ? "secondary" : "ghost"}
-                  aria-pressed={employeePreview}
-                  onClick={togglePreview}
-                  className="ml-auto"
-                >
-                  <Eye />
-                  {es ? "Vista de empleado" : "Employee view"}
-                </Button>
-              )}
-            </nav>
+            <div className="mt-6">
+              <WorkspaceTabs
+                view={view}
+                onView={setView}
+                adminUi={adminUi}
+                isAdmin={w.isAdmin}
+                employeePreview={employeePreview}
+                onTogglePreview={togglePreview}
+                es={es}
+              />
+            </div>
             {view === "demo" && (
               <TransferDemo
                 invoices={own}
@@ -385,128 +324,23 @@ function Dashboard() {
             )}
             {view === "history" && (
               <section className="mt-6">
-                <div className="flex flex-wrap items-center gap-2">
-                  {["all", "approved", "review", "rejected", "security"].map((v) => (
-                    <Button
-                      key={v}
-                      variant={filter === v ? "secondary" : "ghost"}
-                      onClick={() => setFilter(v)}
-                    >
-                      {v === "security"
-                        ? es
-                          ? "Alertas de seguridad"
-                          : "Security alerts"
-                        : v === "all"
-                          ? es
-                            ? "Todas"
-                            : "All"
-                          : statusText[lang][v as "approved" | "review" | "rejected"]}
-                    </Button>
-                  ))}
-                  <span className="ml-auto text-sm text-muted-foreground">
-                    {list.length} {es ? "facturas" : "invoices"}
-                  </span>
-                </div>
+                <LedgerFilters invoices={own} filter={filter} onFilter={setFilter} es={es} />
                 {busy && (
                   <div role="status" className="mt-5">
-                    <p className="text-sm text-primary">
+                    <p className="text-sm font-semibold text-ink-violet">
                       {es ? "Guardando y evaluando documento…" : "Saving and evaluating document…"}
                     </p>
                     <ScanChecklist es={es} running={busy} />
                   </div>
                 )}
-                {list.length === 0 ? (
-                  <div className="py-20 text-center">
-                    <FileText className="mx-auto size-10 text-muted-foreground" />
-                    <h2 className="mt-5 text-xl font-medium">
-                      {es ? "Sin facturas todavía" : "No invoices yet"}
-                    </h2>
-                    <Button variant="outline" className="mt-6" onClick={() => setUploadOpen(true)}>
-                      <Upload />
-                      {es ? "Subir factura" : "Upload invoice"}
-                    </Button>
-                  </div>
-                ) : (
-                  <ul className="mt-5 divide-y border-y">
-                    {list.map((i) => (
-                      <motion.li
-                        key={i.id}
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <Button
-                          variant="ghost"
-                          onClick={() => showInvoice(i.id)}
-                          className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2 rounded-none px-2 py-5 text-left sm:grid-cols-[minmax(0,1fr)_150px_140px]"
-                        >
-                          <span className="min-w-0">
-                            <span className="block truncate font-semibold">
-                              {i.vendor || i.file_name}
-                              {i.security_status === "passed" && (
-                                <ShieldCheck
-                                  aria-label={
-                                    es
-                                      ? "Referencia confirmada coincidente"
-                                      : "Confirmed reference matches"
-                                  }
-                                  className="ml-2 inline size-4 text-success"
-                                />
-                              )}
-                            </span>
-                            <span className="mt-1 block truncate text-sm text-muted-foreground">
-                              {i.invoice_number ||
-                                (es ? "Sin número identificado" : "Number not identified")}{" "}
-                              ·{" "}
-                              {i.invoice_date ||
-                                (es ? "Sin fecha identificada" : "Date not identified")}
-                            </span>
-                            <span className="mt-1 block truncate text-sm">
-                              {i.description ||
-                                (es
-                                  ? "Sin descripción identificada"
-                                  : "Description not identified")}
-                            </span>
-                            <span className="mt-1 block truncate text-xs text-muted-foreground">
-                              {adminUi
-                                ? `${i.profiles?.display_name || (es ? "Empleado" : "Employee")} · `
-                                : ""}
-                              {new Date(i.created_at).toLocaleString(lang)} ·{" "}
-                              {i.mime_type === "application/pdf" ? "PDF" : es ? "Imagen" : "Image"}
-                            </span>
-                          </span>
-                          <span className="text-right font-medium">
-                            {i.amount !== null
-                              ? `${i.currency || ""} ${i.amount.toLocaleString(lang)}`
-                              : "—"}
-                          </span>
-                          <span
-                            className={cn(
-                              "col-span-2 justify-self-start rounded-md px-2 py-1 text-xs sm:col-span-1 sm:justify-self-end",
-                              i.status === "approved"
-                                ? "bg-success-soft text-success"
-                                : i.status === "review"
-                                  ? "bg-warning-soft text-warning"
-                                  : i.status === "error" || i.status === "rejected"
-                                    ? "bg-destructive-soft text-destructive"
-                                    : "bg-muted text-foreground",
-                            )}
-                          >
-                            {i.security_status === "blocked"
-                              ? es
-                                ? "Alerta de seguridad"
-                                : "Security block"
-                              : i.security_status === "review"
-                                ? es
-                                  ? "Referencia pendiente"
-                                  : "Reference pending"
-                                : statusText[lang][i.status as keyof typeof statusText.es]}
-                          </span>
-                        </Button>
-                      </motion.li>
-                    ))}
-                  </ul>
-                )}
+                <InvoiceLedger
+                  invoices={list}
+                  adminUi={adminUi}
+                  es={es}
+                  lang={lang}
+                  onOpen={showInvoice}
+                  onUpload={() => setUploadOpen(true)}
+                />
               </section>
             )}
             {view === "rules" && adminUi && (
@@ -736,10 +570,21 @@ function Dashboard() {
             <>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-2xl font-semibold">
-                    {inv.currency} {inv.amount?.toLocaleString(lang) ?? "—"}
+                  <Stamp
+                    key={`${inv.id}-${inv.status}-${inv.security_status}`}
+                    tone={invoiceStampTone(inv)}
+                    es={es}
+                    size="lg"
+                    land
+                  />
+                  <p className="typed mt-5 text-3xl font-bold">
+                    {inv.currency}{" "}
+                    {inv.amount?.toLocaleString(lang, { minimumFractionDigits: 2 }) ?? "—"}
                   </p>
-                  <dl className="mt-4 grid gap-3 text-sm">
+                  <p className="mt-3 break-words border-t border-dashed border-input pt-3 text-[15px] leading-relaxed">
+                    {inv.error_message || (es ? inv.explanation_es : inv.explanation_en)}
+                  </p>
+                  <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
                     <div>
                       <dt className="text-muted-foreground">{es ? "Proveedor" : "Supplier"}</dt>
                       <dd className="break-words font-medium">
@@ -781,8 +626,14 @@ function Dashboard() {
                       </dd>
                     </div>
                   </dl>
-                  <div className="mt-4">
-                    <span className="text-sm">
+                  <div className="mt-4 flex items-center gap-2 text-sm font-semibold">
+                    <ShieldCheck
+                      className={cn(
+                        "size-4",
+                        inv.security_status === "passed" ? "text-ink-green" : "text-ink-violet",
+                      )}
+                    />
+                    <span>
                       {inv.security_status === "passed"
                         ? es
                           ? "Referencia confirmada coincidente"
@@ -792,12 +643,6 @@ function Dashboard() {
                           : "Reference needs review"}
                     </span>
                   </div>
-                  <p className="mt-3 text-sm font-medium">
-                    {statusText[lang][inv.status as keyof typeof statusText.es]}
-                  </p>
-                  <p className="mt-2 break-words text-sm text-muted-foreground">
-                    {inv.error_message || (es ? inv.explanation_es : inv.explanation_en)}
-                  </p>
                   {inv.status === "pending" && inv.user_id === w.user.id && (
                     <Button
                       disabled={busy}
@@ -884,11 +729,14 @@ function Dashboard() {
                 <h2 className="text-sm font-semibold">
                   {es ? "Registro de decisiones" : "Decision history"}
                 </h2>
-                <ol className="mt-3 space-y-3">
+                <ol className="typed mt-3 space-y-2 text-[13px] leading-relaxed">
                   {events.map((e, i) => (
-                    <li key={i} className="text-sm">
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(e.created_at).toLocaleString(lang)} ·{" "}
+                    <li key={i} className="grid grid-cols-[auto_minmax(0,1fr)] gap-3">
+                      <span className="text-muted-foreground">
+                        {new Date(e.created_at).toLocaleString(lang, {
+                          dateStyle: "short",
+                          timeStyle: "medium",
+                        })}
                       </span>
                       {es ? e.message_es : e.message_en}
                     </li>

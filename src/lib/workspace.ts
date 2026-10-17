@@ -64,3 +64,6 @@ export const workspaceOptions = queryOptions({
     };
   },
 });
+
+export type Workspace = Awaited<ReturnType<typeof workspaceOptions.queryFn & object>>;
+export type WorkspaceInvoice = Workspace["invoices"][number];

@@ -119,21 +119,22 @@ function Login() {
   }
   return (
     <div className="min-h-dvh bg-surface">
-      <header className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-5">
-        <Logo />
-        <div className="flex gap-2">
-          <ThemeToggle />
-          <LangSwitch />
+      <header className="border-b-2 border-rule bg-background">
+        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-8">
+          <Logo />
+          <div className="flex items-center gap-2">
+            <LangSwitch />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
       <motion.section
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.25 }}
-        className="mx-auto max-w-md px-5 py-12"
+        className="mx-auto my-10 max-w-md border-2 border-rule bg-card px-6 py-8 shadow-lift sm:my-16 sm:px-8"
       >
-        <p className="text-sm font-medium text-primary">WinkWink</p>
-        <h1 className="mt-2 text-3xl font-semibold">
+        <h1 className="text-3xl font-extrabold tracking-[-0.025em]">
           {mode === "signup"
             ? es
               ? "Crear cuenta"
@@ -198,7 +199,7 @@ function Login() {
               {es
                 ? "Al crear una cuenta se almacena tu correo y nombre para el acceso. La autorización para usar documentos se solicita después de entrar."
                 : "Account creation stores your email and name for access. Document-processing authorization is requested after sign-in."}{" "}
-              <Link to="/privacy" className="text-primary underline">
+              <Link to="/privacy" className="font-semibold text-ink-violet underline">
                 {es ? "Privacidad" : "Privacy"}
               </Link>
             </p>

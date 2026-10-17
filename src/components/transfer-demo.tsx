@@ -6,6 +6,8 @@ import { evaluateTransferDemo, createDemoEmployeeAccess } from "@/lib/invoices.f
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "./ui/button";
+import { Stamp } from "./stamp";
+import { invoiceStampTone } from "@/lib/stamp";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "./ui/dialog";
 import type { Database } from "@/integrations/supabase/types";
 type Invoice = Database["public"]["Tables"]["invoices"]["Row"];
@@ -200,7 +202,7 @@ export function TransferDemo({
           }
         </div>
       )}
-      <ul className="mt-5 divide-y border-y">
+      <ul className="mt-5 divide-y divide-dashed divide-input border-y-2 border-rule">
         {list.map((i) => (
           <li key={i.id} className="grid min-w-0 gap-4 py-5 md:grid-cols-[minmax(0,1fr)_auto]">
             <div className="min-w-0">
@@ -208,18 +210,14 @@ export function TransferDemo({
                 <span className="text-xs font-medium text-muted-foreground">
                   {name(i.user_id)} · {i.invoice_number}
                 </span>
-                <span
-                  className={`rounded-md px-2 py-1 text-xs ${i.status === "approved" ? "bg-success-soft text-success" : i.status === "review" ? "bg-warning-soft text-warning" : "bg-muted text-foreground"}`}
-                >
-                  {label(i)}
-                </span>
+                <Stamp tone={invoiceStampTone(i)} es={es} label={label(i)} />
               </div>
               <h3 className="mt-2 break-words text-lg font-semibold">{i.vendor}</h3>
               <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
                 <Building2 className="size-4 text-muted-foreground" />
                 <span>{channel(i.proposed_channel)}</span>
                 <ArrowRight className="size-4 text-muted-foreground" />
-                <span className="font-medium tabular-nums">
+                <span className="typed font-bold">
                   {i.currency} {format(i.amount ?? 0)}
                 </span>
                 <span className="text-muted-foreground">

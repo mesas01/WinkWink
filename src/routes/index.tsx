@@ -1,16 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import {
-  motion,
-  useMotionValueEvent,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from "framer-motion";
-import { ArrowRight, Check, FileText, Hand, ScanLine, ShieldCheck, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { ArrowRight, ScanLine, ShieldCheck, Scale } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { LangSwitch, Logo, ThemeToggle } from "@/components/blinka";
 import { LegalLinks } from "@/components/legal";
+import { Stamp } from "@/components/stamp";
+import type { StampTone } from "@/lib/stamp";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -19,13 +15,14 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "WinkWink — Revisión de facturas" },
+      { title: "WinkWink — Facturas bajo control" },
       {
         name: "description",
-        content: "Revisión de documentos y reglas de aprobación, sin ejecutar pagos.",
+        content:
+          "Agente de gobernanza y antifraude para cuentas por pagar en Blinka: paga, retiene o bloquea cada factura y explica por qué.",
       },
-      { property: "og:title", content: "WinkWink — Revisión de facturas" },
-      { property: "og:description", content: "Facturas y decisiones bajo revisión." },
+      { property: "og:title", content: "WinkWink — Facturas bajo control" },
+      { property: "og:description", content: "Cada factura, sellada con su decisión y su porqué." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -69,6 +66,9 @@ const copy = {
     paidLog: "Aprobado automáticamente. Categoría Software y monto ($150) bajo el umbral de $500.",
     review: "Requiere revisión humana",
     reviewLog: "Revisión requerida. El monto ($120) excede el límite de $100 para Viáticos.",
+    blocked: "Bloqueada por seguridad",
+    blockedLog:
+      "ALERTA DE SEGURIDAD: la cuenta de la factura (Wells Fargo ****9999) no coincide con la cuenta verificada de AWS en Blinka (Chase ****4321). Pago bloqueado para prevenir fraude.",
     approve: "Aprobar excepción",
     reject: "Rechazar",
     rulesEyebrow: "Ejemplos de reglas",
@@ -116,6 +116,9 @@ const copy = {
       "Approved automatically. Category is Software and amount ($150) is under the $500 threshold.",
     review: "Requires human review",
     reviewLog: "Review required. Amount ($120) exceeds the $100 limit for Travel.",
+    blocked: "Blocked by security",
+    blockedLog:
+      "SECURITY ALERT: the bank account on the invoice (Wells Fargo ****9999) does not match AWS's pre-verified account in Blinka (Chase ****4321). Payment blocked to prevent fraud.",
     approve: "Approve override",
     reject: "Reject",
     rulesEyebrow: "Example rules",
@@ -131,44 +134,52 @@ const copy = {
   },
 };
 
+type C = (typeof copy)["es"];
+
 function Landing() {
   const lang = useApp((s) => s.lang);
   const c = copy[lang];
+  const es = lang === "es";
   return (
-    <div className="bg-background font-display text-foreground">
-      <Nav c={c} />
-      <Hero c={c} />
-      <Statement text={c.statement} />
-      <How c={c} />
-
-      <Outcomes c={c} />
-      <Rules c={c} />
-      <Final c={c} />
+    <div className="bg-background text-foreground">
+      <Nav c={c} es={es} />
+      <main>
+        <Hero c={c} es={es} />
+        <How c={c} />
+        <Outcomes c={c} es={es} />
+        <Rules c={c} />
+        <Final c={c} />
+      </main>
     </div>
   );
 }
-type C = (typeof copy)["es"];
 
-function Nav({ c }: { c: C }) {
-  const { scrollY } = useScroll();
-  const [solid, setSolid] = useState(false);
-  useMotionValueEvent(scrollY, "change", (v) => setSolid(v > 12));
+function Nav({ c, es }: { c: C; es: boolean }) {
   const [signedIn, setSignedIn] = useState(false);
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setSignedIn(Boolean(data.user)));
   }, []);
   return (
-    <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color] duration-300",
-        solid ? "glass border-b" : "border-b border-transparent",
-      )}
-    >
-      <div className="mx-auto grid grid-cols-[minmax(0,1fr)_auto] gap-3 min-h-16 max-w-6xl items-center justify-between px-6">
+    <header className="sticky top-0 z-50 border-b-2 border-rule bg-background">
+      <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-3 px-5 sm:px-8">
         <Logo />
+        <nav
+          aria-label={es ? "Secciones" : "Sections"}
+          className="hidden items-center gap-6 text-sm font-semibold md:flex"
+        >
+          {["#how", "#control", "#rules"].map((href, i) => (
+            <a
+              key={href}
+              href={href}
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {c.nav[i]}
+            </a>
+          ))}
+        </nav>
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <LangSwitch className="hidden sm:inline-flex" />
+          <ThemeToggle />
           <Button asChild>
             <Link to={signedIn ? "/dashboard" : "/login"}>{signedIn ? "WinkWink" : c.enter}</Link>
           </Button>
@@ -178,314 +189,177 @@ function Nav({ c }: { c: C }) {
   );
 }
 
-function Words({
-  text,
-  delay = 0,
-  className,
-  wordClass,
-}: {
-  text: string;
-  delay?: number;
-  className?: string;
-  wordClass?: string;
-}) {
+function Hero({ c, es }: { c: C; es: boolean }) {
   return (
-    <span className={className}>
-      {text.split(" ").map((w, i) => (
-        <motion.span
-          key={i}
-          className="inline-block pb-[0.08em]"
-          initial={{ opacity: 0, transform: "translateY(18px)", filter: "blur(8px)" }}
-          animate={{ opacity: 1, transform: "translateY(0px)", filter: "blur(0px)" }}
-          transition={{ delay: delay + i * 0.06, duration: 0.7, ease }}
-        >
-          <span className={wordClass}>{w}</span>&nbsp;
-        </motion.span>
-      ))}
-    </span>
-  );
-}
-
-function Hero({ c }: { c: C }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "start 20%"] });
-  const rotate = useTransform(scrollYProgress, [0, 1], [18, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [0.88, 1]);
-  const transform = useTransform(
-    [rotate, scale] as MotionValue<number>[],
-    ([r, s]) => `perspective(1600px) rotateX(${r}deg) scale(${s})`,
-  );
-  return (
-    <section className="relative overflow-hidden pt-36">
-      <div
-        aria-hidden
-        className="hero-glow pointer-events-none absolute inset-x-0 top-0 h-[720px]"
-      />
-      <div className="relative mx-auto max-w-5xl px-6 text-center">
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-          className="text-sm font-semibold text-primary"
-        >
-          {c.eyebrow}
-        </motion.p>
-        <h1 className="text-display mt-4 break-words">
-          <Words text={c.h1a} delay={0.1} className="block" />
-          <Words text={c.h1b} delay={0.35} className="block" wordClass="text-gradient" />
+    <section className="mx-auto grid max-w-6xl gap-12 px-5 pb-20 pt-14 sm:px-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-center lg:pt-20">
+      <div>
+        <h1 className="text-display lg:text-[clamp(3.5rem,5.2vw,4.75rem)]">
+          {c.h1a}
+          <span className="block text-ink-violet">{c.h1b}</span>
         </h1>
-        <motion.p
-          initial={{ opacity: 0, transform: "translateY(10px)" }}
-          animate={{ opacity: 1, transform: "translateY(0px)" }}
-          transition={{ delay: 0.8, duration: 0.6, ease }}
-          className="mx-auto mt-6 max-w-2xl text-lead text-muted-foreground"
-        >
-          {c.sub}
-        </motion.p>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 0.6 }}
-          className="mt-9 flex flex-wrap items-center justify-center gap-4"
-        >
-          <Link
-            to="/login"
-            className="press inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-[15px] font-medium text-primary-foreground shadow-cta"
-          >
-            {c.cta}
-            <ArrowRight className="size-4" />
-          </Link>
-          <a
-            href="#how"
-            className="group inline-flex items-center gap-1 text-[15px] font-medium text-primary"
-          >
-            {c.cta2}
-            <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-          </a>
-        </motion.div>
+        <p className="mt-6 max-w-xl text-lead text-muted-foreground">{c.sub}</p>
+        <div className="mt-9 flex flex-wrap items-center gap-3">
+          <Button asChild size="lg">
+            <Link to="/login">
+              {c.cta}
+              <ArrowRight />
+            </Link>
+          </Button>
+          <Button asChild size="lg" variant="outline">
+            <a href="#how">{c.cta2}</a>
+          </Button>
+        </div>
       </div>
-      <div ref={ref} className="relative mx-auto mt-20 max-w-5xl px-6 pb-24">
-        <motion.div
-          style={{ transform }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.1, duration: 0.8 }}
-          className="origin-top rounded-[28px] bg-card p-2 shadow-hero"
-        >
-          <ProductMock c={c} />
-        </motion.div>
-      </div>
+      <LedgerMock c={c} es={es} />
     </section>
   );
 }
 
-function ProductMock({ c }: { c: C }) {
-  const rows = [
-    ["INV-001", "AWS", "$150", "paid"],
-    ["INV-002", "Uber", "$120", "review"],
-    ["INV-003", "Unknown Design Agency", "$2,000", "review"],
-    ["INV-004", "Slack", "$45", "paid"],
-  ] as const;
+const MOCK_ROWS: { id: string; vendor: string; amount: string; tone: StampTone }[] = [
+  { id: "INV-001", vendor: "AWS", amount: "USD 150.00", tone: "paid" },
+  { id: "INV-002", vendor: "Uber", amount: "USD 120.00", tone: "held" },
+  { id: "INV-003", vendor: "AWS", amount: "USD 150.00", tone: "blocked" },
+  { id: "INV-004", vendor: "Slack", amount: "USD 45.00", tone: "paid" },
+];
+
+/** Synthetic example ledger. The stamps land one after another: the agent deciding, row by row. */
+function LedgerMock({ c, es }: { c: C; es: boolean }) {
   return (
-    <div className="overflow-hidden rounded-[22px] border bg-surface">
-      <div className="flex items-center gap-1.5 border-b bg-background px-4 py-3">
-        {[0, 1, 2].map((i) => (
-          <span key={i} className="size-2.5 rounded-full bg-input" />
-        ))}
-        <span className="ml-3 text-xs text-muted-foreground">WinkWink · Ejemplo / Example</span>
-      </div>
-      <div className="grid gap-4 p-5 md:grid-cols-[1.4fr_1fr]">
-        <div className="rounded-xl bg-background shadow-crisp">
-          {rows.map(([id, v, a, s], i) => (
-            <motion.div
-              key={id}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 + i * 0.08, duration: 0.4 }}
-              className="flex items-center gap-3 border-b px-4 py-3 text-left text-sm last:border-b-0"
+    <figure className="border-2 border-rule bg-card shadow-hero">
+      <figcaption className="flex items-center justify-between border-b-2 border-rule px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em]">
+        <span>{es ? "Cola de facturas" : "Invoice queue"}</span>
+        <span className="text-muted-foreground">
+          {es ? "Ejemplo sintético" : "Synthetic example"}
+        </span>
+      </figcaption>
+      <ul>
+        {MOCK_ROWS.map((r, i) => (
+          <li
+            key={r.id}
+            className={cn(
+              "grid grid-cols-[minmax(0,1fr)_auto_7.5rem] items-center gap-4 border-b border-dashed border-input px-4 py-3.5 last:border-b-0",
+              r.tone === "blocked" && "bg-destructive-soft/60",
+            )}
+          >
+            <span className="min-w-0">
+              <span className="block truncate font-semibold">{r.vendor}</span>
+              <span className="typed text-xs text-muted-foreground">{r.id}</span>
+            </span>
+            <span className="typed text-sm font-bold">{r.amount}</span>
+            <span
+              className="justify-self-end [&>span]:[animation-delay:var(--d)]"
+              style={{ ["--d" as string]: `${0.5 + i * 0.35}s` }}
             >
-              <span className="hidden sm:block w-16 shrink-0 font-mono text-[11px] text-muted-foreground">
-                {id}
-              </span>
-              <span className="min-w-0 flex-1 truncate font-medium">{v}</span>
-              <span className="tnum font-medium">{a}</span>
-              <span
-                className={cn(
-                  "hidden sm:block shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium",
-                  s === "paid" ? "bg-success-soft text-success" : "bg-warning-soft text-warning",
-                )}
-              >
-                {s === "paid" ? c.paid : c.review}
-              </span>
-            </motion.div>
-          ))}
-        </div>
-        <div className="flex flex-col gap-3 rounded-xl bg-background p-4 text-left shadow-crisp">
-          <p className="font-mono text-[11px] text-muted-foreground">INV-002 · Uber</p>
-          <p className="tnum text-3xl font-semibold tracking-tight">$120</p>
-          <p className="rounded-md bg-surface p-2.5 font-mono text-[11px] leading-relaxed">
-            {c.reviewLog}
-          </p>
-          <div className="mt-auto grid grid-cols-2 gap-2">
-            <span className="rounded-lg bg-primary py-2 text-center text-xs font-medium text-primary-foreground">
-              {c.approve}
+              <Stamp tone={r.tone} es={es} land />
             </span>
-            <span className="rounded-lg py-2 text-center text-xs font-medium text-destructive shadow-crisp">
-              {c.reject}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Statement({ text }: { text: string }) {
-  const ref = useRef<HTMLParagraphElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 85%", "end 45%"] });
-  const words = text.split(" ");
-  return (
-    <section className="mx-auto max-w-4xl px-6 py-32">
-      <p ref={ref} className="text-statement">
-        {words.map((w, i) => (
-          <Word key={i} p={scrollYProgress} range={[i / words.length, (i + 1) / words.length]}>
-            {w}
-          </Word>
+          </li>
         ))}
+      </ul>
+      <p className="typed border-t-2 border-rule px-4 py-3 text-[13px] leading-relaxed text-ink-red">
+        {c.blockedLog}
       </p>
-    </section>
+    </figure>
   );
-}
-function Word({
-  p,
-  range,
-  children,
-}: {
-  p: MotionValue<number>;
-  range: [number, number];
-  children: string;
-}) {
-  const opacity = useTransform(p, range, [1, 1]);
-  return <motion.span style={{ opacity }}>{children} </motion.span>;
 }
 
 function Reveal({
   children,
   className,
   delay = 0,
+  as = "div",
 }: {
   children: React.ReactNode;
   className?: string;
   delay?: number;
+  as?: "div" | "li";
 }) {
+  const Tag = as === "li" ? motion.li : motion.div;
   return (
-    <motion.div
+    <Tag
       className={className}
-      initial={{ opacity: 0, transform: "translateY(24px)" }}
+      initial={{ opacity: 0, transform: "translateY(16px)" }}
       whileInView={{ opacity: 1, transform: "translateY(0px)" }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ delay, duration: 0.8, ease }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ delay, duration: 0.6, ease }}
     >
       {children}
-    </motion.div>
+    </Tag>
   );
 }
 
+const STEP_ICONS = [ScanLine, ShieldCheck, Scale];
+
 function How({ c }: { c: C }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const [active, setActive] = useState(0);
-  useMotionValueEvent(scrollYProgress, "change", (v) => setActive(Math.min(2, Math.floor(v * 3))));
-  const icons = [ScanLine, ShieldCheck, Sparkles];
   return (
-    <section id="how" ref={ref} className="relative bg-surface py-16 lg:h-[250dvh] lg:py-0">
-      <div className="flex items-center lg:sticky lg:top-0 lg:min-h-dvh">
-        <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-6 lg:grid-cols-2">
-          <div>
-            <p className="text-sm font-semibold text-primary">{c.howEyebrow}</p>
-            <h2 className="text-headline mt-3">{c.howTitle}</h2>
-            <ol className="mt-10 flex flex-col gap-6">
-              {c.steps.map((s, i) => (
-                <li
-                  key={i}
-                  className="flex gap-4 transition-opacity duration-500"
-                  style={{ opacity: 1 }}
-                >
-                  <span className="relative mt-1 h-12 w-0.5 shrink-0 overflow-hidden rounded-full bg-input">
-                    <motion.span
-                      className="absolute inset-0 origin-top bg-primary"
-                      animate={{ transform: `scaleY(${active >= i ? 1 : 0})` }}
-                      transition={{ duration: 0.5, ease }}
-                    />
-                  </span>
-                  <div>
-                    <p className="text-xl font-semibold tracking-tight">{s.t}</p>
-                    <p className="mt-1 text-muted-foreground">{s.d}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-          <div className="relative hidden lg:grid aspect-square place-items-center rounded-[32px] bg-background shadow-hero">
-            {icons.map((Icon, i) => (
-              <motion.div
-                key={i}
-                className="absolute flex flex-col items-center gap-6"
-                animate={{
-                  opacity: active === i ? 1 : 0,
-                  transform: active === i ? "scale(1)" : "scale(0.94)",
-                  filter: active === i ? "blur(0px)" : "blur(6px)",
-                }}
-                transition={{ type: "spring", bounce: 0, duration: 0.5 }}
+    <section id="how" className="scroll-mt-20 border-y-2 border-rule bg-surface">
+      <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+        <h2 className="text-headline max-w-2xl">{c.howTitle}</h2>
+        <p className="text-statement mt-8 max-w-4xl text-muted-foreground">{c.statement}</p>
+        <ol className="mt-14 grid gap-0 md:grid-cols-3">
+          {c.steps.map((s, i) => {
+            const Icon = STEP_ICONS[i] ?? ScanLine;
+            return (
+              <Reveal
+                as="li"
+                key={s.t}
+                delay={i * 0.08}
+                className="border-t-2 border-rule py-6 md:border-l md:border-t-2 md:border-l-input md:px-6 md:first:border-l-0 md:first:pl-0"
               >
-                <span className="grid size-28 place-items-center rounded-[28px] bg-primary-soft text-primary">
-                  <Icon className="size-12" strokeWidth={1.5} />
+                <span className="flex items-center gap-3">
+                  <span className="typed text-sm font-bold text-ink-violet">{i + 1}/3</span>
+                  <Icon className="size-5 text-muted-foreground" strokeWidth={1.75} />
                 </span>
-                <span className="font-mono text-sm text-muted-foreground">0{i + 1} / 03</span>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+                <p className="mt-4 text-xl font-bold tracking-[-0.01em]">{s.t}</p>
+                <p className="mt-2 leading-relaxed text-muted-foreground">{s.d}</p>
+              </Reveal>
+            );
+          })}
+        </ol>
       </div>
     </section>
   );
 }
 
-function Outcomes({ c }: { c: C }) {
+function Outcomes({ c, es }: { c: C; es: boolean }) {
+  const entries: { tone: StampTone; title: string; log: string }[] = [
+    { tone: "paid", title: c.paid, log: c.paidLog },
+    { tone: "held", title: c.review, log: c.reviewLog },
+    { tone: "blocked", title: c.blocked, log: c.blockedLog },
+  ];
   return (
-    <section id="control" className="mx-auto max-w-6xl px-6 py-24">
-      <Reveal className="text-center">
-        <p className="text-sm font-semibold text-primary">{c.outEyebrow}</p>
-        <h2 className="text-headline mt-3">{c.outTitle}</h2>
-      </Reveal>
-      <div className="mt-16 grid gap-6 md:grid-cols-2">
-        <Reveal className="tile">
-          <span className="grid size-12 place-items-center rounded-2xl bg-success-soft text-success">
-            <Check className="size-6" />
-          </span>
-          <p className="mt-8 text-3xl font-semibold tracking-tight">{c.paid}</p>
-          <p className="mt-4 font-mono text-sm leading-relaxed text-muted-foreground">
-            {c.paidLog}
-          </p>
-        </Reveal>
-        <Reveal className="tile" delay={0.1}>
-          <span className="grid size-12 place-items-center rounded-2xl bg-warning-soft text-warning">
-            <Hand className="size-6" />
-          </span>
-          <p className="mt-8 text-3xl font-semibold tracking-tight">{c.review}</p>
-          <p className="mt-4 font-mono text-sm leading-relaxed text-muted-foreground">
-            {c.reviewLog}
-          </p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            <span className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
-              {c.approve}
-            </span>
-            <span className="rounded-full px-4 py-2 text-sm font-medium text-destructive shadow-crisp">
-              {c.reject}
-            </span>
-          </div>
-        </Reveal>
+    <section id="control" className="mx-auto max-w-6xl scroll-mt-20 px-5 py-24 sm:px-8">
+      <h2 className="text-headline max-w-2xl">{c.outTitle}</h2>
+      <div className="mt-12 border-y-2 border-rule">
+        {entries.map((e, i) => (
+          <Reveal
+            key={e.tone}
+            delay={i * 0.06}
+            className="grid gap-4 border-b border-dashed border-input py-7 last:border-b-0 md:grid-cols-[15rem_minmax(0,1fr)] md:items-start"
+          >
+            <Stamp tone={e.tone} es={es} size="lg" className="justify-self-start text-xl" />
+            <div>
+              <p className="text-2xl font-bold tracking-[-0.015em]">{e.title}</p>
+              <p
+                className={cn(
+                  "typed mt-2 max-w-3xl leading-relaxed",
+                  e.tone === "blocked" ? "text-ink-red" : "text-muted-foreground",
+                )}
+              >
+                {e.log}
+              </p>
+              {e.tone === "held" && (
+                <div className="mt-4 flex flex-wrap gap-2" aria-hidden>
+                  <span className="inline-flex min-h-9 items-center rounded-[3px] bg-foreground px-3 text-sm font-semibold text-background">
+                    {c.approve}
+                  </span>
+                  <span className="inline-flex min-h-9 items-center rounded-[3px] border border-input px-3 text-sm font-semibold text-ink-red">
+                    {c.reject}
+                  </span>
+                </div>
+              )}
+            </div>
+          </Reveal>
+        ))}
       </div>
     </section>
   );
@@ -493,27 +367,25 @@ function Outcomes({ c }: { c: C }) {
 
 function Rules({ c }: { c: C }) {
   return (
-    <section id="rules" className="bg-surface py-32">
-      <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 lg:grid-cols-2">
-        <Reveal>
-          <p className="text-sm font-semibold text-primary">{c.rulesEyebrow}</p>
-          <h2 className="text-headline mt-3 whitespace-pre-line">{c.rulesTitle}</h2>
-        </Reveal>
-        <div className="flex flex-col gap-3">
+    <section id="rules" className="scroll-mt-20 border-y-2 border-rule bg-surface">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-24 sm:px-8 lg:grid-cols-2 lg:items-center">
+        <h2 className="text-headline whitespace-pre-line">{c.rulesTitle}</h2>
+        <ul className="border-y-2 border-rule">
           {c.rules.map((r, i) => (
             <Reveal
-              key={i}
-              delay={i * 0.08}
-              className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-lg bg-background p-5 shadow-crisp"
+              as="li"
+              key={r}
+              delay={i * 0.06}
+              className="flex items-center gap-4 border-b border-dashed border-input py-4 last:border-b-0"
             >
-              <FileText className="size-5 shrink-0 text-primary" />
-              <span className="min-w-0 flex-1 break-words font-medium">{r}</span>
-              <span className="relative h-6 w-10 shrink-0 rounded-full bg-primary">
+              <span className="typed text-sm font-bold text-ink-violet">R{i + 1}</span>
+              <span className="min-w-0 flex-1 font-semibold">{r}</span>
+              <span aria-hidden className="relative h-6 w-10 shrink-0 rounded-full bg-foreground">
                 <span className="absolute right-0.5 top-0.5 size-5 rounded-full bg-background" />
               </span>
             </Reveal>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );
@@ -521,22 +393,20 @@ function Rules({ c }: { c: C }) {
 
 function Final({ c }: { c: C }) {
   return (
-    <section className="px-6 pb-16 pt-40 text-center">
-      <Reveal>
+    <section className="px-5 pt-28 sm:px-8">
+      <div className="mx-auto max-w-6xl">
         <h2 className="text-display whitespace-pre-line">{c.finalTitle}</h2>
-        <Link
-          to="/login"
-          className="press mt-10 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-base font-medium text-primary-foreground shadow-cta"
-        >
-          {c.finalCta}
-          <ArrowRight className="size-4" />
-        </Link>
-      </Reveal>
-      <footer className="mx-auto mt-20 flex flex-col gap-5 max-w-6xl items-start border-t pt-6 text-xs text-muted-foreground">
-        <Logo />
-        <span>{c.foot} · Santiago Mesa</span>
-        <LegalLinks />
-      </footer>
+        <Button asChild size="lg" className="mt-10">
+          <Link to="/login">
+            {c.finalCta}
+            <ArrowRight />
+          </Link>
+        </Button>
+        <footer className="mt-24 flex flex-col gap-4 border-t-2 border-rule py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <span>{c.foot} · Santiago Mesa</span>
+          <LegalLinks />
+        </footer>
+      </div>
     </section>
   );
 }
