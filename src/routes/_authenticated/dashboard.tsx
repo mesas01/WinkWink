@@ -1,87 +1,904 @@
-import { TransferDemo } from '@/components/transfer-demo';
-import { InvoiceDecision } from '@/components/invoice-decision';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
-import { useServerFn } from '@tanstack/react-start';
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { FileText, Upload, LogOut, Plus, Loader2, Check, X, ShieldCheck, FolderOpen, Settings, Download, Eye } from 'lucide-react';
-import { toast } from 'sonner';
-import { z } from 'zod';
-import { supabase } from '@/integrations/supabase/client';
-import { workspaceOptions } from '@/lib/workspace';
-import { adminUiVisible, inboxFor } from '@/lib/preview';
-import { useApp } from '@/lib/store';
-import { evaluateUploadedInvoice, savePaymentRule } from '@/lib/invoices.functions';
-import { POLICY_VERSION, validateUpload, ruleSchema } from '@/lib/invoice-policy';
-import { Logo, ThemeToggle, LangSwitch } from '@/components/blinka';
-import { LegalLinks } from '@/components/legal';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
-import { AdminPanel } from '@/components/admin-panel';
-import { ScanChecklist, SecurityBadge } from '@/components/security-scan';
+import { TransferDemo } from "@/components/transfer-demo";
+import { InvoiceDecision } from "@/components/invoice-decision";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import {
+  FileText,
+  Upload,
+  LogOut,
+  Plus,
+  Loader2,
+  Check,
+  X,
+  ShieldCheck,
+  FolderOpen,
+  Settings,
+  Download,
+  Eye,
+} from "lucide-react";
+import { toast } from "sonner";
+import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import { workspaceOptions } from "@/lib/workspace";
+import { adminUiVisible, inboxFor } from "@/lib/preview";
+import { useApp } from "@/lib/store";
+import { evaluateUploadedInvoice, savePaymentRule } from "@/lib/invoices.functions";
+import { POLICY_VERSION, validateUpload, ruleSchema } from "@/lib/invoice-policy";
+import { Logo, ThemeToggle, LangSwitch } from "@/components/blinka";
+import { LegalLinks } from "@/components/legal";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import { AdminPanel } from "@/components/admin-panel";
+import { ScanChecklist, SecurityBadge } from "@/components/security-scan";
 
-export const Route = createFileRoute('/_authenticated/dashboard')({ loader: ({ context }) => context.queryClient.ensureQueryData(workspaceOptions), head: () => ({ meta: [{ title: 'Facturas — WinkWink' }, { name: 'description', content: 'Historial privado de facturas y revisión de documentos en WinkWink.' }, { property: 'og:title', content: 'Facturas — WinkWink' }, { property: 'og:description', content: 'Facturas, documentos y reglas de revisión.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary' }] }), component: Dashboard });
-const statusText = { es: { pending: 'Pendiente', processing: 'Evaluando', approved: 'Aprobada · simulación', review: 'Revisión humana', rejected: 'Rechazada', error: 'Error de evaluación' }, en: { pending: 'Pending', processing: 'Evaluating', approved: 'Approved · simulated', review: 'Human review', rejected: 'Rejected', error: 'Evaluation error' } };
+export const Route = createFileRoute("/_authenticated/dashboard")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(workspaceOptions),
+  head: () => ({
+    meta: [
+      { title: "Facturas — WinkWink" },
+      {
+        name: "description",
+        content: "Historial privado de facturas y revisión de documentos en WinkWink.",
+      },
+      { property: "og:title", content: "Facturas — WinkWink" },
+      { property: "og:description", content: "Facturas, documentos y reglas de revisión." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: Dashboard,
+});
+const statusText = {
+  es: {
+    pending: "Pendiente",
+    processing: "Evaluando",
+    approved: "Aprobada · simulación",
+    review: "Revisión humana",
+    rejected: "Rechazada",
+    error: "Error de evaluación",
+  },
+  en: {
+    pending: "Pending",
+    processing: "Evaluating",
+    approved: "Approved · simulated",
+    review: "Human review",
+    rejected: "Rejected",
+    error: "Evaluation error",
+  },
+};
 function Dashboard() {
-  const { data: w } = useSuspenseQuery(workspaceOptions); const qc = useQueryClient(); const nav = useNavigate();
-  const lang = useApp(s => s.lang); const es = lang === 'es';
-  const employeePreview = useApp(s => s.employeePreview); const setEmployeePreview = useApp(s => s.setEmployeePreview);
-  const [view, setView] = useState<'history'|'rules'|'privacy'|'demo'>('demo'); const [filter, setFilter] = useState('all');
-  const [uploadOpen, setUploadOpen] = useState(false); const [ruleOpen, setRuleOpen] = useState(false); const [selected, setSelected] = useState<string|null>(null);
-  const [busy, setBusy] = useState(false); const [preview, setPreview] = useState(''); const [previewBusy, setPreviewBusy] = useState(false);
-  const evaluate = useServerFn(evaluateUploadedInvoice); const addRule = useServerFn(savePaymentRule);
+  const { data: w } = useSuspenseQuery(workspaceOptions);
+  const qc = useQueryClient();
+  const nav = useNavigate();
+  const lang = useApp((s) => s.lang);
+  const es = lang === "es";
+  const employeePreview = useApp((s) => s.employeePreview);
+  const setEmployeePreview = useApp((s) => s.setEmployeePreview);
+  const [view, setView] = useState<"history" | "rules" | "privacy" | "demo">("demo");
+  const [filter, setFilter] = useState("all");
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [ruleOpen, setRuleOpen] = useState(false);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [preview, setPreview] = useState("");
+  const [previewBusy, setPreviewBusy] = useState(false);
+  const evaluate = useServerFn(evaluateUploadedInvoice);
+  const addRule = useServerFn(savePaymentRule);
   const refresh = () => qc.invalidateQueries({ queryKey: workspaceOptions.queryKey });
-  const adminUi = adminUiVisible(w.isAdmin, employeePreview); const own = inboxFor(w.invoices, w.isAdmin, employeePreview, w.user.id);
-  const inv = own.find(i => i.id === selected); const list = own.filter(i => filter === 'all' || (filter === 'security' ? i.security_status === 'blocked' : i.status === filter));
-  const [events, setEvents] = useState<{ message_es: string; message_en: string; created_at: string }[]>([]);
+  const adminUi = adminUiVisible(w.isAdmin, employeePreview);
+  const own = inboxFor(w.invoices, w.isAdmin, employeePreview, w.user.id);
+  const inv = own.find((i) => i.id === selected);
+  const list = own.filter(
+    (i) =>
+      filter === "all" ||
+      (filter === "security" ? i.security_status === "blocked" : i.status === filter),
+  );
+  const [events, setEvents] = useState<
+    { message_es: string; message_en: string; created_at: string }[]
+  >([]);
   async function showInvoice(id: string) {
-    setSelected(id); setPreview(''); setEvents([]); setPreviewBusy(true);
-    const invoice = w.invoices.find(i => i.id === id); if (!invoice) return;
+    setSelected(id);
+    setPreview("");
+    setEvents([]);
+    setPreviewBusy(true);
+    const invoice = w.invoices.find((i) => i.id === id);
+    if (!invoice) return;
     try {
-      const [url, log] = await Promise.all([supabase.storage.from('invoice-originals').createSignedUrl(invoice.storage_path, 600), supabase.from('invoice_events').select('message_es,message_en,created_at').eq('invoice_id', id).order('created_at')]);
+      const [url, log] = await Promise.all([
+        supabase.storage.from("invoice-originals").createSignedUrl(invoice.storage_path, 600),
+        supabase
+          .from("invoice_events")
+          .select("message_es,message_en,created_at")
+          .eq("invoice_id", id)
+          .order("created_at"),
+      ]);
       if (url.error || log.error) throw new Error(url.error?.message ?? log.error?.message);
-      setPreview(url.data?.signedUrl ?? ''); setEvents(log.data ?? []);
-    } catch(error) { toast.error(error instanceof Error ? error.message : 'Error'); } finally { setPreviewBusy(false); }
+      setPreview(url.data?.signedUrl ?? "");
+      setEvents(log.data ?? []);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error");
+    } finally {
+      setPreviewBusy(false);
+    }
   }
-  async function signOut() { await qc.cancelQueries(); qc.clear(); await supabase.auth.signOut(); await nav({ to: '/login', replace: true }); }
-  function togglePreview() { const next = !employeePreview; setEmployeePreview(next); if (next) { setView('history'); setSelected(null); } }
-  async function consent(e: React.FormEvent<HTMLFormElement>) { e.preventDefault(); setBusy(true); const { error } = await supabase.from('consents').insert({ user_id: w.user.id, terms_version: POLICY_VERSION }); setBusy(false); if (error) toast.error(error.message); else await refresh(); }
+  async function signOut() {
+    await qc.cancelQueries();
+    qc.clear();
+    await supabase.auth.signOut();
+    await nav({ to: "/login", replace: true });
+  }
+  function togglePreview() {
+    const next = !employeePreview;
+    setEmployeePreview(next);
+    if (next) {
+      setView("history");
+      setSelected(null);
+    }
+  }
+  async function consent(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setBusy(true);
+    const { error } = await supabase
+      .from("consents")
+      .insert({ user_id: w.user.id, terms_version: POLICY_VERSION });
+    setBusy(false);
+    if (error) toast.error(error.message);
+    else await refresh();
+  }
   async function upload(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault(); const form = e.currentTarget; const f = new FormData(form); const file = f.get('file');
-    if (!(file instanceof File) || !validateUpload(file.size, file.type)) { toast.error(es ? 'Selecciona un PDF, JPG, PNG o WebP de hasta 10 MB.' : 'Choose a PDF, JPG, PNG or WebP up to 10 MB.'); return; }
-    setBusy(true); const id = crypto.randomUUID(); const path = `${w.user.id}/${id}/original`; let inserted = false;
+    e.preventDefault();
+    const form = e.currentTarget;
+    const f = new FormData(form);
+    const file = f.get("file");
+    if (!(file instanceof File) || !validateUpload(file.size, file.type)) {
+      toast.error(
+        es
+          ? "Selecciona un PDF, JPG, PNG o WebP de hasta 10 MB."
+          : "Choose a PDF, JPG, PNG or WebP up to 10 MB.",
+      );
+      return;
+    }
+    setBusy(true);
+    const id = crypto.randomUUID();
+    const path = `${w.user.id}/${id}/original`;
+    let inserted = false;
     try {
-      const name = file.name.slice(0, 200); const { error: fileError } = await supabase.storage.from('invoice-originals').upload(path, file, { contentType: file.type, upsert: false }); if (fileError) throw fileError;
-      const { error } = await supabase.from('invoices').insert({ id, user_id: w.user.id, storage_path: path, file_name: name, mime_type: file.type, test_document: true });
-      if (error) throw error; inserted = true; setUploadOpen(false); form.reset(); await refresh();
-      const result = await evaluate({ data: { id } }); if (!result.ok) toast.error(result.message); else toast.success(es ? 'Factura evaluada' : 'Invoice evaluated'); await refresh();
-    } catch(error) { if (!inserted) await supabase.storage.from('invoice-originals').remove([path]); toast.error(error instanceof Error ? error.message : 'Error'); }
-    finally { setBusy(false); }
+      const name = file.name.slice(0, 200);
+      const { error: fileError } = await supabase.storage
+        .from("invoice-originals")
+        .upload(path, file, { contentType: file.type, upsert: false });
+      if (fileError) throw fileError;
+      const { error } = await supabase.from("invoices").insert({
+        id,
+        user_id: w.user.id,
+        storage_path: path,
+        file_name: name,
+        mime_type: file.type,
+        test_document: true,
+      });
+      if (error) throw error;
+      inserted = true;
+      setUploadOpen(false);
+      form.reset();
+      await refresh();
+      const result = await evaluate({ data: { id } });
+      if (!result.ok) toast.error(result.message);
+      else toast.success(es ? "Factura evaluada" : "Invoice evaluated");
+      await refresh();
+    } catch (error) {
+      if (!inserted) await supabase.storage.from("invoice-originals").remove([path]);
+      toast.error(error instanceof Error ? error.message : "Error");
+    } finally {
+      setBusy(false);
+    }
   }
-  async function createRule(e: React.FormEvent<HTMLFormElement>) { e.preventDefault(); setBusy(true); const f = new FormData(e.currentTarget); try { const rule = ruleSchema.parse({ label: f.get('label'), category: f.get('category'), comparison: f.get('comparison'), threshold: Number(f.get('threshold')), currency: f.get('currency'), action: f.get('action'), enabled: true }); await addRule({ data: rule }); setRuleOpen(false); await refresh(); toast.success(es ? 'Regla guardada' : 'Rule saved'); } catch(error) { toast.error(error instanceof Error ? error.message : 'Error'); } finally { setBusy(false); } }
-  async function resolve(status: 'approved'|'rejected') { if (!inv) return; setBusy(true); const { error } = await supabase.rpc('resolve_invoice', { _id: inv.id, _status: status }); setBusy(false); if (error) toast.error(error.message); else { setSelected(null); await refresh(); } }
-  return <div className="min-h-dvh bg-background">
-    <header className="border-b"><div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-4 sm:px-8"><Logo /><div className="flex shrink-0 items-center gap-2"><ThemeToggle /><LangSwitch /><Button variant="ghost" size="icon" aria-label={es ? 'Cerrar sesión' : 'Sign out'} title={es ? 'Cerrar sesión' : 'Sign out'} onClick={signOut}><LogOut /></Button></div></div></header>
-    <div className="mx-auto max-w-7xl px-4 py-7 sm:px-8">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3"><div className="min-w-0"><p className="text-sm text-muted-foreground">{w.profile?.display_name || w.user.email} · {adminUi ? (es ? 'Administración' : 'Administration') : (es ? 'Empleado' : 'Employee')}</p><h1 className="mt-2 text-3xl font-semibold">{view === 'demo' ? (es ? 'Transferencias · demo' : 'Transfers · demo') : view === 'rules' ? (es ? 'Panel administrativo' : 'Administration panel') : view === 'privacy' ? (es ? 'Privacidad' : 'Privacy') : adminUi ? (es ? 'Todas las facturas' : 'All invoices') : (es ? 'Mis facturas' : 'My invoices')}</h1></div>{w.consent && view === 'history' && <Button onClick={() => setUploadOpen(true)} disabled={busy} className="shrink-0"><Upload /><span className="hidden sm:inline">{es ? 'Subir factura' : 'Upload invoice'}</span><span className="sr-only sm:hidden">{es ? 'Subir factura' : 'Upload invoice'}</span></Button>}</div>
-      {!w.consent ? <section className="mt-10 max-w-xl"><h2 className="text-xl font-semibold">{es ? 'Autorización de tratamiento' : 'Data-processing authorization'}</h2><p className="mt-3 leading-7 text-muted-foreground">{es ? 'WinkWink tratará tu nombre, cuenta y documentos para revisión, historial y seguridad mediante Lovable Cloud y Lovable AI. El uso de documentos reales permanece deshabilitado mientras se completan contacto, acuerdos y conservación.' : 'WinkWink processes your account, name and documents for review, history and security through Lovable Cloud and Lovable AI. Real-document use remains disabled pending contact, agreements and retention verification.'}</p><LegalLinks /><form onSubmit={consent} className="mt-5 space-y-4"><label className="flex items-start gap-3 text-sm leading-6"><input required type="checkbox" className="mt-1 size-5 shrink-0" />{es ? 'He leído los términos y la política de privacidad, tengo al menos 18 años y autorizo este tratamiento para las finalidades indicadas.' : 'I have read the terms and privacy policy, am at least 18, and authorize processing for the stated purposes.'}</label><Button disabled={busy} type="submit">{es ? 'Autorizar y continuar' : 'Authorize and continue'}</Button></form></section> : <>
-        {w.isAdmin && employeePreview && <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-warning/40 bg-warning-soft px-4 py-3"><p className="text-sm font-medium text-warning">{es ? 'Vista de empleado: solo cambia lo que ves. Tu cuenta sigue siendo de administración.' : 'Employee view: only what you see changes. Your account is still an administrator.'}</p><Button size="sm" variant="outline" onClick={() => setEmployeePreview(false)}>{es ? 'Salir de la vista' : 'Exit view'}</Button></div>}
-        <nav aria-label={es ? 'Espacio de trabajo' : 'Workspace'} className="mt-7 flex flex-wrap gap-2 border-b pb-4"><Button variant={view === 'demo' ? 'secondary' : 'ghost'} onClick={() => setView('demo')}><FileText />{es ? 'Demo de transferencias' : 'Transfer demo'}</Button><Button variant={view === 'history' ? 'secondary' : 'ghost'} onClick={() => setView('history')}><FolderOpen />{es ? 'Historial' : 'History'}</Button>{adminUi && <Button variant={view === 'rules' ? 'secondary' : 'ghost'} onClick={() => setView('rules')}><Settings />{es ? 'Administración' : 'Administration'}</Button>}<Button variant={view === 'privacy' ? 'secondary' : 'ghost'} onClick={() => setView('privacy')}><ShieldCheck />{es ? 'Privacidad' : 'Privacy'}</Button>{w.isAdmin && <Button variant={employeePreview ? 'secondary' : 'ghost'} aria-pressed={employeePreview} onClick={togglePreview} className="ml-auto"><Eye />{es ? 'Vista de empleado' : 'Employee view'}</Button>}</nav>
-        {view === 'demo' && <TransferDemo invoices={own} budgets={adminUi ? w.budgets : w.budgets.filter(b => b.employee_id === w.user.id)} employees={adminUi ? w.employees : w.employees.filter(e => e.id === w.user.id)} isAdmin={adminUi} es={es} refresh={refresh} onInvoice={showInvoice} />}
-        {view === 'history' && <section className="mt-6"><div className="flex flex-wrap items-center gap-2">{['all','approved','review','rejected','security'].map(v => <Button key={v} variant={filter === v ? 'secondary' : 'ghost'} onClick={() => setFilter(v)}>{v === 'security' ? (es ? 'Alertas de seguridad' : 'Security alerts') : v === 'all' ? (es ? 'Todas' : 'All') : statusText[lang][v as 'approved'|'review'|'rejected']}</Button>)}<span className="ml-auto text-sm text-muted-foreground">{list.length} {es ? 'facturas' : 'invoices'}</span></div>
-          {busy && <div role="status" className="mt-5"><p className="text-sm text-primary">{es ? 'Guardando y evaluando documento…' : 'Saving and evaluating document…'}</p><ScanChecklist es={es} running={busy} /></div>}
-          {list.length === 0 ? <div className="py-20 text-center"><FileText className="mx-auto size-10 text-muted-foreground" /><h2 className="mt-5 text-xl font-medium">{es ? 'Sin facturas todavía' : 'No invoices yet'}</h2><Button variant="outline" className="mt-6" onClick={() => setUploadOpen(true)}><Upload />{es ? 'Subir factura' : 'Upload invoice'}</Button></div> : <ul className="mt-5 divide-y border-y">{list.map(i => <motion.li key={i.id} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .2 }}><Button variant="ghost" onClick={() => showInvoice(i.id)} className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2 rounded-none px-2 py-5 text-left sm:grid-cols-[minmax(0,1fr)_150px_140px]"><span className="min-w-0"><span className="block truncate font-semibold">{i.vendor || i.file_name}{i.security_status === 'passed' && <ShieldCheck aria-label={es ? 'Referencia confirmada coincidente' : 'Confirmed reference matches'} className="ml-2 inline size-4 text-success" />}</span><span className="mt-1 block truncate text-sm text-muted-foreground">{i.invoice_number || (es ? 'Sin número identificado' : 'Number not identified')} · {i.invoice_date || (es ? 'Sin fecha identificada' : 'Date not identified')}</span><span className="mt-1 block truncate text-sm">{i.description || (es ? 'Sin descripción identificada' : 'Description not identified')}</span><span className="mt-1 block truncate text-xs text-muted-foreground">{adminUi ? `${i.profiles?.display_name || (es ? 'Empleado' : 'Employee')} · ` : ''}{new Date(i.created_at).toLocaleString(lang)} · {i.mime_type === 'application/pdf' ? 'PDF' : (es ? 'Imagen' : 'Image')}</span></span><span className="text-right font-medium">{i.amount !== null ? `${i.currency || ''} ${i.amount.toLocaleString(lang)}` : '—'}</span><span className={cn('col-span-2 justify-self-start rounded-md px-2 py-1 text-xs sm:col-span-1 sm:justify-self-end', i.status === 'approved' ? 'bg-success-soft text-success' : i.status === 'review' ? 'bg-warning-soft text-warning' : i.status === 'error' || i.status === 'rejected' ? 'bg-destructive-soft text-destructive' : 'bg-muted text-foreground')}>{i.security_status === 'blocked' ? (es ? 'Alerta de seguridad' : 'Security block') : i.security_status === 'review' ? (es ? 'Referencia pendiente' : 'Reference pending') : statusText[lang][i.status as keyof typeof statusText.es]}</span></Button></motion.li>)}</ul>}
-        </section>}
-        {view === 'rules' && adminUi && <AdminPanel workspace={w} es={es} refresh={refresh} onAddRule={() => setRuleOpen(true)} onInvoice={showInvoice} />}
-        {view === 'privacy' && <section className="mt-7 max-w-2xl"><h2 className="text-xl font-semibold">{es ? 'Solicitudes de datos personales' : 'Personal-data requests'}</h2><LegalLinks /><form className="mt-5 space-y-4" onSubmit={async e => { e.preventDefault(); const form = e.currentTarget; const f = new FormData(form); try { const input = z.object({ kind: z.enum(['access','correction','deletion','revocation','complaint']), message: z.string().trim().min(1).max(2000) }).parse({ kind: f.get('kind'), message: f.get('message') }); const { error } = await supabase.from('privacy_requests').insert({ ...input, user_id: w.user.id }); if (error) throw error; form.reset(); toast.success(es ? 'Solicitud registrada' : 'Request recorded'); await refresh(); } catch(error) { toast.error(error instanceof Error ? error.message : 'Error'); } }}><label className="block text-sm">{es ? 'Tipo de solicitud' : 'Request type'}<select name="kind" className="mt-2 w-full rounded-md border bg-background p-3">{[['access','Acceso','Access'],['correction','Corrección','Correction'],['deletion','Supresión','Deletion'],['revocation','Revocación','Revocation'],['complaint','Reclamo','Complaint']].map(([v,s,en]) => <option key={v} value={v}>{es ? s : en}</option>)}</select></label><label className="block text-sm">{es ? 'Mensaje (sin datos sensibles)' : 'Message (no sensitive data)'}<textarea name="message" required maxLength={2000} className="mt-2 min-h-28 w-full rounded-md border bg-background p-3" /></label><Button type="submit">{es ? 'Registrar solicitud' : 'Submit request'}</Button></form><ul className="mt-7 divide-y">{w.requests.map(r => <li key={r.id} className="py-4"><p className="text-sm font-medium">{r.kind} · {new Date(r.created_at).toLocaleString(lang)}</p><p className="mt-2 break-words text-sm text-muted-foreground">{r.message}</p><p className="mt-2 text-xs">{r.status}</p></li>)}</ul></section>}
-      </>}
-      <footer className="mt-12 border-t py-5"><LegalLinks /></footer>
+  async function createRule(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setBusy(true);
+    const f = new FormData(e.currentTarget);
+    try {
+      const rule = ruleSchema.parse({
+        label: f.get("label"),
+        category: f.get("category"),
+        comparison: f.get("comparison"),
+        threshold: Number(f.get("threshold")),
+        currency: f.get("currency"),
+        action: f.get("action"),
+        enabled: true,
+      });
+      await addRule({ data: rule });
+      setRuleOpen(false);
+      await refresh();
+      toast.success(es ? "Regla guardada" : "Rule saved");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Error");
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function resolve(status: "approved" | "rejected") {
+    if (!inv) return;
+    setBusy(true);
+    const { error } = await supabase.rpc("resolve_invoice", { _id: inv.id, _status: status });
+    setBusy(false);
+    if (error) toast.error(error.message);
+    else {
+      setSelected(null);
+      await refresh();
+    }
+  }
+  return (
+    <div className="min-h-dvh bg-background">
+      <header className="border-b">
+        <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-4 sm:px-8">
+          <Logo />
+          <div className="flex shrink-0 items-center gap-2">
+            <ThemeToggle />
+            <LangSwitch />
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={es ? "Cerrar sesión" : "Sign out"}
+              title={es ? "Cerrar sesión" : "Sign out"}
+              onClick={signOut}
+            >
+              <LogOut />
+            </Button>
+          </div>
+        </div>
+      </header>
+      <div className="mx-auto max-w-7xl px-4 py-7 sm:px-8">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+          <div className="min-w-0">
+            <p className="text-sm text-muted-foreground">
+              {w.profile?.display_name || w.user.email} ·{" "}
+              {adminUi ? (es ? "Administración" : "Administration") : es ? "Empleado" : "Employee"}
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold">
+              {view === "demo"
+                ? es
+                  ? "Transferencias · demo"
+                  : "Transfers · demo"
+                : view === "rules"
+                  ? es
+                    ? "Panel administrativo"
+                    : "Administration panel"
+                  : view === "privacy"
+                    ? es
+                      ? "Privacidad"
+                      : "Privacy"
+                    : adminUi
+                      ? es
+                        ? "Todas las facturas"
+                        : "All invoices"
+                      : es
+                        ? "Mis facturas"
+                        : "My invoices"}
+            </h1>
+          </div>
+          {w.consent && view === "history" && (
+            <Button onClick={() => setUploadOpen(true)} disabled={busy} className="shrink-0">
+              <Upload />
+              <span className="hidden sm:inline">{es ? "Subir factura" : "Upload invoice"}</span>
+              <span className="sr-only sm:hidden">{es ? "Subir factura" : "Upload invoice"}</span>
+            </Button>
+          )}
+        </div>
+        {!w.consent ? (
+          <section className="mt-10 max-w-xl">
+            <h2 className="text-xl font-semibold">
+              {es ? "Autorización de tratamiento" : "Data-processing authorization"}
+            </h2>
+            <p className="mt-3 leading-7 text-muted-foreground">
+              {es
+                ? "WinkWink tratará tu nombre, cuenta y documentos para revisión, historial y seguridad mediante Lovable Cloud y Lovable AI. El uso de documentos reales permanece deshabilitado mientras se completan contacto, acuerdos y conservación."
+                : "WinkWink processes your account, name and documents for review, history and security through Lovable Cloud and Lovable AI. Real-document use remains disabled pending contact, agreements and retention verification."}
+            </p>
+            <LegalLinks />
+            <form onSubmit={consent} className="mt-5 space-y-4">
+              <label className="flex items-start gap-3 text-sm leading-6">
+                <input required type="checkbox" className="mt-1 size-5 shrink-0" />
+                {es
+                  ? "He leído los términos y la política de privacidad, tengo al menos 18 años y autorizo este tratamiento para las finalidades indicadas."
+                  : "I have read the terms and privacy policy, am at least 18, and authorize processing for the stated purposes."}
+              </label>
+              <Button disabled={busy} type="submit">
+                {es ? "Autorizar y continuar" : "Authorize and continue"}
+              </Button>
+            </form>
+          </section>
+        ) : (
+          <>
+            {w.isAdmin && employeePreview && (
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-warning/40 bg-warning-soft px-4 py-3">
+                <p className="text-sm font-medium text-warning">
+                  {es
+                    ? "Vista de empleado: solo cambia lo que ves. Tu cuenta sigue siendo de administración."
+                    : "Employee view: only what you see changes. Your account is still an administrator."}
+                </p>
+                <Button size="sm" variant="outline" onClick={() => setEmployeePreview(false)}>
+                  {es ? "Salir de la vista" : "Exit view"}
+                </Button>
+              </div>
+            )}
+            <nav
+              aria-label={es ? "Espacio de trabajo" : "Workspace"}
+              className="mt-7 flex flex-wrap gap-2 border-b pb-4"
+            >
+              <Button
+                variant={view === "demo" ? "secondary" : "ghost"}
+                onClick={() => setView("demo")}
+              >
+                <FileText />
+                {es ? "Demo de transferencias" : "Transfer demo"}
+              </Button>
+              <Button
+                variant={view === "history" ? "secondary" : "ghost"}
+                onClick={() => setView("history")}
+              >
+                <FolderOpen />
+                {es ? "Historial" : "History"}
+              </Button>
+              {adminUi && (
+                <Button
+                  variant={view === "rules" ? "secondary" : "ghost"}
+                  onClick={() => setView("rules")}
+                >
+                  <Settings />
+                  {es ? "Administración" : "Administration"}
+                </Button>
+              )}
+              <Button
+                variant={view === "privacy" ? "secondary" : "ghost"}
+                onClick={() => setView("privacy")}
+              >
+                <ShieldCheck />
+                {es ? "Privacidad" : "Privacy"}
+              </Button>
+              {w.isAdmin && (
+                <Button
+                  variant={employeePreview ? "secondary" : "ghost"}
+                  aria-pressed={employeePreview}
+                  onClick={togglePreview}
+                  className="ml-auto"
+                >
+                  <Eye />
+                  {es ? "Vista de empleado" : "Employee view"}
+                </Button>
+              )}
+            </nav>
+            {view === "demo" && (
+              <TransferDemo
+                invoices={own}
+                budgets={adminUi ? w.budgets : w.budgets.filter((b) => b.employee_id === w.user.id)}
+                employees={adminUi ? w.employees : w.employees.filter((e) => e.id === w.user.id)}
+                isAdmin={adminUi}
+                es={es}
+                refresh={refresh}
+                onInvoice={showInvoice}
+              />
+            )}
+            {view === "history" && (
+              <section className="mt-6">
+                <div className="flex flex-wrap items-center gap-2">
+                  {["all", "approved", "review", "rejected", "security"].map((v) => (
+                    <Button
+                      key={v}
+                      variant={filter === v ? "secondary" : "ghost"}
+                      onClick={() => setFilter(v)}
+                    >
+                      {v === "security"
+                        ? es
+                          ? "Alertas de seguridad"
+                          : "Security alerts"
+                        : v === "all"
+                          ? es
+                            ? "Todas"
+                            : "All"
+                          : statusText[lang][v as "approved" | "review" | "rejected"]}
+                    </Button>
+                  ))}
+                  <span className="ml-auto text-sm text-muted-foreground">
+                    {list.length} {es ? "facturas" : "invoices"}
+                  </span>
+                </div>
+                {busy && (
+                  <div role="status" className="mt-5">
+                    <p className="text-sm text-primary">
+                      {es ? "Guardando y evaluando documento…" : "Saving and evaluating document…"}
+                    </p>
+                    <ScanChecklist es={es} running={busy} />
+                  </div>
+                )}
+                {list.length === 0 ? (
+                  <div className="py-20 text-center">
+                    <FileText className="mx-auto size-10 text-muted-foreground" />
+                    <h2 className="mt-5 text-xl font-medium">
+                      {es ? "Sin facturas todavía" : "No invoices yet"}
+                    </h2>
+                    <Button variant="outline" className="mt-6" onClick={() => setUploadOpen(true)}>
+                      <Upload />
+                      {es ? "Subir factura" : "Upload invoice"}
+                    </Button>
+                  </div>
+                ) : (
+                  <ul className="mt-5 divide-y border-y">
+                    {list.map((i) => (
+                      <motion.li
+                        key={i.id}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Button
+                          variant="ghost"
+                          onClick={() => showInvoice(i.id)}
+                          className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2 rounded-none px-2 py-5 text-left sm:grid-cols-[minmax(0,1fr)_150px_140px]"
+                        >
+                          <span className="min-w-0">
+                            <span className="block truncate font-semibold">
+                              {i.vendor || i.file_name}
+                              {i.security_status === "passed" && (
+                                <ShieldCheck
+                                  aria-label={
+                                    es
+                                      ? "Referencia confirmada coincidente"
+                                      : "Confirmed reference matches"
+                                  }
+                                  className="ml-2 inline size-4 text-success"
+                                />
+                              )}
+                            </span>
+                            <span className="mt-1 block truncate text-sm text-muted-foreground">
+                              {i.invoice_number ||
+                                (es ? "Sin número identificado" : "Number not identified")}{" "}
+                              ·{" "}
+                              {i.invoice_date ||
+                                (es ? "Sin fecha identificada" : "Date not identified")}
+                            </span>
+                            <span className="mt-1 block truncate text-sm">
+                              {i.description ||
+                                (es
+                                  ? "Sin descripción identificada"
+                                  : "Description not identified")}
+                            </span>
+                            <span className="mt-1 block truncate text-xs text-muted-foreground">
+                              {adminUi
+                                ? `${i.profiles?.display_name || (es ? "Empleado" : "Employee")} · `
+                                : ""}
+                              {new Date(i.created_at).toLocaleString(lang)} ·{" "}
+                              {i.mime_type === "application/pdf" ? "PDF" : es ? "Imagen" : "Image"}
+                            </span>
+                          </span>
+                          <span className="text-right font-medium">
+                            {i.amount !== null
+                              ? `${i.currency || ""} ${i.amount.toLocaleString(lang)}`
+                              : "—"}
+                          </span>
+                          <span
+                            className={cn(
+                              "col-span-2 justify-self-start rounded-md px-2 py-1 text-xs sm:col-span-1 sm:justify-self-end",
+                              i.status === "approved"
+                                ? "bg-success-soft text-success"
+                                : i.status === "review"
+                                  ? "bg-warning-soft text-warning"
+                                  : i.status === "error" || i.status === "rejected"
+                                    ? "bg-destructive-soft text-destructive"
+                                    : "bg-muted text-foreground",
+                            )}
+                          >
+                            {i.security_status === "blocked"
+                              ? es
+                                ? "Alerta de seguridad"
+                                : "Security block"
+                              : i.security_status === "review"
+                                ? es
+                                  ? "Referencia pendiente"
+                                  : "Reference pending"
+                                : statusText[lang][i.status as keyof typeof statusText.es]}
+                          </span>
+                        </Button>
+                      </motion.li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            )}
+            {view === "rules" && adminUi && (
+              <AdminPanel
+                workspace={w}
+                es={es}
+                refresh={refresh}
+                onAddRule={() => setRuleOpen(true)}
+                onInvoice={showInvoice}
+              />
+            )}
+            {view === "privacy" && (
+              <section className="mt-7 max-w-2xl">
+                <h2 className="text-xl font-semibold">
+                  {es ? "Solicitudes de datos personales" : "Personal-data requests"}
+                </h2>
+                <LegalLinks />
+                <form
+                  className="mt-5 space-y-4"
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const form = e.currentTarget;
+                    const f = new FormData(form);
+                    try {
+                      const input = z
+                        .object({
+                          kind: z.enum([
+                            "access",
+                            "correction",
+                            "deletion",
+                            "revocation",
+                            "complaint",
+                          ]),
+                          message: z.string().trim().min(1).max(2000),
+                        })
+                        .parse({ kind: f.get("kind"), message: f.get("message") });
+                      const { error } = await supabase
+                        .from("privacy_requests")
+                        .insert({ ...input, user_id: w.user.id });
+                      if (error) throw error;
+                      form.reset();
+                      toast.success(es ? "Solicitud registrada" : "Request recorded");
+                      await refresh();
+                    } catch (error) {
+                      toast.error(error instanceof Error ? error.message : "Error");
+                    }
+                  }}
+                >
+                  <label className="block text-sm">
+                    {es ? "Tipo de solicitud" : "Request type"}
+                    <select name="kind" className="mt-2 w-full rounded-md border bg-background p-3">
+                      {[
+                        ["access", "Acceso", "Access"],
+                        ["correction", "Corrección", "Correction"],
+                        ["deletion", "Supresión", "Deletion"],
+                        ["revocation", "Revocación", "Revocation"],
+                        ["complaint", "Reclamo", "Complaint"],
+                      ].map(([v, s, en]) => (
+                        <option key={v} value={v}>
+                          {es ? s : en}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block text-sm">
+                    {es ? "Mensaje (sin datos sensibles)" : "Message (no sensitive data)"}
+                    <textarea
+                      name="message"
+                      required
+                      maxLength={2000}
+                      className="mt-2 min-h-28 w-full rounded-md border bg-background p-3"
+                    />
+                  </label>
+                  <Button type="submit">{es ? "Registrar solicitud" : "Submit request"}</Button>
+                </form>
+                <ul className="mt-7 divide-y">
+                  {w.requests.map((r) => (
+                    <li key={r.id} className="py-4">
+                      <p className="text-sm font-medium">
+                        {r.kind} · {new Date(r.created_at).toLocaleString(lang)}
+                      </p>
+                      <p className="mt-2 break-words text-sm text-muted-foreground">{r.message}</p>
+                      <p className="mt-2 text-xs">{r.status}</p>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </>
+        )}
+        <footer className="mt-12 border-t py-5">
+          <LegalLinks />
+        </footer>
+      </div>
+      <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
+        <DialogContent>
+          <DialogTitle>{es ? "Subir factura" : "Upload invoice"}</DialogTitle>
+          <DialogDescription>
+            {es
+              ? "PDF, JPG, PNG o WebP · máximo 10 MB. Se evalúa al subirlo."
+              : "PDF, JPG, PNG or WebP · up to 10 MB. Evaluated after upload."}
+          </DialogDescription>
+          <p className="text-sm text-warning">
+            {es
+              ? "Solo documentos de prueba sin datos personales reales. Pendiente habilitación legal y operativa."
+              : "Test documents without real personal data only. Legal and operational setup pending."}
+          </p>
+          <form onSubmit={upload} className="space-y-5">
+            <label className="block text-sm font-medium">
+              {es ? "Foto o archivo" : "Photo or file"}
+              <Input
+                name="file"
+                type="file"
+                accept="application/pdf,image/jpeg,image/png,image/webp"
+                required
+                className="mt-2 h-auto py-3"
+              />
+            </label>
+            <label className="flex items-start gap-3 text-sm leading-6">
+              <input required type="checkbox" className="mt-1 size-5 shrink-0" />
+              {es
+                ? "Tengo derecho a compartir el archivo, es una prueba sin datos personales reales y autorizo su almacenamiento y análisis por IA según la política de privacidad."
+                : "I have the right to share this test file, it contains no real personal data, and I authorize storage and AI analysis under the privacy policy."}
+            </label>
+            <LegalLinks />
+            <Button disabled={busy} type="submit" className="w-full">
+              <Upload />
+              {es ? "Subir y evaluar" : "Upload and evaluate"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={ruleOpen} onOpenChange={setRuleOpen}>
+        <DialogContent>
+          <DialogTitle>{es ? "Agregar regla" : "Add rule"}</DialogTitle>
+          <DialogDescription>
+            {es
+              ? "Las reglas de revisión tienen prioridad. Las monedas no se convierten."
+              : "Review rules take priority. Currencies are not converted."}
+          </DialogDescription>
+          <form onSubmit={createRule} className="space-y-4">
+            <label className="block text-sm">
+              {es ? "Nombre de la regla" : "Rule name"}
+              <Input name="label" maxLength={120} required className="mt-2" />
+            </label>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <label className="min-w-0 text-sm">
+                {es ? "Categoría" : "Category"}
+                <select name="category" className="mt-2 w-full rounded-md border bg-background p-2">
+                  {[
+                    ["software", "Software/SaaS"],
+                    ["travel", es ? "Viáticos" : "Travel"],
+                    ["marketing", "Marketing"],
+                    ["other", es ? "Otra" : "Other"],
+                    ["unknown", es ? "Proveedor desconocido" : "Unknown vendor"],
+                  ].map(([v, l]) => (
+                    <option key={v} value={v}>
+                      {l}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="text-sm">
+                {es ? "Condición" : "Condition"}
+                <select
+                  name="comparison"
+                  className="mt-2 w-full rounded-md border bg-background p-2"
+                >
+                  <option value="under">{es ? "Menor que" : "Under"}</option>
+                  <option value="over">{es ? "Mayor que" : "Over"}</option>
+                  <option value="always">{es ? "Siempre" : "Always"}</option>
+                </select>
+              </label>
+              <label className="text-sm">
+                {es ? "Monto" : "Amount"}
+                <Input
+                  name="threshold"
+                  type="number"
+                  min={0}
+                  max={1e12}
+                  step="0.01"
+                  defaultValue={500}
+                  required
+                  className="mt-2"
+                />
+              </label>
+              <label className="text-sm">
+                {es ? "Moneda" : "Currency"}
+                <select name="currency" className="mt-2 w-full rounded-md border bg-background p-2">
+                  {["USD", "COP", "EUR", "BRL", "USDC"].map((c) => (
+                    <option key={c}>{c}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <label className="block text-sm">
+              {es ? "Resultado" : "Outcome"}
+              <select name="action" className="mt-2 w-full rounded-md border bg-background p-2">
+                <option value="review">{es ? "Revisión humana" : "Human review"}</option>
+                <option value="approve">{es ? "Aprobar" : "Approve"}</option>
+              </select>
+            </label>
+            <Button disabled={busy} type="submit" className="w-full">
+              <Plus />
+              {es ? "Guardar regla" : "Save rule"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={Boolean(selected)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelected(null);
+            setPreview("");
+          }
+        }}
+      >
+        <DialogContent className="max-w-3xl">
+          <DialogTitle>{inv?.vendor || inv?.file_name || (es ? "Factura" : "Invoice")}</DialogTitle>
+          <DialogDescription>
+            {inv
+              ? `${inv.profiles?.display_name || (es ? "Empleado" : "Employee")} · ${new Date(inv.created_at).toLocaleString(lang)}`
+              : ""}
+          </DialogDescription>
+          {inv && (
+            <>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="text-2xl font-semibold">
+                    {inv.currency} {inv.amount?.toLocaleString(lang) ?? "—"}
+                  </p>
+                  <dl className="mt-4 grid gap-3 text-sm">
+                    <div>
+                      <dt className="text-muted-foreground">{es ? "Proveedor" : "Supplier"}</dt>
+                      <dd className="break-words font-medium">
+                        {inv.vendor || (es ? "No identificado" : "Not identified")}
+                      </dd>
+                      {inv.matched_merchant && (
+                        <dd className="mt-1 text-sm text-muted-foreground">
+                          {es ? "Comercio reconocido: " : "Recognized merchant: "}
+                          {inv.matched_merchant}
+                        </dd>
+                      )}
+                    </div>
+                    <div>
+                      <dt className="text-muted-foreground">
+                        {es ? "Número de factura" : "Invoice number"}
+                      </dt>
+                      <dd className="break-words font-medium">
+                        {inv.invoice_number || (es ? "No identificado" : "Not identified")}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-muted-foreground">
+                        {es ? "Fecha de emisión" : "Issue date"}
+                      </dt>
+                      <dd>{inv.invoice_date || (es ? "No identificada" : "Not identified")}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-muted-foreground">
+                        {es ? "Fecha de vencimiento" : "Due date"}
+                      </dt>
+                      <dd>{inv.due_date || (es ? "No identificada" : "Not identified")}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-muted-foreground">
+                        {es ? "Descripción" : "Description"}
+                      </dt>
+                      <dd className="break-words">
+                        {inv.description || (es ? "No identificada" : "Not identified")}
+                      </dd>
+                    </div>
+                  </dl>
+                  <div className="mt-4">
+                    <span className="text-sm">
+                      {inv.security_status === "passed"
+                        ? es
+                          ? "Referencia confirmada coincidente"
+                          : "Confirmed reference matches"
+                        : es
+                          ? "Referencia pendiente de revisión"
+                          : "Reference needs review"}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm font-medium">
+                    {statusText[lang][inv.status as keyof typeof statusText.es]}
+                  </p>
+                  <p className="mt-2 break-words text-sm text-muted-foreground">
+                    {inv.error_message || (es ? inv.explanation_es : inv.explanation_en)}
+                  </p>
+                  {inv.status === "pending" && inv.user_id === w.user.id && (
+                    <Button
+                      disabled={busy}
+                      className="mt-4 h-auto whitespace-normal"
+                      onClick={async () => {
+                        setBusy(true);
+                        try {
+                          const r = await evaluate({ data: { id: inv.id } });
+                          if (!r.ok) toast.error(r.message);
+                          await refresh();
+                          await showInvoice(inv.id);
+                        } finally {
+                          setBusy(false);
+                        }
+                      }}
+                    >
+                      {es ? "Ejecutar agente WinkWink" : "Run WinkWink agent"}
+                    </Button>
+                  )}
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    {inv.invoice_date} · {inv.category}
+                  </p>
+                  {adminUi && inv.status === "review" && (
+                    <div className="mt-5 grid grid-cols-2 gap-2">
+                      <Button
+                        disabled={busy || inv.security_status !== "passed"}
+                        onClick={() => resolve("approved")}
+                      >
+                        <Check />
+                        {es ? "Aprobar" : "Approve"}
+                      </Button>
+                      <Button disabled={busy} variant="outline" onClick={() => resolve("rejected")}>
+                        <X />
+                        {es ? "Rechazar" : "Reject"}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  {previewBusy ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    preview &&
+                    (inv.mime_type === "application/pdf" ? (
+                      <div className="grid min-h-48 place-items-center border bg-surface">
+                        <FileText className="size-12 text-primary" />
+                        <Button asChild variant="outline">
+                          <a href={preview} target="_blank" rel="noopener noreferrer">
+                            {es ? "Abrir PDF original" : "Open original PDF"}
+                          </a>
+                        </Button>
+                      </div>
+                    ) : (
+                      <img
+                        src={preview}
+                        alt={
+                          es
+                            ? `Factura original: ${inv.file_name}`
+                            : `Original invoice: ${inv.file_name}`
+                        }
+                        className="max-h-80 w-full object-contain"
+                      />
+                    ))
+                  )}
+                  {preview && (
+                    <Button asChild variant="link" className="mt-2">
+                      <a href={preview} target="_blank" rel="noopener noreferrer">
+                        <Download />
+                        {es ? "Abrir archivo original" : "Open original file"}
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </div>
+              {inv.demo_scenario && (
+                <p className="border-t pt-4 text-sm text-muted-foreground">
+                  {es
+                    ? "Factura sintética: no se llamó a la IA ni a plataformas de pago. La decisión aplica referencias y topes guardados."
+                    : "Synthetic invoice: no AI or payment platform calls. The decision applies saved references and caps."}
+                </p>
+              )}
+              <InvoiceDecision usage={inv.ai_usage} decision={inv.decision_snapshot} es={es} />
+              <section className="border-t pt-4">
+                <h2 className="text-sm font-semibold">
+                  {es ? "Registro de decisiones" : "Decision history"}
+                </h2>
+                <ol className="mt-3 space-y-3">
+                  {events.map((e, i) => (
+                    <li key={i} className="text-sm">
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(e.created_at).toLocaleString(lang)} ·{" "}
+                      </span>
+                      {es ? e.message_es : e.message_en}
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
-    <Dialog open={uploadOpen} onOpenChange={setUploadOpen}><DialogContent><DialogTitle>{es ? 'Subir factura' : 'Upload invoice'}</DialogTitle><DialogDescription>{es ? 'PDF, JPG, PNG o WebP · máximo 10 MB. Se evalúa al subirlo.' : 'PDF, JPG, PNG or WebP · up to 10 MB. Evaluated after upload.'}</DialogDescription><p className="text-sm text-warning">{es ? 'Solo documentos de prueba sin datos personales reales. Pendiente habilitación legal y operativa.' : 'Test documents without real personal data only. Legal and operational setup pending.'}</p><form onSubmit={upload} className="space-y-5"><label className="block text-sm font-medium">{es ? 'Foto o archivo' : 'Photo or file'}<Input name="file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" required className="mt-2 h-auto py-3" /></label><label className="flex items-start gap-3 text-sm leading-6"><input required type="checkbox" className="mt-1 size-5 shrink-0" />{es ? 'Tengo derecho a compartir el archivo, es una prueba sin datos personales reales y autorizo su almacenamiento y análisis por IA según la política de privacidad.' : 'I have the right to share this test file, it contains no real personal data, and I authorize storage and AI analysis under the privacy policy.'}</label><LegalLinks /><Button disabled={busy} type="submit" className="w-full"><Upload />{es ? 'Subir y evaluar' : 'Upload and evaluate'}</Button></form></DialogContent></Dialog>
-    <Dialog open={ruleOpen} onOpenChange={setRuleOpen}><DialogContent><DialogTitle>{es ? 'Agregar regla' : 'Add rule'}</DialogTitle><DialogDescription>{es ? 'Las reglas de revisión tienen prioridad. Las monedas no se convierten.' : 'Review rules take priority. Currencies are not converted.'}</DialogDescription><form onSubmit={createRule} className="space-y-4"><label className="block text-sm">{es ? 'Nombre de la regla' : 'Rule name'}<Input name="label" maxLength={120} required className="mt-2" /></label><div className="grid grid-cols-1 gap-3 sm:grid-cols-2"><label className="min-w-0 text-sm">{es ? 'Categoría' : 'Category'}<select name="category" className="mt-2 w-full rounded-md border bg-background p-2">{[['software','Software/SaaS'],['travel',es ? 'Viáticos' : 'Travel'],['marketing','Marketing'],['other',es ? 'Otra' : 'Other'],['unknown',es ? 'Proveedor desconocido' : 'Unknown vendor']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}</select></label><label className="text-sm">{es ? 'Condición' : 'Condition'}<select name="comparison" className="mt-2 w-full rounded-md border bg-background p-2"><option value="under">{es ? 'Menor que' : 'Under'}</option><option value="over">{es ? 'Mayor que' : 'Over'}</option><option value="always">{es ? 'Siempre' : 'Always'}</option></select></label><label className="text-sm">{es ? 'Monto' : 'Amount'}<Input name="threshold" type="number" min={0} max={1e12} step="0.01" defaultValue={500} required className="mt-2" /></label><label className="text-sm">{es ? 'Moneda' : 'Currency'}<select name="currency" className="mt-2 w-full rounded-md border bg-background p-2">{['USD','COP','EUR','BRL','USDC'].map(c => <option key={c}>{c}</option>)}</select></label></div><label className="block text-sm">{es ? 'Resultado' : 'Outcome'}<select name="action" className="mt-2 w-full rounded-md border bg-background p-2"><option value="review">{es ? 'Revisión humana' : 'Human review'}</option><option value="approve">{es ? 'Aprobar' : 'Approve'}</option></select></label><Button disabled={busy} type="submit" className="w-full"><Plus />{es ? 'Guardar regla' : 'Save rule'}</Button></form></DialogContent></Dialog>
-    <Dialog open={Boolean(selected)} onOpenChange={open => { if (!open) { setSelected(null); setPreview(''); } }}><DialogContent className="max-w-3xl"><DialogTitle>{inv?.vendor || inv?.file_name || (es ? 'Factura' : 'Invoice')}</DialogTitle><DialogDescription>{inv ? `${inv.profiles?.display_name || (es ? 'Empleado' : 'Employee')} · ${new Date(inv.created_at).toLocaleString(lang)}` : ''}</DialogDescription>{inv && <><div className="grid gap-4 sm:grid-cols-2"><div><p className="text-2xl font-semibold">{inv.currency} {inv.amount?.toLocaleString(lang) ?? '—'}</p><dl className="mt-4 grid gap-3 text-sm"><div><dt className="text-muted-foreground">{es ? 'Proveedor' : 'Supplier'}</dt><dd className="break-words font-medium">{inv.vendor || (es ? 'No identificado' : 'Not identified')}</dd>{inv.matched_merchant && <dd className="mt-1 text-sm text-muted-foreground">{es ? 'Comercio reconocido: ' : 'Recognized merchant: '}{inv.matched_merchant}</dd>}</div><div><dt className="text-muted-foreground">{es ? 'Número de factura' : 'Invoice number'}</dt><dd className="break-words font-medium">{inv.invoice_number || (es ? 'No identificado' : 'Not identified')}</dd></div><div><dt className="text-muted-foreground">{es ? 'Fecha de emisión' : 'Issue date'}</dt><dd>{inv.invoice_date || (es ? 'No identificada' : 'Not identified')}</dd></div><div><dt className="text-muted-foreground">{es ? 'Fecha de vencimiento' : 'Due date'}</dt><dd>{inv.due_date || (es ? 'No identificada' : 'Not identified')}</dd></div><div><dt className="text-muted-foreground">{es ? 'Descripción' : 'Description'}</dt><dd className="break-words">{inv.description || (es ? 'No identificada' : 'Not identified')}</dd></div></dl><div className="mt-4"><span className="text-sm">{inv.security_status==='passed'?(es?'Referencia confirmada coincidente':'Confirmed reference matches'):(es?'Referencia pendiente de revisión':'Reference needs review')}</span></div><p className="mt-3 text-sm font-medium">{statusText[lang][inv.status as keyof typeof statusText.es]}</p><p className="mt-2 break-words text-sm text-muted-foreground">{inv.error_message || (es ? inv.explanation_es : inv.explanation_en)}</p>{inv.status === 'pending' && inv.user_id === w.user.id && <Button disabled={busy} className="mt-4 h-auto whitespace-normal" onClick={async () => { setBusy(true); try { const r = await evaluate({ data: { id: inv.id } }); if (!r.ok) toast.error(r.message); await refresh(); await showInvoice(inv.id); } finally { setBusy(false); } }}>{es ? 'Ejecutar agente WinkWink' : 'Run WinkWink agent'}</Button>}<p className="mt-3 text-xs text-muted-foreground">{inv.invoice_date} · {inv.category}</p>{adminUi && inv.status === 'review' && <div className="mt-5 grid grid-cols-2 gap-2"><Button disabled={busy || inv.security_status !== 'passed'} onClick={() => resolve('approved')}><Check />{es ? 'Aprobar' : 'Approve'}</Button><Button disabled={busy} variant="outline" onClick={() => resolve('rejected')}><X />{es ? 'Rechazar' : 'Reject'}</Button></div>}</div><div>{previewBusy ? <Loader2 className="animate-spin" /> : preview && (inv.mime_type === 'application/pdf' ? <div className="grid min-h-48 place-items-center border bg-surface"><FileText className="size-12 text-primary" /><Button asChild variant="outline"><a href={preview} target="_blank" rel="noopener noreferrer">{es ? 'Abrir PDF original' : 'Open original PDF'}</a></Button></div> : <img src={preview} alt={es ? `Factura original: ${inv.file_name}` : `Original invoice: ${inv.file_name}`} className="max-h-80 w-full object-contain" />)}{preview && <Button asChild variant="link" className="mt-2"><a href={preview} target="_blank" rel="noopener noreferrer"><Download />{es ? 'Abrir archivo original' : 'Open original file'}</a></Button>}</div></div>{inv.demo_scenario && <p className="border-t pt-4 text-sm text-muted-foreground">{es ? 'Factura sintética: no se llamó a la IA ni a plataformas de pago. La decisión aplica referencias y topes guardados.' : 'Synthetic invoice: no AI or payment platform calls. The decision applies saved references and caps.'}</p>}<InvoiceDecision usage={inv.ai_usage} decision={inv.decision_snapshot} es={es}/><section className="border-t pt-4"><h2 className="text-sm font-semibold">{es ? 'Registro de decisiones' : 'Decision history'}</h2><ol className="mt-3 space-y-3">{events.map((e,i) => <li key={i} className="text-sm"><span className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString(lang)} · </span>{es ? e.message_es : e.message_en}</li>)}</ol></section></>}</DialogContent></Dialog>
-  </div>;
+  );
 }

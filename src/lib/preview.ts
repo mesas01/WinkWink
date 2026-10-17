@@ -14,5 +14,5 @@ export function inboxFor<T extends { user_id: string }>(
   employeePreview: boolean,
   userId: string,
 ) {
-  return isAdmin && employeePreview ? rows.filter(r => r.user_id === userId) : rows;
+  return isAdmin && employeePreview ? rows.filter((r) => r.user_id === userId) : rows;
 }

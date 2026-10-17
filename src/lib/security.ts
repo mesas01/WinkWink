@@ -1,16 +1,64 @@
-import { normalizeMerchant } from './merchants';
+import { normalizeMerchant } from "./merchants";
 
-export type Credentials = { bankName: string | null; bankLast4: string | null; taxId: string | null };
+export type Credentials = {
+  bankName: string | null;
+  bankLast4: string | null;
+  taxId: string | null;
+};
 export type VerifiedCredentials = Credentials & { verified: boolean };
-export type SecurityResult = { status: 'passed' | 'review' | 'blocked'; es: string; en: string };
-const id = (value: string) => value.normalize('NFKC').toUpperCase().replace(/[\s-]/g, '');
-export const sameInvoiceNumber = (a: string, b: string) => a.trim().toUpperCase() === b.trim().toUpperCase();
-export function scanSecurity(document: Credentials, registered: VerifiedCredentials | null, duplicate: boolean, blockedVendor = false): SecurityResult {
-  if (duplicate) return { status: 'blocked', es: 'ALERTA DE SEGURIDAD: número de factura duplicado para el mismo proveedor. No se ejecutó ningún pago.', en: 'SECURITY ALERT: duplicate invoice number for the same supplier. No payment was executed.' };
-  if (blockedVendor || !registered) return { status: 'blocked', es: 'ALERTA DE SEGURIDAD: proveedor bloqueado, desconocido o ambiguo. No se ejecutó ningún pago.', en: 'SECURITY ALERT: blocked, unknown or ambiguous supplier. No payment was executed.' };
-  if (!registered.verified || !registered.bankName || !registered.bankLast4 || !registered.taxId) return { status: 'review', es: 'Verificación de seguridad pendiente: faltan datos confirmados del proveedor.', en: 'Security verification pending: confirmed supplier credentials are missing.' };
-  if ((document.bankLast4 && document.bankLast4 !== registered.bankLast4) || (document.bankName && normalizeMerchant(document.bankName) !== normalizeMerchant(registered.bankName))) return { status: 'blocked', es: `ALERTA DE SEGURIDAD: la cuenta de la factura (${document.bankName ?? 'Banco no identificado'} ****${document.bankLast4 ?? '????'}) no coincide con la cuenta registrada (${registered.bankName} ****${registered.bankLast4}). Aprobación bloqueada para prevenir fraude. No se ejecutó ningún pago.`, en: `SECURITY ALERT: Bank account on invoice (${document.bankName ?? 'Unidentified bank'} ****${document.bankLast4 ?? '????'}) does not match the pre-verified account in WinkWink (${registered.bankName} ****${registered.bankLast4}). Approval blocked to prevent fraud. No payment was executed.` };
-  if (document.taxId && id(document.taxId) !== id(registered.taxId)) return { status: 'blocked', es: 'ALERTA DE SEGURIDAD: identificación fiscal diferente de la registrada. No se ejecutó ningún pago.', en: 'SECURITY ALERT: tax ID does not match the registered supplier. No payment was executed.' };
-  if (!document.bankName || !document.bankLast4 || !document.taxId) return { status: 'review', es: 'Verificación de seguridad pendiente: faltan datos bancarios o fiscales legibles en la factura.', en: 'Security verification pending: readable bank or tax details are missing from the invoice.' };
-  return { status: 'passed', es: 'Datos registrados coincidentes; sin duplicado identificado. No constituye certificación bancaria.', en: 'Registered details match; no duplicate identified. This is not bank certification.' };
+export type SecurityResult = { status: "passed" | "review" | "blocked"; es: string; en: string };
+const id = (value: string) => value.normalize("NFKC").toUpperCase().replace(/[\s-]/g, "");
+export const sameInvoiceNumber = (a: string, b: string) =>
+  a.trim().toUpperCase() === b.trim().toUpperCase();
+export function scanSecurity(
+  document: Credentials,
+  registered: VerifiedCredentials | null,
+  duplicate: boolean,
+  blockedVendor = false,
+): SecurityResult {
+  if (duplicate)
+    return {
+      status: "blocked",
+      es: "ALERTA DE SEGURIDAD: número de factura duplicado para el mismo proveedor. No se ejecutó ningún pago.",
+      en: "SECURITY ALERT: duplicate invoice number for the same supplier. No payment was executed.",
+    };
+  if (blockedVendor || !registered)
+    return {
+      status: "blocked",
+      es: "ALERTA DE SEGURIDAD: proveedor bloqueado, desconocido o ambiguo. No se ejecutó ningún pago.",
+      en: "SECURITY ALERT: blocked, unknown or ambiguous supplier. No payment was executed.",
+    };
+  if (!registered.verified || !registered.bankName || !registered.bankLast4 || !registered.taxId)
+    return {
+      status: "review",
+      es: "Verificación de seguridad pendiente: faltan datos confirmados del proveedor.",
+      en: "Security verification pending: confirmed supplier credentials are missing.",
+    };
+  if (
+    (document.bankLast4 && document.bankLast4 !== registered.bankLast4) ||
+    (document.bankName &&
+      normalizeMerchant(document.bankName) !== normalizeMerchant(registered.bankName))
+  )
+    return {
+      status: "blocked",
+      es: `ALERTA DE SEGURIDAD: la cuenta de la factura (${document.bankName ?? "Banco no identificado"} ****${document.bankLast4 ?? "????"}) no coincide con la cuenta registrada (${registered.bankName} ****${registered.bankLast4}). Aprobación bloqueada para prevenir fraude. No se ejecutó ningún pago.`,
+      en: `SECURITY ALERT: Bank account on invoice (${document.bankName ?? "Unidentified bank"} ****${document.bankLast4 ?? "????"}) does not match the pre-verified account in WinkWink (${registered.bankName} ****${registered.bankLast4}). Approval blocked to prevent fraud. No payment was executed.`,
+    };
+  if (document.taxId && id(document.taxId) !== id(registered.taxId))
+    return {
+      status: "blocked",
+      es: "ALERTA DE SEGURIDAD: identificación fiscal diferente de la registrada. No se ejecutó ningún pago.",
+      en: "SECURITY ALERT: tax ID does not match the registered supplier. No payment was executed.",
+    };
+  if (!document.bankName || !document.bankLast4 || !document.taxId)
+    return {
+      status: "review",
+      es: "Verificación de seguridad pendiente: faltan datos bancarios o fiscales legibles en la factura.",
+      en: "Security verification pending: readable bank or tax details are missing from the invoice.",
+    };
+  return {
+    status: "passed",
+    es: "Datos registrados coincidentes; sin duplicado identificado. No constituye certificación bancaria.",
+    en: "Registered details match; no duplicate identified. This is not bank certification.",
+  };
 }

@@ -1,0 +1,21 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:#F8FAFC;color:#0F172A;font:14px/1.4 system-ui,sans-serif;display:grid;grid-template-columns:240px 1fr}
+nav{background:#fff;border-right:1px solid #e2e8f0;padding:24px 16px}nav b{font-size:18px;display:block;margin-bottom:24px}
+nav div{padding:8px 10px;border-radius:6px;color:#475569}nav .on{background:#EFF6FF;color:#2563EB;font-weight:600}
+main{padding:28px 32px}h1{font-size:26px}
+.k{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:20px 0}.k div{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px}.k b{font-size:24px;display:block}
+table{width:100%;background:#fff;border:1px solid #e2e8f0;border-radius:10px;border-collapse:separate}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid #f1f5f9}th{font-size:12px;color:#64748b}
+.p{padding:2px 8px;border-radius:999px;font-size:12px}.g{background:#DCFCE7;color:#166534}.a{background:#FEF3C7;color:#92400E}.r{background:#FEE2E2;color:#991B1B}
+</style></head><body>
+<nav><b>WinkWink</b><div class="on">Facturas</div><div>Reglas</div><div>Proveedores</div><div>Auditoría</div></nav>
+<main><h1>Facturas</h1><div class="k"><div><b>82%</b>Autoaprobadas</div><div><b>3</b>En revisión</div><div><b>1</b>Bloqueadas</div><div><b>$4,210</b>Liberado</div></div>
+<table><tr><th>Proveedor</th><th>Categoría</th><th>Monto</th><th>Estado</th></tr>
+<tr><td>AWS</td><td>Software</td><td>$150.00</td><td><span class="p g">Pagada</span></td></tr>
+<tr><td>Uber</td><td>Viáticos</td><td>$120.00</td><td><span class="p a">Revisión</span></td></tr>
+<tr><td>AWS</td><td>Software</td><td>$150.00</td><td><span class="p r">Bloqueada</span></td></tr>
+<tr><td>Slack</td><td>Software</td><td>$45.00</td><td><span class="p g">Pagada</span></td></tr></table></main>
+</body></html>

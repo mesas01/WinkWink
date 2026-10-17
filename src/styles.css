@@ -11,7 +11,8 @@
 
 @theme inline {
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Geist", system-ui, sans-serif;
+  --font-display:
+    "SF Pro Display", -apple-system, BlinkMacSystemFont, "Geist", system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -46,7 +47,9 @@
   --color-ring: var(--ring);
   --shadow-crisp: 0 0 0 1px var(--border), 0 1px 2px 0 oklch(0.2 0.03 260 / 0.05);
   --shadow-lift: 0 0 0 1px var(--border), 0 8px 24px -8px oklch(0.2 0.03 260 / 0.12);
-  --shadow-cta: 0 1px 0 0 oklch(1 0 0 / 0.2) inset, 0 6px 16px -6px color-mix(in oklab, var(--primary) 60%, transparent);
+  --shadow-cta:
+    0 1px 0 0 oklch(1 0 0 / 0.2) inset,
+    0 6px 16px -6px color-mix(in oklab, var(--primary) 60%, transparent);
   --shadow-hero: 0 0 0 1px var(--border), 0 40px 80px -30px oklch(0.25 0.08 262 / 0.35);
   --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
@@ -112,14 +115,22 @@
 }
 
 /* Emil: no transitions while swapping theme, so colors change in one frame */
-.theme-switching *, .theme-switching *::before, .theme-switching *::after { transition: none !important; }
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .press:active { transform: none; }
+  .press:active {
+    transform: none;
+  }
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
+  * {
+    border-color: var(--color-border);
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -127,36 +138,121 @@
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "cv11", "ss01";
   }
-  button { cursor: pointer; }
+  button {
+    cursor: pointer;
+  }
 }
 
-@utility tnum { font-variant-numeric: tabular-nums; }
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
 @utility press {
-  transition: transform 160ms var(--ease-out-quint), background-color 160ms var(--ease-out-quint), box-shadow 160ms var(--ease-out-quint);
-  &:active { transform: scale(0.97); }
+  transition:
+    transform 160ms var(--ease-out-quint),
+    background-color 160ms var(--ease-out-quint),
+    box-shadow 160ms var(--ease-out-quint);
+  &:active {
+    transform: scale(0.97);
+  }
 }
 
 /* Apple-style type scale: size-specific tracking & leading */
-@utility text-display { font-size: clamp(2.75rem, 7vw, 5.75rem); line-height: 1.02; letter-spacing: -0.045em; font-weight: 700; }
-@utility text-headline { font-size: clamp(2.25rem, 4.5vw, 3.5rem); line-height: 1.06; letter-spacing: -0.035em; font-weight: 700; }
-@utility text-statement { font-size: clamp(1.75rem, 3.6vw, 2.75rem); line-height: 1.2; letter-spacing: -0.025em; font-weight: 600; }
-@utility text-lead { font-size: clamp(1.125rem, 1.6vw, 1.375rem); line-height: 1.45; letter-spacing: -0.012em; }
+@utility text-display {
+  font-size: clamp(2.75rem, 7vw, 5.75rem);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  font-weight: 700;
+}
+@utility text-headline {
+  font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+}
+@utility text-statement {
+  font-size: clamp(1.75rem, 3.6vw, 2.75rem);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+}
+@utility text-lead {
+  font-size: clamp(1.125rem, 1.6vw, 1.375rem);
+  line-height: 1.45;
+  letter-spacing: -0.012em;
+}
 @utility text-gradient {
   background: linear-gradient(120deg, var(--primary), oklch(0.62 0.17 220));
-  -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
-@utility glass { background-color: color-mix(in oklab, var(--background) 72%, transparent); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); }
-@utility hero-glow { background: radial-gradient(60% 50% at 50% 0%, color-mix(in oklab, var(--primary) 18%, transparent), transparent 70%); }
-@utility tile { border-radius: 28px; background-color: var(--surface); padding: 2.5rem; box-shadow: 0 0 0 1px var(--border); }
-html { scroll-behavior: smooth; }
+@utility glass {
+  background-color: color-mix(in oklab, var(--background) 72%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+@utility hero-glow {
+  background: radial-gradient(
+    60% 50% at 50% 0%,
+    color-mix(in oklab, var(--primary) 18%, transparent),
+    transparent 70%
+  );
+}
+@utility tile {
+  border-radius: 28px;
+  background-color: var(--surface);
+  padding: 2.5rem;
+  box-shadow: 0 0 0 1px var(--border);
+}
+html {
+  scroll-behavior: smooth;
+}
 
-:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
-* { letter-spacing: 0 !important; }
-button, input, select { min-height: 44px; }
-button { white-space: normal; height: auto; overflow-wrap: anywhere; }
-.text-display { font-size: 3rem; }
-.text-headline { font-size: 2.5rem; }
-.text-statement { font-size: 2rem; }
-.text-lead { font-size: 1.125rem; }
-@media (min-width: 768px) { .text-display { font-size: 5rem; } .text-headline { font-size: 3.5rem; } }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+* {
+  letter-spacing: 0 !important;
+}
+button,
+input,
+select {
+  min-height: 44px;
+}
+button {
+  white-space: normal;
+  height: auto;
+  overflow-wrap: anywhere;
+}
+.text-display {
+  font-size: 3rem;
+}
+.text-headline {
+  font-size: 2.5rem;
+}
+.text-statement {
+  font-size: 2rem;
+}
+.text-lead {
+  font-size: 1.125rem;
+}
+@media (min-width: 768px) {
+  .text-display {
+    font-size: 5rem;
+  }
+  .text-headline {
+    font-size: 3.5rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

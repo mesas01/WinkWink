@@ -1,0 +1,227 @@
+{
+ "title": "Mundo visual de WinkWink",
+ "question": "La tirada asignó Billete de seguridad. Quédate con esa, toma una alternativa o vuelve a tirar.",
+ "options": [
+  {
+   "id": "assigned",
+   "kind": "assigned",
+   "label": "Billete de seguridad",
+   "kicker": "THE ROLL",
+   "lineage": "Familias de billetes multimoneda: impresión en intaglio, guilloches y hilo de seguridad",
+   "thesis": "Cada factura lleva un hilo de seguridad que se rompe a la vista cuando la cuenta no coincide.",
+   "palette": [
+    "#14302A",
+    "#F3F1E8",
+    "#6B2D8F",
+    "#2F7F79",
+    "#D23B1F"
+   ],
+   "materials": [
+    "intaglio ink",
+    "cotton security paper",
+    "guilloche hairline"
+   ],
+   "viewport": "Riel lateral en tinta intaglio verde-negra, cola de facturas en tabla densa y panel de decisión a la derecha; cada fila lleva un hilo de seguridad vertical, y si la cuenta no coincide el hilo se rompe en rojo con la etiqueta BLOQUEADO.",
+   "risk": "Los guilloches pueden volverse decoración si salen del estado de seguridad; solo aparecen donde hay verificación.",
+   "raised": [
+    {
+     "from": "challenger-ticket",
+     "raise": "Nada desaparece, se anula: una decisión revertida queda tachada en el registro, nunca se borra."
+    },
+    {
+     "from": "challenger-emission",
+     "raise": "El estado no depende solo del color: hilo continuo = verificado, discontinuo = pendiente, roto = bloqueado."
+    },
+    {
+     "from": "challenger-rail",
+     "raise": "Todas las líneas, reglas e hilos se dibujan a un píxel de dispositivo exacto."
+    },
+    {
+     "from": "challenger-wall",
+     "raise": "La fila enfocada se eleva y el resto de la cola se atenúa un paso mientras se revisa."
+    }
+   ],
+   "html": ".impeccable/mocks/decision/assigned.html"
+  },
+  {
+   "id": "model-pick",
+   "kind": "pick",
+   "label": "Sello notarial",
+   "kicker": "IMPECCABLE’S PICK",
+   "lineage": "Libros de notaría y sellos de caucho: APROBADO, RETENIDO, BLOQUEADO",
+   "thesis": "El agente sella cada factura con su decisión y el porqué queda escrito al margen.",
+   "palette": [
+    "#FAF8F4",
+    "#1A1A1A",
+    "#4B3B8F",
+    "#C2261E",
+    "#1E7A46"
+   ],
+   "materials": [
+    "rubber stamp ink",
+    "ledger paper"
+   ],
+   "viewport": "Barra superior y tabla de facturas; cada estado es un sello de tinta ligeramente rotado, y el panel de detalle muestra el sello en grande con la razón de una línea debajo.",
+   "risk": "Es lo más familiar para auditoría; corre el riesgo de verse como un trámite si los sellos se ven de juguete.",
+   "html": ".impeccable/mocks/decision/model-pick.html"
+  },
+  {
+   "id": "challenger-ticket",
+   "kind": "challenger",
+   "catalogId": "vernacular-ephemera-jet-age-ticket-wallet",
+   "label": "Tiquete de aerolínea",
+   "verdict": "competitive",
+   "lineage": "Cupones con copia al carbón de la era jet",
+   "thesis": "Cada factura es un cupón: validado, usado o anulado (VOID) se estampa solo.",
+   "palette": [
+    "#1D2D5C",
+    "#C8102E",
+    "#5B3F8C",
+    "#FFFFFF"
+   ],
+   "materials": [
+    "carbon copy coupon",
+    "ruled fare boxes"
+   ],
+   "viewport": "Encabezado azul marino de aerolínea; facturas como cupones apilados con casillas reguladas; el VOID rojo marca los bloqueos.",
+   "case": "Encaja bien con el viaje de la factura de cupón a decisión; pierde en claridad porque el cliente es finanzas, no viajes.",
+   "risk": "Sugiere viajes en un producto de cuentas por pagar.",
+   "html": ".impeccable/mocks/decision/challenger-ticket.html"
+  },
+  {
+   "id": "challenger-rail",
+   "kind": "challenger",
+   "catalogId": "rw-centre-rail-reference-setting",
+   "label": "Riel central de referencias",
+   "verdict": "declined",
+   "lineage": "Ediciones con aparato crítico y márgenes amplios",
+   "thesis": "Dos columnas de texto alrededor de un riel de claves.",
+   "palette": [
+    "#1B1B1B",
+    "#E8E1D3",
+    "#C2401F"
+   ],
+   "materials": [
+    "ruling engine hairlines",
+    "bone paper"
+   ],
+   "viewport": "Bloque de texto pequeño dentro de un margen amplio de anotaciones.",
+   "case": "Es un mundo para leer, no para operar una cola de facturas.",
+   "risk": "Se lee como un libro, no como una herramienta.",
+   "kept": "Precisión de un píxel en cada línea."
+  },
+  {
+   "id": "challenger-wall",
+   "kind": "challenger",
+   "catalogId": "pop-culture-shelf-streaming-title-card-wall",
+   "label": "Muro de streaming",
+   "verdict": "declined",
+   "lineage": "Filas de pósters en catálogos de streaming",
+   "thesis": "Filas horizontales donde el título enfocado crece.",
+   "palette": [
+    "#111111",
+    "#E50914",
+    "#FFFFFF"
+   ],
+   "materials": [
+    "poster artwork"
+   ],
+   "viewport": "Filas desplazables de tarjetas.",
+   "case": "Las facturas no tienen arte, y el desplazamiento horizontal oculta la cola.",
+   "risk": "Entretenimiento en una herramienta de control.",
+   "kept": "Enfocar una fila y atenuar el resto."
+  },
+  {
+   "id": "challenger-bitmap",
+   "kind": "challenger",
+   "catalogId": "emigre-bitmap-specimen",
+   "label": "Espécimen bitmap",
+   "verdict": "declined",
+   "lineage": "Especímenes tipográficos de Emigre",
+   "thesis": "Letras de píxeles a escala de póster.",
+   "palette": [
+    "#FFFFFF",
+    "#000000",
+    "#FF3B00"
+   ],
+   "materials": [
+    "halftone",
+    "dot matrix"
+   ],
+   "viewport": "Titular de píxeles sobre columnas densas.",
+   "case": "Le quita confianza a una herramienta de pagos.",
+   "risk": "Se ve como novedad.",
+   "kept": "Una sola familia numérica repetida con disciplina en todos los tamaños."
+  },
+  {
+   "id": "challenger-atlas",
+   "kind": "challenger",
+   "catalogId": "notation-diagram-systems-star-atlas",
+   "label": "Atlas estelar",
+   "verdict": "declined",
+   "lineage": "Cartas celestes por magnitud",
+   "thesis": "La importancia se codifica en el tamaño del punto.",
+   "palette": [
+    "#0E1A33",
+    "#F2F2EE",
+    "#E0A040"
+   ],
+   "materials": [
+    "chart plates"
+   ],
+   "viewport": "Fondo azul noche con puntos.",
+   "case": "Los montos se leen mejor como cifras que como estrellas.",
+   "risk": "Es poético, pero hay que descifrarlo.",
+   "kept": "Una escala fija de magnitud para el monto en la vista general."
+  },
+  {
+   "id": "challenger-emission",
+   "kind": "challenger",
+   "catalogId": "operate-c-emission-line-rail",
+   "label": "Líneas de emisión",
+   "verdict": "declined",
+   "lineage": "Espectrogramas de vidrio",
+   "thesis": "El estado se lleva en la forma de la línea, no en el tono.",
+   "palette": [
+    "#2A2A2C",
+    "#E8E4DA",
+    "#F5C400"
+   ],
+   "materials": [
+    "charcoal continuum"
+   ],
+   "viewport": "Riel descentrado con marcas finas.",
+   "case": "Demasiado abstracto para que los empleados lo lean de un vistazo.",
+   "risk": "Es frío y críptico.",
+   "kept": "El estado codificado por la forma de la línea además del color."
+  }
+ ],
+ "reroll": {
+  "registers": [
+   "safer",
+   "bolder"
+  ]
+ },
+ "buildPath": {
+  "value": "code"
+ },
+ "canon": true,
+ "canonCard": {
+  "kind": "canon",
+  "label": "El estándar de la categoría",
+  "thesis": "Un panel fintech limpio, como Ramp o Brex, ejecutado con oficio.",
+  "palette": [
+   "#FFFFFF",
+   "#0F172A",
+   "#2563EB"
+  ],
+  "materials": [
+   "clean grid",
+   "neutral surfaces"
+  ],
+  "viewport": "Barra lateral, KPIs, tabla de facturas y panel de detalle.",
+  "risk": "Indistinguible de la competencia, por diseño.",
+  "html": ".impeccable/mocks/decision/canon.html"
+ },
+ "steer": true
+}

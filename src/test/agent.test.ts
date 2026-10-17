@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 import { evaluate, INVOICES } from "@/lib/agent";
 
 const on = { saas: true, travel: true, unknown: true };
-const byId = (id: string) => { const invoice = INVOICES.find((i) => i.id === id); if (!invoice) throw new Error('Missing test invoice'); return invoice; };
+const byId = (id: string) => {
+  const invoice = INVOICES.find((i) => i.id === id);
+  if (!invoice) throw new Error("Missing test invoice");
+  return invoice;
+};
 
 describe("Blinka agent rules", () => {
   it("auto-approves software under $500 (AWS $150)", () => {

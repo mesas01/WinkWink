@@ -10,7 +10,11 @@ export function responseImage(urlOrDataURL: string) {
 }
 
 export function responsePDF(filename: string, base64: string) {
-  return { type: "input_file", filename, file_data: `data:application/pdf;base64,${requireContent(base64)}` } as const;
+  return {
+    type: "input_file",
+    filename,
+    file_data: `data:application/pdf;base64,${requireContent(base64)}`,
+  } as const;
 }
 
 export function sdkImage(urlOrDataURL: string) {
@@ -18,7 +22,12 @@ export function sdkImage(urlOrDataURL: string) {
 }
 
 export function sdkPDF(filename: string, base64: string) {
-  return { type: "file", filename, data: requireContent(base64), mediaType: "application/pdf" } as const;
+  return {
+    type: "file",
+    filename,
+    data: requireContent(base64),
+    mediaType: "application/pdf",
+  } as const;
 }
 
 export function chatImage(urlOrDataURL: string) {

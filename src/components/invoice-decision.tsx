@@ -1,7 +1,69 @@
-import type { Json } from '@/integrations/supabase/types';
-function record(value: Json | undefined): Record<string,Json|undefined> { return value && typeof value==='object' && !Array.isArray(value)?value:{}; }
-export function InvoiceDecision({usage,decision,es}:{usage:Json|null;decision:Json|null;es:boolean}) {
-  const u=record(usage);const d=record(decision);const budgets=Array.isArray(d['budgets'])?d['budgets']:[];
-  const shown=(v:Json|undefined)=>typeof v==='number'?v.toLocaleString(es?'es-CO':'en'):typeof v==='string'?v:'—';
-  return <section className="border-t pt-4"><h2 className="text-sm font-semibold">{es?'Consumo de IA y decisión':'AI usage & decision'}</h2><dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">{[[es?'Modelo':'Model',u['model']],[es?'Llamadas':'Calls',u['calls']],[es?'Tokens de entrada':'Input tokens',u['inputTokens']],[es?'Tokens de salida':'Output tokens',u['outputTokens']],[es?'Total de tokens':'Total tokens',u['totalTokens']],[es?'Referencia de proveedor':'Supplier reference',d['trustPassed']===true?(es?'Coincide':'Matches'):(es?'Revisión':'Review')]].map(([label,value])=><div key={String(label)} className="min-w-0"><dt className="text-muted-foreground">{String(label)}</dt><dd className="break-words">{shown(value)}</dd></div>)}</dl><p className="mt-3 text-xs text-muted-foreground">{es?'Tokens informados por el proveedor, no precio ni dinero transferido.':'Provider-reported tokens, not a price or transferred money.'}</p>{budgets.length>0&&<ul className="mt-4 divide-y border-y">{budgets.map((v,i)=>{const b=record(v);return <li key={i} className="py-3 text-sm"><h3 className="font-medium">{shown(b['label'])}</h3><p className="mt-1 text-muted-foreground">{es?'Reservado':'Reserved'}: {shown(b['used'])} + {shown(b['amount'])} {shown(b['currency'])} · {es?'Máximo':'Limit'}: {shown(b['limit'])}</p><p className="mt-1 text-xs">{es?'Por factura':'Per invoice'}: {shown(b['perPayment'])} · {es?'Revisión encima de':'Review above'}: {shown(b['humanAbove'])}</p></li>;})}</ul>}</section>;
+import type { Json } from "@/integrations/supabase/types";
+function record(value: Json | undefined): Record<string, Json | undefined> {
+  return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+}
+export function InvoiceDecision({
+  usage,
+  decision,
+  es,
+}: {
+  usage: Json | null;
+  decision: Json | null;
+  es: boolean;
+}) {
+  const u = record(usage);
+  const d = record(decision);
+  const budgets = Array.isArray(d["budgets"]) ? d["budgets"] : [];
+  const shown = (v: Json | undefined) =>
+    typeof v === "number" ? v.toLocaleString(es ? "es-CO" : "en") : typeof v === "string" ? v : "—";
+  return (
+    <section className="border-t pt-4">
+      <h2 className="text-sm font-semibold">
+        {es ? "Consumo de IA y decisión" : "AI usage & decision"}
+      </h2>
+      <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+        {[
+          [es ? "Modelo" : "Model", u["model"]],
+          [es ? "Llamadas" : "Calls", u["calls"]],
+          [es ? "Tokens de entrada" : "Input tokens", u["inputTokens"]],
+          [es ? "Tokens de salida" : "Output tokens", u["outputTokens"]],
+          [es ? "Total de tokens" : "Total tokens", u["totalTokens"]],
+          [
+            es ? "Referencia de proveedor" : "Supplier reference",
+            d["trustPassed"] === true ? (es ? "Coincide" : "Matches") : es ? "Revisión" : "Review",
+          ],
+        ].map(([label, value]) => (
+          <div key={String(label)} className="min-w-0">
+            <dt className="text-muted-foreground">{String(label)}</dt>
+            <dd className="break-words">{shown(value)}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="mt-3 text-xs text-muted-foreground">
+        {es
+          ? "Tokens informados por el proveedor, no precio ni dinero transferido."
+          : "Provider-reported tokens, not a price or transferred money."}
+      </p>
+      {budgets.length > 0 && (
+        <ul className="mt-4 divide-y border-y">
+          {budgets.map((v, i) => {
+            const b = record(v);
+            return (
+              <li key={i} className="py-3 text-sm">
+                <h3 className="font-medium">{shown(b["label"])}</h3>
+                <p className="mt-1 text-muted-foreground">
+                  {es ? "Reservado" : "Reserved"}: {shown(b["used"])} + {shown(b["amount"])}{" "}
+                  {shown(b["currency"])} · {es ? "Máximo" : "Limit"}: {shown(b["limit"])}
+                </p>
+                <p className="mt-1 text-xs">
+                  {es ? "Por factura" : "Per invoice"}: {shown(b["perPayment"])} ·{" "}
+                  {es ? "Revisión encima de" : "Review above"}: {shown(b["humanAbove"])}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
 }

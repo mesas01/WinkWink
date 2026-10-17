@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:#FAF8F4;color:#1A1A1A;font:14px/1.4 Archivo,sans-serif}
+header{height:64px;display:flex;align-items:center;gap:28px;padding:0 32px;border-bottom:2px solid #1A1A1A}
+header b{font:800 20px Archivo}header span{color:#555}header .on{color:#1A1A1A;font-weight:600;border-bottom:2px solid #4B3B8F;padding-bottom:20px;margin-top:22px}
+.wrap{display:grid;grid-template-columns:1fr 460px;height:836px}
+main{padding:28px 32px}
+h1{font:800 34px Archivo}
+table{width:100%;border-collapse:collapse;margin-top:22px}
+th{text-align:left;font-size:11px;text-transform:uppercase;color:#666;padding:8px;border-bottom:1px solid #1A1A1A}
+td{padding:16px 8px;border-bottom:1px dashed #c9c3b6}
+td.n{font-family:'Courier Prime';text-align:right}
+.stamp{display:inline-block;font:700 12px 'Courier Prime';letter-spacing:.08em;padding:3px 8px;border:2px solid;border-radius:3px;transform:rotate(-3deg)}
+.g{color:#1E7A46}.v{color:#4B3B8F}.r{color:#C2261E}
+aside{border-left:2px solid #1A1A1A;padding:32px;background:#fff;position:relative}
+.big{font:700 34px 'Courier Prime';color:#C2261E;border:4px solid #C2261E;padding:10px 18px;display:inline-block;transform:rotate(-6deg);margin:26px 0}
+.why{font:15px/1.6 'Courier Prime';border-top:1px solid #ddd;padding-top:14px}
+</style></head><body>
+<header><b>WinkWink</b><span class="on">Facturas</span><span>Reglas</span><span>Proveedores</span><span>Auditoría</span><span style="margin-left:auto">Admin financiero · ES/EN</span></header>
+<div class="wrap"><main><h1>Facturas de octubre</h1>
+<table><tr><th>Factura</th><th>Proveedor</th><th>Categoría</th><th style="text-align:right">Monto</th><th>Sello</th></tr>
+<tr><td>INV-001</td><td>AWS</td><td>Software</td><td class="n">USD 150.00</td><td><span class="stamp g">PAGADA</span></td></tr>
+<tr><td>INV-002</td><td>Uber</td><td>Viáticos</td><td class="n">USD 120.00</td><td><span class="stamp v">RETENIDA</span></td></tr>
+<tr><td>INV-003</td><td>AWS</td><td>Software</td><td class="n">USD 150.00</td><td><span class="stamp r">BLOQUEADA</span></td></tr>
+<tr><td>INV-004</td><td>Slack</td><td>Software</td><td class="n">USD 45.00</td><td><span class="stamp g">PAGADA</span></td></tr>
+<tr><td>INV-005</td><td>Figma</td><td>Software</td><td class="n">USD 75.00</td><td><span class="stamp g">PAGADA</span></td></tr>
+</table></main>
+<aside><small>INV-003 · AWS · USD 150.00</small><br><span class="big">BLOQUEADA</span>
+<p class="why">La cuenta de la factura (Wells Fargo ****9999) no coincide con la cuenta verificada de AWS (Chase ****4321). Pago bloqueado para prevenir fraude.</p></aside></div>
+</body></html>

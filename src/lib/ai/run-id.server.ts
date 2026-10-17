@@ -45,7 +45,10 @@ export function getLovableAiGatewayRunId(request: Request) {
   return request.headers.get(LOVABLE_AIG_RUN_ID_HEADER)?.trim() || undefined;
 }
 
-export function getLovableAiGatewayResponseHeaders(providerHeaders: HeadersInit | undefined, init?: HeadersInit) {
+export function getLovableAiGatewayResponseHeaders(
+  providerHeaders: HeadersInit | undefined,
+  init?: HeadersInit,
+) {
   const headers = new Headers(init);
   const exposedHeaders = new Set(
     (headers.get("Access-Control-Expose-Headers") ?? "")

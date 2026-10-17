@@ -83,17 +83,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "WinkWink — AI Auto-Approver" },
-      { name: "description", content: "AI governance agent for accounts payable with human-in-the-loop." },
+      {
+        name: "description",
+        content: "AI governance agent for accounts payable with human-in-the-loop.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
-
 
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
@@ -123,7 +124,9 @@ function RootComponent() {
   const theme = useApp((s) => s.theme);
   const lang = useApp((s) => s.lang);
   const router = useRouter();
-  useEffect(() => { document.documentElement.lang = lang; }, [lang]);
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
       if (!["SIGNED_IN", "SIGNED_OUT", "USER_UPDATED"].includes(event)) return;
@@ -144,8 +147,15 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <MotionConfig reducedMotion="user">
-        <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] bg-background p-3">{lang === "es" ? "Saltar al contenido" : "Skip to content"}</a>
-        <main id="main-content"><Outlet /></main>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] bg-background p-3"
+        >
+          {lang === "es" ? "Saltar al contenido" : "Skip to content"}
+        </a>
+        <main id="main-content">
+          <Outlet />
+        </main>
       </MotionConfig>
       <Toaster position="bottom-right" theme={theme} toastOptions={{ className: "font-sans" }} />
     </QueryClientProvider>
