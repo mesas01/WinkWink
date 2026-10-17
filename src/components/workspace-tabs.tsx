@@ -36,7 +36,7 @@ interface WorkspaceTabsProps {
 
 const tabClass = (active: boolean) =>
   cn(
-    "press relative -mb-px inline-flex min-h-11 items-center gap-2 border-b-2 px-1 text-sm font-semibold transition-colors",
+    "press relative -mb-px inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-1 text-sm font-semibold transition-colors",
     active
       ? "border-ink-violet text-foreground"
       : "border-transparent text-muted-foreground hover:text-foreground",
@@ -48,7 +48,7 @@ export function WorkspaceTabs(props: WorkspaceTabsProps) {
   return (
     <nav
       aria-label={es ? "Espacio de trabajo" : "Workspace"}
-      className="flex flex-wrap items-end gap-x-6 gap-y-1 border-b"
+      className="-mx-4 flex items-end gap-x-6 overflow-x-auto border-b px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0"
     >
       {visible.map(({ id, icon: Icon, es: labelEs, en }) => (
         <button

@@ -14,6 +14,7 @@ export function InvoiceDecision({
   const u = record(usage);
   const d = record(decision);
   const budgets = Array.isArray(d["budgets"]) ? d["budgets"] : [];
+  if (usage === null && budgets.length === 0) return null;
   const shown = (v: Json | undefined) =>
     typeof v === "number" ? v.toLocaleString(es ? "es-CO" : "en") : typeof v === "string" ? v : "—";
   return (

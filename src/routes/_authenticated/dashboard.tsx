@@ -18,6 +18,7 @@ import {
   Settings,
   Download,
   Eye,
+  Lock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -43,6 +44,8 @@ import {
 } from "@/components/invoice-ledger";
 import { Stamp } from "@/components/stamp";
 import { invoiceStampTone } from "@/lib/stamp";
+import { readBankComparison } from "@/lib/security-view";
+import { BankMismatch, SupplierReferenceLine } from "@/components/security-detail";
 import { ScanChecklist, SecurityBadge } from "@/components/security-scan";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -568,7 +571,7 @@ function Dashboard() {
           </DialogDescription>
           {inv && (
             <>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className={cn("grid gap-6", (preview || previewBusy) && "sm:grid-cols-2")}>
                 <div>
                   <Stamp
                     key={`${inv.id}-${inv.status}-${inv.security_status}`}
@@ -581,9 +584,17 @@ function Dashboard() {
                     {inv.currency}{" "}
                     {inv.amount?.toLocaleString(lang, { minimumFractionDigits: 2 }) ?? "—"}
                   </p>
-                  <p className="mt-3 break-words border-t border-dashed border-input pt-3 text-[15px] leading-relaxed">
+                  <p
+                    className={cn(
+                      "mt-3 break-words border-t border-dashed border-input pt-3 text-[15px] leading-relaxed",
+                      inv.security_status === "blocked" && "font-semibold text-ink-red",
+                    )}
+                  >
                     {inv.error_message || (es ? inv.explanation_es : inv.explanation_en)}
                   </p>
+                  {inv.security_status === "blocked" && (
+                    <BankMismatch comparison={readBankComparison(inv.security_snapshot)} es={es} />
+                  )}
                   <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
                     <div>
                       <dt className="text-muted-foreground">{es ? "Proveedor" : "Supplier"}</dt>
@@ -626,23 +637,7 @@ function Dashboard() {
                       </dd>
                     </div>
                   </dl>
-                  <div className="mt-4 flex items-center gap-2 text-sm font-semibold">
-                    <ShieldCheck
-                      className={cn(
-                        "size-4",
-                        inv.security_status === "passed" ? "text-ink-green" : "text-ink-violet",
-                      )}
-                    />
-                    <span>
-                      {inv.security_status === "passed"
-                        ? es
-                          ? "Referencia confirmada coincidente"
-                          : "Confirmed reference matches"
-                        : es
-                          ? "Referencia pendiente de revisión"
-                          : "Reference needs review"}
-                    </span>
-                  </div>
+                  <SupplierReferenceLine status={inv.security_status} es={es} />
                   {inv.status === "pending" && inv.user_id === w.user.id && (
                     <Button
                       disabled={busy}
@@ -662,18 +657,24 @@ function Dashboard() {
                       {es ? "Ejecutar agente WinkWink" : "Run WinkWink agent"}
                     </Button>
                   )}
-                  <p className="mt-3 text-xs text-muted-foreground">
-                    {inv.invoice_date} · {inv.category}
-                  </p>
                   {adminUi && inv.status === "review" && (
                     <div className="mt-5 grid grid-cols-2 gap-2">
-                      <Button
-                        disabled={busy || inv.security_status !== "passed"}
-                        onClick={() => resolve("approved")}
-                      >
-                        <Check />
-                        {es ? "Aprobar" : "Approve"}
-                      </Button>
+                      {inv.security_status === "blocked" ? (
+                        <p className="flex items-start gap-2 text-sm font-semibold text-ink-red">
+                          <Lock className="mt-0.5 size-4 shrink-0" />
+                          {es
+                            ? "Aprobación bloqueada: la cuenta no coincide con la verificada en Blinka."
+                            : "Approval locked: the account does not match the one verified in Blinka."}
+                        </p>
+                      ) : (
+                        <Button
+                          disabled={busy || inv.security_status !== "passed"}
+                          onClick={() => resolve("approved")}
+                        >
+                          <Check />
+                          {es ? "Aprobar" : "Approve"}
+                        </Button>
+                      )}
                       <Button disabled={busy} variant="outline" onClick={() => resolve("rejected")}>
                         <X />
                         {es ? "Rechazar" : "Reject"}

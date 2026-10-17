@@ -53,9 +53,9 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --shadow-crisp: 0 0 0 1px var(--border);
-  --shadow-lift: 0 1px 0 0 var(--rule), 0 10px 24px -14px oklch(0.2 0.01 60 / 0.28);
+  --shadow-lift: none;
   --shadow-cta: none;
-  --shadow-hero: 0 1px 0 0 var(--rule), 0 24px 48px -28px oklch(0.2 0.01 60 / 0.35);
+  --shadow-hero: none;
   --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
 }
@@ -64,7 +64,7 @@
   --radius: 3px;
   --overlay: oklch(0.2 0.01 60 / 0.55);
   --background: oklch(0.982 0.006 80);
-  --surface: oklch(0.955 0.011 80);
+  --surface: oklch(0.982 0.006 80);
   --foreground: oklch(0.22 0.005 60);
   --card: oklch(0.995 0.003 80);
   --card-foreground: oklch(0.22 0.005 60);
@@ -98,7 +98,7 @@
 .dark {
   --overlay: oklch(0.08 0.005 60 / 0.7);
   --background: oklch(0.19 0.006 60);
-  --surface: oklch(0.165 0.006 60);
+  --surface: oklch(0.19 0.006 60);
   --foreground: oklch(0.94 0.01 80);
   --card: oklch(0.22 0.007 60);
   --card-foreground: oklch(0.94 0.01 80);
@@ -179,6 +179,18 @@
   &:active {
     transform: scale(0.97);
   }
+}
+
+/* Lovable sign-in button, restyled into the ledger world (outline, square) */
+.lovable-auth-button.lovable-auth-button {
+  border-radius: 3px;
+  border: 1px solid var(--input);
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: none;
+}
+.lovable-auth-button.lovable-auth-button:hover {
+  border-color: var(--foreground);
 }
 
 /* Typewritten record: amounts, IDs and audit lines */

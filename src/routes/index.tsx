@@ -62,7 +62,7 @@ const copy = {
     ],
     outEyebrow: "Ejemplos de revisión",
     outTitle: "Cada decisión, con contexto.",
-    paid: "Aprobada por regla",
+    approved: "Aprobada por regla",
     paidLog: "Aprobado automáticamente. Categoría Software y monto ($150) bajo el umbral de $500.",
     review: "Requiere revisión humana",
     reviewLog: "Revisión requerida. El monto ($120) excede el límite de $100 para Viáticos.",
@@ -111,7 +111,7 @@ const copy = {
     ],
     outEyebrow: "Review examples",
     outTitle: "Every decision, in context.",
-    paid: "Approved by rule",
+    approved: "Approved by rule",
     paidLog:
       "Approved automatically. Category is Software and amount ($150) is under the $500 threshold.",
     review: "Requires human review",
@@ -216,10 +216,10 @@ function Hero({ c, es }: { c: C; es: boolean }) {
 }
 
 const MOCK_ROWS: { id: string; vendor: string; amount: string; tone: StampTone }[] = [
-  { id: "INV-001", vendor: "AWS", amount: "USD 150.00", tone: "paid" },
+  { id: "INV-001", vendor: "AWS", amount: "USD 150.00", tone: "approved" },
   { id: "INV-002", vendor: "Uber", amount: "USD 120.00", tone: "held" },
   { id: "INV-003", vendor: "AWS", amount: "USD 150.00", tone: "blocked" },
-  { id: "INV-004", vendor: "Slack", amount: "USD 45.00", tone: "paid" },
+  { id: "INV-004", vendor: "Slack", amount: "USD 45.00", tone: "approved" },
 ];
 
 /** Synthetic example ledger. The stamps land one after another: the agent deciding, row by row. */
@@ -255,7 +255,7 @@ function LedgerMock({ c, es }: { c: C; es: boolean }) {
           </li>
         ))}
       </ul>
-      <p className="typed border-t-2 border-rule px-4 py-3 text-[13px] leading-relaxed text-ink-red">
+      <p className="border-t-2 border-rule px-4 py-3 text-sm font-semibold leading-relaxed text-ink-red">
         {c.blockedLog}
       </p>
     </figure>
@@ -322,7 +322,7 @@ function How({ c }: { c: C }) {
 
 function Outcomes({ c, es }: { c: C; es: boolean }) {
   const entries: { tone: StampTone; title: string; log: string }[] = [
-    { tone: "paid", title: c.paid, log: c.paidLog },
+    { tone: "approved", title: c.approved, log: c.paidLog },
     { tone: "held", title: c.review, log: c.reviewLog },
     { tone: "blocked", title: c.blocked, log: c.blockedLog },
   ];
@@ -341,7 +341,7 @@ function Outcomes({ c, es }: { c: C; es: boolean }) {
               <p className="text-2xl font-bold tracking-[-0.015em]">{e.title}</p>
               <p
                 className={cn(
-                  "typed mt-2 max-w-3xl leading-relaxed",
+                  "mt-2 max-w-3xl leading-relaxed",
                   e.tone === "blocked" ? "text-ink-red" : "text-muted-foreground",
                 )}
               >

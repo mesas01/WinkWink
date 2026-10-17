@@ -9,7 +9,7 @@ export type LedgerFilter = "all" | "approved" | "review" | "rejected" | "securit
 
 const FILTERS: { id: LedgerFilter; tone?: StampTone; es: string; en: string }[] = [
   { id: "all", es: "Todas", en: "All" },
-  { id: "approved", tone: "paid", es: "Pagadas", en: "Paid" },
+  { id: "approved", tone: "approved", es: "Aprobadas", en: "Approved" },
   { id: "review", tone: "held", es: "Retenidas", en: "Held" },
   { id: "rejected", tone: "rejected", es: "Rechazadas", en: "Rejected" },
   { id: "security", tone: "blocked", es: "Bloqueos de seguridad", en: "Security blocks" },
@@ -59,6 +59,13 @@ export function LedgerFilters({ invoices, filter, onFilter, es }: FilterBarProps
   );
 }
 
+/** The agent's one-sentence reason, written in the row's margin. */
+const reasonFor = (i: WorkspaceInvoice, es: boolean) =>
+  i.error_message ||
+  (es ? i.explanation_es : i.explanation_en) ||
+  i.description ||
+  (es ? "Sin decisión todavía" : "No decision yet");
+
 const formatAmount = (i: WorkspaceInvoice, lang: string) =>
   i.amount === null
     ? "—"
@@ -91,7 +98,7 @@ function LedgerRow({ invoice: i, adminUi, es, lang, onOpen }: RowProps) {
             {i.security_status === "passed" && (
               <ShieldCheck
                 aria-label={es ? "Cuenta verificada coincide" : "Verified account matches"}
-                className="size-4 shrink-0 text-ink-green"
+                className="size-4 shrink-0 text-muted-foreground"
               />
             )}
           </span>
@@ -99,8 +106,13 @@ function LedgerRow({ invoice: i, adminUi, es, lang, onOpen }: RowProps) {
             {i.invoice_number || missing} · {i.invoice_date || missing}
             {adminUi && ` · ${i.profiles?.display_name || (es ? "Empleado" : "Employee")}`}
           </span>
-          <span className="mt-1 block truncate text-sm text-muted-foreground">
-            {i.description || (es ? "Sin descripción identificada" : "Description not identified")}
+          <span
+            className={cn(
+              "mt-1.5 line-clamp-2 text-sm",
+              tone === "blocked" ? "font-semibold text-ink-red" : "text-muted-foreground",
+            )}
+          >
+            {reasonFor(i, es)}
           </span>
         </span>
         <span className="typed text-right text-base font-bold">{formatAmount(i, lang)}</span>

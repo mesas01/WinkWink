@@ -1,4 +1,4 @@
-export type StampTone = "paid" | "held" | "blocked" | "rejected" | "pending" | "error";
+export type StampTone = "approved" | "held" | "blocked" | "rejected" | "pending" | "error";
 
 export interface StampLabel {
   es: string;
@@ -6,7 +6,7 @@ export interface StampLabel {
 }
 
 const LABELS: Record<StampTone, StampLabel> = {
-  paid: { es: "Pagada", en: "Paid" },
+  approved: { es: "Aprobada", en: "Approved" },
   held: { es: "Retenida", en: "Held" },
   blocked: { es: "Bloqueada", en: "Blocked" },
   rejected: { es: "Rechazada", en: "Rejected" },
@@ -15,7 +15,7 @@ const LABELS: Record<StampTone, StampLabel> = {
 };
 
 const TILTS: Record<StampTone, string> = {
-  paid: "-3deg",
+  approved: "-3deg",
   held: "2deg",
   blocked: "-4deg",
   rejected: "3deg",
@@ -38,7 +38,7 @@ export function invoiceStampTone(invoice: InvoiceStampInput): StampTone {
   if (invoice.security_status === "blocked") return "blocked";
   switch (invoice.status) {
     case "approved":
-      return "paid";
+      return "approved";
     case "review":
       return "held";
     case "rejected":

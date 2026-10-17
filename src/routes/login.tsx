@@ -237,7 +237,7 @@ function Login() {
               className="lovable-auth-button w-full"
               onClick={() => social("lovable")}
             >
-              Continue with Lovable
+              {es ? "Continuar con Lovable" : "Continue with Lovable"}
             </Button>
           </div>
         )}
