@@ -1,0 +1,104 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792266948461,
+      "tag": "0000_winkwink_private_invoices",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792267234801,
+      "tag": "0001_invoice_insert_identifier",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792267736283,
+      "tag": "0002_invoice_document_number",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792268208644,
+      "tag": "0003_merchant_alias_policies",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792270658829,
+      "tag": "0004_invoice_security_scan",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792271823626,
+      "tag": "0005_trusted_suppliers_and_atomic_budgets",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792271960846,
+      "tag": "0006_validate_trust_and_rule_snapshots",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792272337109,
+      "tag": "0007_approval_reservation_clock",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792272694133,
+      "tag": "0008_employee_caps_and_transfer_demo",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792272948818,
+      "tag": "0009_protect_synthetic_demo_markers",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792273235776,
+      "tag": "0010_demo_marker_guard_request_claims",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792273258801,
+      "tag": "0011_demo_marker_table_specific_guards",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792273446230,
+      "tag": "0012_supplier_reference_files",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792273755189,
+      "tag": "0013_complete_supplier_reference_guard",
+      "breakpoints": true
+    }
+  ]
+}

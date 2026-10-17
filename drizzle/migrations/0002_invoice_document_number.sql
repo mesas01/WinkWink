@@ -1,0 +1,2 @@
+ALTER TABLE public.invoices ADD COLUMN invoice_number text;
+COMMENT ON COLUMN public.invoices.invoice_number IS 'Invoice identifier extracted from the original document; null when not readable or absent.';

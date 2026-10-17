@@ -1,0 +1,3 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { LegalPage } from '@/components/legal';
+export const Route = createFileRoute('/terms')({ head: () => ({ meta: [{ title: 'Términos — WinkWink' }, { name: 'description', content: 'Condiciones de uso del servicio gratuito de revisión de facturas WinkWink.' }, { property: 'og:title', content: 'Términos — WinkWink' }, { property: 'og:description', content: 'Alcance, uso permitido y condiciones del servicio.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary' }] }), component: () => <LegalPage kind="terms" /> });

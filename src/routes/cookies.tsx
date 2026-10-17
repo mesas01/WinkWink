@@ -1,0 +1,3 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { LegalPage } from '@/components/legal';
+export const Route = createFileRoute('/cookies')({ head: () => ({ meta: [{ title: 'Cookies — WinkWink' }, { name: 'description', content: 'Sesión, preferencias y evaluación del consentimiento de cookies de WinkWink.' }, { property: 'og:title', content: 'Cookies — WinkWink' }, { property: 'og:description', content: 'Almacenamiento necesario y rastreo opcional.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary' }] }), component: () => <LegalPage kind="cookies" /> });

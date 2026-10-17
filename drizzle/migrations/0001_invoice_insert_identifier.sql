@@ -1,0 +1,1 @@
+GRANT INSERT(id) ON public.invoices TO authenticated;
