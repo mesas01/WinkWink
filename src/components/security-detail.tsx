@@ -12,18 +12,18 @@ export function BankMismatch({
 }) {
   if (!comparison) return null;
   return (
-    <dl className="typed mt-4 border-y-2 border-ink-red text-sm">
-      <div className="grid grid-cols-[9rem_minmax(0,1fr)] gap-3 border-b border-dashed border-input py-2">
+    <dl className="mt-4 border-y-2 border-ink-red text-sm">
+      <div className="grid grid-cols-[10.5rem_minmax(0,1fr)] gap-3 border-b border-dashed border-input py-2">
         <dt className="text-muted-foreground">{es ? "En la factura" : "On the invoice"}</dt>
-        <dd className="font-bold text-ink-red line-through decoration-2">
+        <dd className="typed font-bold text-ink-red line-through decoration-2">
           {comparison.invoiceAccount}
         </dd>
       </div>
-      <div className="grid grid-cols-[9rem_minmax(0,1fr)] gap-3 py-2">
+      <div className="grid grid-cols-[10.5rem_minmax(0,1fr)] gap-3 py-2">
         <dt className="text-muted-foreground">
           {es ? "Verificada en Blinka" : "Verified in Blinka"}
         </dt>
-        <dd className="font-bold">{comparison.verifiedAccount}</dd>
+        <dd className="typed font-bold">{comparison.verifiedAccount}</dd>
       </div>
     </dl>
   );

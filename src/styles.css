@@ -12,7 +12,7 @@
 
 /* WinkWink · notary ledger world.
    Ground is ledger paper, text is ink, and state color exists only as stamp ink:
-   green = PAGADA, violet = RETENIDA, red = BLOQUEADA / RECHAZADA. */
+   green = APROBADA, violet = RETENIDA, red = BLOQUEADA / RECHAZADA. */
 @theme inline {
   --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;

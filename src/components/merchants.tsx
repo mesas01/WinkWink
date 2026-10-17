@@ -136,7 +136,6 @@ export function Merchants({
       className="mt-8"
     >
       <div className="border-b pb-6">
-        <p className="mb-2 text-xs font-medium uppercase text-muted-foreground">WinkWink</p>
         <h2 className="text-2xl font-semibold">{es ? "Reglas Activas" : "Active Rules"}</h2>
       </div>
       <TestInvoiceLibrary es={es} />

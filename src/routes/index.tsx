@@ -36,7 +36,6 @@ const copy = {
   es: {
     nav: ["Cómo funciona", "Reglas", "Control"],
     enter: "Entrar",
-    eyebrow: "WinkWink Auto-Approver",
     h1a: "WinkWink.",
     h1b: "Facturas bajo control.",
     sub: "Sube una factura, revisa los datos extraídos y conserva un historial de decisiones. Las excepciones requieren revisión humana. No ejecutamos pagos.",
@@ -44,7 +43,6 @@ const copy = {
     cta2: "Ver cómo funciona",
     statement:
       "Una factura. Un documento original. Una decisión revisable. La IA puede equivocarse; tus reglas y la revisión humana mantienen el control.",
-    howEyebrow: "Cómo funciona",
     howTitle: "Tres pasos. Una decisión revisable.",
     steps: [
       {
@@ -60,7 +58,6 @@ const copy = {
         d: "Propone una aprobación cuando se cumplen las reglas; las excepciones pasan a revisión humana.",
       },
     ],
-    outEyebrow: "Ejemplos de revisión",
     outTitle: "Cada decisión, con contexto.",
     approved: "Aprobada por regla",
     paidLog: "Aprobado automáticamente. Categoría Software y monto ($150) bajo el umbral de $500.",
@@ -71,7 +68,6 @@ const copy = {
       "ALERTA DE SEGURIDAD: la cuenta de la factura (Wells Fargo ****9999) no coincide con la cuenta verificada de AWS en Blinka (Chase ****4321). Pago bloqueado para prevenir fraude.",
     approve: "Aprobar excepción",
     reject: "Rechazar",
-    rulesEyebrow: "Ejemplos de reglas",
     rulesTitle: "Tú pones los límites.\nEl agente los respeta.",
     rules: [
       "Auto-aprobar Software/SaaS menor a $500",
@@ -85,7 +81,6 @@ const copy = {
   en: {
     nav: ["How it works", "Rules", "Control"],
     enter: "Sign in",
-    eyebrow: "WinkWink Auto-Approver",
     h1a: "WinkWink.",
     h1b: "Invoices under control.",
     sub: "Upload an invoice, inspect extracted fields and keep a decision history. Exceptions require human review. No payments are executed.",
@@ -93,7 +88,6 @@ const copy = {
     cta2: "See how it works",
     statement:
       "One invoice. One original document. One reviewable decision. AI can make mistakes; your rules and human review keep you in control.",
-    howEyebrow: "How it works",
     howTitle: "Three steps. A reviewable decision.",
     steps: [
       {
@@ -109,7 +103,6 @@ const copy = {
         d: "Marks compliant invoices approved; exceptions are routed for human review.",
       },
     ],
-    outEyebrow: "Review examples",
     outTitle: "Every decision, in context.",
     approved: "Approved by rule",
     paidLog:
@@ -121,7 +114,6 @@ const copy = {
       "SECURITY ALERT: the bank account on the invoice (Wells Fargo ****9999) does not match AWS's pre-verified account in Blinka (Chase ****4321). Payment blocked to prevent fraud.",
     approve: "Approve override",
     reject: "Reject",
-    rulesEyebrow: "Example rules",
     rulesTitle: "You set the limits.\nThe agent respects them.",
     rules: [
       "Auto-approve Software/SaaS under $500",

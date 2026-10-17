@@ -1,0 +1,479 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-17T22:44:54.876549+00:00",
+  "title": "Design System: WinkWink",
+  "extensions": {
+    "colorMeta": {
+      "ink-violet": {
+        "role": "primary",
+        "displayName": "Notary Violet",
+        "canonical": "oklch(0.42 0.13 285)",
+        "hexApprox": "#483e90",
+        "dark": "oklch(0.75 0.12 285)",
+        "tonalRamp": [
+          "oklch(0.15 0.065 285)",
+          "oklch(0.26 0.065 285)",
+          "oklch(0.37 0.13 285)",
+          "oklch(0.48 0.13 285)",
+          "oklch(0.59 0.13 285)",
+          "oklch(0.7 0.13 285)",
+          "oklch(0.82 0.13 285)",
+          "oklch(0.95 0.065 285)"
+        ]
+      },
+      "ink-green": {
+        "role": "secondary",
+        "displayName": "Ledger Green",
+        "canonical": "oklch(0.49 0.12 152)",
+        "hexApprox": "#15733c",
+        "dark": "oklch(0.78 0.13 152)",
+        "tonalRamp": [
+          "oklch(0.15 0.06 152)",
+          "oklch(0.26 0.06 152)",
+          "oklch(0.37 0.12 152)",
+          "oklch(0.48 0.12 152)",
+          "oklch(0.59 0.12 152)",
+          "oklch(0.7 0.12 152)",
+          "oklch(0.82 0.12 152)",
+          "oklch(0.95 0.06 152)"
+        ]
+      },
+      "ink-red": {
+        "role": "secondary",
+        "displayName": "Block Red",
+        "canonical": "oklch(0.52 0.19 29)",
+        "hexApprox": "#be241b",
+        "dark": "oklch(0.72 0.17 29)",
+        "tonalRamp": [
+          "oklch(0.15 0.095 29)",
+          "oklch(0.26 0.095 29)",
+          "oklch(0.37 0.19 29)",
+          "oklch(0.48 0.19 29)",
+          "oklch(0.59 0.19 29)",
+          "oklch(0.7 0.19 29)",
+          "oklch(0.82 0.19 29)",
+          "oklch(0.95 0.095 29)"
+        ]
+      },
+      "ledger-ink": {
+        "role": "neutral",
+        "displayName": "Ledger Ink",
+        "canonical": "oklch(0.22 0.005 60)",
+        "hexApprox": "#1c1a18",
+        "dark": "oklch(0.94 0.01 80)",
+        "tonalRamp": [
+          "oklch(0.15 0.005 60)",
+          "oklch(0.26 0.005 60)",
+          "oklch(0.37 0.005 60)",
+          "oklch(0.48 0.005 60)",
+          "oklch(0.59 0.005 60)",
+          "oklch(0.7 0.005 60)",
+          "oklch(0.82 0.005 60)",
+          "oklch(0.95 0.005 60)"
+        ]
+      },
+      "ledger-paper": {
+        "role": "neutral",
+        "displayName": "Ledger Paper",
+        "canonical": "oklch(0.982 0.006 80)",
+        "hexApprox": "#fbf9f5",
+        "dark": "oklch(0.19 0.006 60)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 80)",
+          "oklch(0.26 0.006 80)",
+          "oklch(0.37 0.006 80)",
+          "oklch(0.48 0.006 80)",
+          "oklch(0.59 0.006 80)",
+          "oklch(0.7 0.006 80)",
+          "oklch(0.82 0.006 80)",
+          "oklch(0.95 0.006 80)"
+        ]
+      },
+      "ledger-card": {
+        "role": "neutral",
+        "displayName": "Ledger Card",
+        "canonical": "oklch(0.995 0.003 80)",
+        "hexApprox": "#fefdfb",
+        "dark": "oklch(0.22 0.007 60)",
+        "tonalRamp": [
+          "oklch(0.15 0.003 80)",
+          "oklch(0.26 0.003 80)",
+          "oklch(0.37 0.003 80)",
+          "oklch(0.48 0.003 80)",
+          "oklch(0.59 0.003 80)",
+          "oklch(0.7 0.003 80)",
+          "oklch(0.82 0.003 80)",
+          "oklch(0.95 0.003 80)"
+        ]
+      },
+      "ledger-tint": {
+        "role": "neutral",
+        "displayName": "Ledger Tint",
+        "canonical": "oklch(0.93 0.012 80)",
+        "hexApprox": "#ece7df",
+        "dark": "oklch(0.26 0.007 60)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 80)",
+          "oklch(0.26 0.012 80)",
+          "oklch(0.37 0.012 80)",
+          "oklch(0.48 0.012 80)",
+          "oklch(0.59 0.012 80)",
+          "oklch(0.7 0.012 80)",
+          "oklch(0.82 0.012 80)",
+          "oklch(0.95 0.012 80)"
+        ]
+      },
+      "pencil": {
+        "role": "neutral",
+        "displayName": "Pencil",
+        "canonical": "oklch(0.46 0.012 70)",
+        "hexApprox": "#5c5751",
+        "dark": "oklch(0.74 0.012 75)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 70)",
+          "oklch(0.26 0.012 70)",
+          "oklch(0.37 0.012 70)",
+          "oklch(0.48 0.012 70)",
+          "oklch(0.59 0.012 70)",
+          "oklch(0.7 0.012 70)",
+          "oklch(0.82 0.012 70)",
+          "oklch(0.95 0.012 70)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(0.87 0.012 80)",
+        "hexApprox": "#d8d3cc",
+        "dark": "oklch(1 0 0 / 11%)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 80)",
+          "oklch(0.26 0.012 80)",
+          "oklch(0.37 0.012 80)",
+          "oklch(0.48 0.012 80)",
+          "oklch(0.59 0.012 80)",
+          "oklch(0.7 0.012 80)",
+          "oklch(0.82 0.012 80)",
+          "oklch(0.95 0.012 80)"
+        ]
+      },
+      "field-line": {
+        "role": "neutral",
+        "displayName": "Field Line",
+        "canonical": "oklch(0.78 0.012 80)",
+        "hexApprox": "#bbb7af",
+        "dark": "oklch(1 0 0 / 20%)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 80)",
+          "oklch(0.26 0.012 80)",
+          "oklch(0.37 0.012 80)",
+          "oklch(0.48 0.012 80)",
+          "oklch(0.59 0.012 80)",
+          "oklch(0.7 0.012 80)",
+          "oklch(0.82 0.012 80)",
+          "oklch(0.95 0.012 80)"
+        ]
+      },
+      "red-wash": {
+        "role": "neutral",
+        "displayName": "Red Wash",
+        "canonical": "oklch(0.95 0.03 29)",
+        "hexApprox": "#ffe8e3",
+        "dark": "oklch(0.3 0.07 29)",
+        "tonalRamp": [
+          "oklch(0.15 0.03 29)",
+          "oklch(0.26 0.03 29)",
+          "oklch(0.37 0.03 29)",
+          "oklch(0.48 0.03 29)",
+          "oklch(0.59 0.03 29)",
+          "oklch(0.7 0.03 29)",
+          "oklch(0.82 0.03 29)",
+          "oklch(0.95 0.03 29)"
+        ]
+      },
+      "violet-wash": {
+        "role": "neutral",
+        "displayName": "Violet Wash",
+        "canonical": "oklch(0.95 0.025 285)",
+        "dark": "oklch(0.3 0.05 285)",
+        "tonalRamp": [
+          "oklch(0.15 0.025 285)",
+          "oklch(0.26 0.025 285)",
+          "oklch(0.37 0.025 285)",
+          "oklch(0.48 0.025 285)",
+          "oklch(0.59 0.025 285)",
+          "oklch(0.7 0.025 285)",
+          "oklch(0.82 0.025 285)",
+          "oklch(0.95 0.025 285)"
+        ]
+      },
+      "green-wash": {
+        "role": "neutral",
+        "displayName": "Green Wash",
+        "canonical": "oklch(0.95 0.03 152)",
+        "hexApprox": "#e0f5e5",
+        "dark": "oklch(0.29 0.05 152)",
+        "tonalRamp": [
+          "oklch(0.15 0.03 152)",
+          "oklch(0.26 0.03 152)",
+          "oklch(0.37 0.03 152)",
+          "oklch(0.48 0.03 152)",
+          "oklch(0.59 0.03 152)",
+          "oklch(0.7 0.03 152)",
+          "oklch(0.82 0.03 152)",
+          "oklch(0.95 0.03 152)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Landing hero and closing statement only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Landing section titles."
+      },
+      "statement": {
+        "displayName": "Statement",
+        "purpose": "One pull statement per landing section, in pencil."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Page titles in the app and on login (1.875rem, 2.25rem from sm)."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Hero sub copy."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Row reasons, detail fields, forms."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase ledger column headers and the mock-ledger caption only."
+      },
+      "typed": {
+        "displayName": "Typed",
+        "purpose": "Courier Prime typed record: amounts, IDs, dates, counts, audit log."
+      },
+      "stamp-sm": {
+        "displayName": "Stamp Sm",
+        "purpose": "Small verdict stamp in ledger rows."
+      },
+      "stamp-lg": {
+        "displayName": "Stamp Lg",
+        "purpose": "Large verdict stamp heading the invoice detail."
+      }
+    },
+    "themes": {
+      "dark": {
+        "note": "Applied via the .dark class; ink and paper swap, stamp inks lighten. Values per token in colorMeta.<token>.dark."
+      }
+    },
+    "shadows": [
+      {
+        "name": "crisp",
+        "value": "0 0 0 1px var(--border)",
+        "purpose": "Hairline ring; the only shadow token with a value."
+      },
+      {
+        "name": "lift / cta / hero",
+        "value": "none",
+        "purpose": "Deliberately flat. Depth is drawn with rules, not shadows."
+      }
+    ],
+    "motion": [
+      {
+        "name": "stamp-in",
+        "value": "280ms cubic-bezier(0.23, 1, 0.32, 1); keyframes scale 1.6 -> 0.96 -> 1, opacity 0 -> 1",
+        "purpose": "Signature: a verdict stamp lands at the moment a decision is shown. Never on ordinary renders."
+      },
+      {
+        "name": "press",
+        "value": "160ms cubic-bezier(0.23, 1, 0.32, 1); active scale 0.97",
+        "purpose": "Tactile feedback on buttons, tabs and filters."
+      },
+      {
+        "name": "ease-out-quint",
+        "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "Default easing for state transitions and reveals."
+      },
+      {
+        "name": "ease-in-out-strong",
+        "value": "cubic-bezier(0.77, 0, 0.175, 1)",
+        "purpose": "Available for on-screen moves."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation/transition 0.01ms; press disabled",
+        "purpose": "prefers-reduced-motion: reduce removes the stamp-in and press."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ],
+    "stampTilts": {
+      "approved": "-3deg",
+      "held": "2deg",
+      "blocked": "-4deg",
+      "rejected": "3deg",
+      "pending": "0deg",
+      "error": "0deg"
+    },
+    "openItems": [
+      "Struck-through revocation (contract raise) is not shipped: invoice_events has no event kind or superseded flag; the Stamp 'struck' treatment exists but is unused."
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink-filled main action, one per view.",
+      "html": "<button class=\"ds-btn-primary\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"17 8 12 3 7 8\"/><line x1=\"12\" x2=\"12\" y1=\"3\" y2=\"15\"/></svg>Subir factura</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 16px;border:0;border-radius:3px;background:var(--foreground,#1c1a18);color:var(--background,#fbf9f5);font:600 14px/1 Archivo,ui-sans-serif,system-ui,sans-serif;cursor:pointer;transition:transform 160ms cubic-bezier(.23,1,.32,1),background-color 160ms cubic-bezier(.23,1,.32,1)}.ds-btn-primary:hover{background:color-mix(in oklab,var(--foreground,#1c1a18) 90%,transparent)}.ds-btn-primary:active{transform:scale(.97)}.ds-btn-primary:focus-visible{outline:2px solid var(--ink-violet,#483e90);outline-offset:2px}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action such as Reject.",
+      "html": "<button class=\"ds-btn-outline\">Rechazar</button>",
+      "css": ".ds-btn-outline{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 16px;border:1px solid var(--input,#bbb7af);border-radius:3px;background:var(--background,#fbf9f5);color:var(--foreground,#1c1a18);font:600 14px/1 Archivo,ui-sans-serif,system-ui,sans-serif;cursor:pointer;transition:transform 160ms cubic-bezier(.23,1,.32,1),background-color 160ms}.ds-btn-outline:hover{background:var(--accent,#ece7df)}.ds-btn-outline:active{transform:scale(.97)}.ds-btn-outline:focus-visible{outline:2px solid var(--ink-violet,#483e90);outline-offset:2px}"
+    },
+    {
+      "name": "Verdict Stamps",
+      "kind": "custom",
+      "refersTo": "stamp-approved",
+      "description": "Signature rubber stamp: Courier Prime uppercase in stamp ink, tilted per verdict; pending is dashed and square.",
+      "html": "<div class=\"ds-stamps\"><span class=\"ds-stamp ds-approved\">Aprobada</span><span class=\"ds-stamp ds-held\">Retenida</span><span class=\"ds-stamp ds-blocked\">Bloqueada</span><span class=\"ds-stamp ds-rejected\">Rechazada</span><span class=\"ds-stamp ds-pending\">Pendiente</span></div>",
+      "css": ".ds-stamps{display:flex;flex-wrap:wrap;gap:16px;align-items:center}.ds-stamp{display:inline-flex;align-items:center;white-space:nowrap;padding:2px 8px;border:2px solid currentColor;border-radius:3px;font:700 11px/1.4 'Courier Prime',ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;animation:ds-stamp-in 280ms cubic-bezier(.23,1,.32,1) both}.ds-approved{color:var(--ink-green,#15733c);rotate:-3deg}.ds-held{color:var(--ink-violet,#483e90);rotate:2deg}.ds-blocked{color:var(--ink-red,#be241b);rotate:-4deg}.ds-rejected{color:var(--ink-red,#be241b);rotate:3deg}.ds-pending{color:var(--muted-foreground,#5c5751);border-style:dashed}@keyframes ds-stamp-in{0%{opacity:0;transform:scale(1.6)}60%{opacity:1;transform:scale(.96)}100%{opacity:1;transform:scale(1)}}@media (prefers-reduced-motion:reduce){.ds-stamp{animation:none}}"
+    },
+    {
+      "name": "Large Blocked Stamp",
+      "kind": "custom",
+      "refersTo": "stamp-blocked-lg",
+      "description": "Heads the invoice detail on a security block, with red wash and 3px border.",
+      "html": "<span class=\"ds-stamp-lg\">Bloqueada</span>",
+      "css": ".ds-stamp-lg{display:inline-flex;padding:8px 20px;border:3px solid currentColor;border-radius:3px;background:var(--destructive-soft,#ffe8e3);color:var(--ink-red,#be241b);font:700 30px/1.2 'Courier Prime',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;rotate:-4deg}"
+    },
+    {
+      "name": "Ledger",
+      "kind": "card",
+      "refersTo": "ledger-row",
+      "description": "Ruled invoice queue: 2px ink frame, dashed rows, typed amount, stamp column; blocked row in red wash.",
+      "html": "<div class=\"ds-ledger\"><div class=\"ds-ledger-head\"><span>Factura</span><span>Monto</span><span>Decisión</span></div><div class=\"ds-row\"><span><b>AWS</b><i>INV-001 · 2026-10-01</i><em>Software bajo el umbral de $500.</em></span><span class=\"ds-amt\">USD 150.00</span><span><span class=\"ds-s\" style=\"color:var(--ink-green,#15733c);rotate:-3deg\">Aprobada</span></span></div><div class=\"ds-row ds-row-blocked\"><span><b>AWS</b><i>INV-003 · 2026-10-02</i><em>La cuenta no coincide con la verificada en Blinka.</em></span><span class=\"ds-amt\">USD 150.00</span><span><span class=\"ds-s\" style=\"color:var(--ink-red,#be241b);rotate:-4deg\">Bloqueada</span></span></div></div>",
+      "css": ".ds-ledger{border-top:2px solid var(--rule,#1c1a18);border-bottom:2px solid var(--rule,#1c1a18);font:14px/1.5 Archivo,ui-sans-serif,system-ui,sans-serif;color:var(--foreground,#1c1a18)}.ds-ledger-head,.ds-row{display:grid;grid-template-columns:minmax(0,1fr) 160px 150px;gap:0 24px;padding:16px 12px;align-items:center}.ds-ledger-head{padding:8px 12px;border-bottom:1px solid var(--rule,#1c1a18);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-foreground,#5c5751)}.ds-ledger-head span:not(:first-child),.ds-amt,.ds-row>span:last-child{text-align:right}.ds-row{border-bottom:1px dashed var(--input,#bbb7af);transition:background-color 160ms}.ds-row:last-child{border-bottom:0}.ds-row:hover{background:var(--card,#fefdfb)}.ds-row b{display:block;font-weight:600}.ds-row i{display:block;font:400 12px 'Courier Prime',ui-monospace,monospace;color:var(--muted-foreground,#5c5751);margin-top:4px}.ds-row em{display:block;font-style:normal;margin-top:6px;color:var(--muted-foreground,#5c5751)}.ds-row-blocked{background:color-mix(in oklab,var(--destructive-soft,#ffe8e3) 50%,transparent)}.ds-row-blocked em{color:var(--ink-red,#be241b);font-weight:600}.ds-amt{font:700 16px 'Courier Prime',ui-monospace,monospace;font-variant-numeric:tabular-nums}.ds-s{display:inline-block;padding:2px 8px;border:2px solid currentColor;border-radius:3px;font:700 11px/1.4 'Courier Prime',ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase}"
+    },
+    {
+      "name": "Filter Tabs",
+      "kind": "chip",
+      "refersTo": "filter-tab",
+      "description": "Square pressable filters with typed counts; active is ink-filled.",
+      "html": "<div class=\"ds-filters\"><button class=\"ds-filter\" aria-pressed=\"true\">Todas <span>12</span></button><button class=\"ds-filter\" aria-pressed=\"false\">Retenidas <span>3</span></button><button class=\"ds-filter\" aria-pressed=\"false\">Bloqueos de seguridad <span>1</span></button></div>",
+      "css": ".ds-filters{display:flex;flex-wrap:wrap;gap:8px}.ds-filter{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 12px;border:1px solid var(--input,#bbb7af);border-radius:3px;background:transparent;color:var(--muted-foreground,#5c5751);font:600 14px Archivo,ui-sans-serif,system-ui,sans-serif;cursor:pointer;transition:transform 160ms cubic-bezier(.23,1,.32,1),color 160ms}.ds-filter span{font:400 12px 'Courier Prime',ui-monospace,monospace;opacity:.8}.ds-filter:hover{border-color:var(--foreground,#1c1a18);color:var(--foreground,#1c1a18)}.ds-filter[aria-pressed=true]{background:var(--foreground,#1c1a18);border-color:var(--foreground,#1c1a18);color:var(--background,#fbf9f5)}.ds-filter:active{transform:scale(.97)}.ds-filter:focus-visible{outline:2px solid var(--ink-violet,#483e90);outline-offset:2px}"
+    },
+    {
+      "name": "Workspace Tabs",
+      "kind": "nav",
+      "refersTo": "workspace-tab",
+      "description": "Top-level app navigation; active tab underlined in violet ink.",
+      "html": "<nav class=\"ds-tabs\"><button class=\"ds-tab\" aria-current=\"page\">Facturas</button><button class=\"ds-tab\">Reglas y administración</button><button class=\"ds-tab\">Privacidad</button></nav>",
+      "css": ".ds-tabs{display:flex;gap:24px;align-items:flex-end;border-bottom:1px solid var(--border,#d8d3cc)}.ds-tab{min-height:44px;margin-bottom:-1px;padding:0 4px;border:0;border-bottom:2px solid transparent;background:none;color:var(--muted-foreground,#5c5751);font:600 14px Archivo,ui-sans-serif,system-ui,sans-serif;cursor:pointer;transition:color 160ms}.ds-tab:hover{color:var(--foreground,#1c1a18)}.ds-tab[aria-current=page]{border-bottom-color:var(--ink-violet,#483e90);color:var(--foreground,#1c1a18)}.ds-tab:focus-visible{outline:2px solid var(--ink-violet,#483e90);outline-offset:2px}"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Field-line stroke on paper, 3px corners, violet focus.",
+      "html": "<label class=\"ds-field\">Correo electrónico<input class=\"ds-input\" type=\"email\" placeholder=\"ana@empresa.co\"></label>",
+      "css": ".ds-field{display:block;font:500 14px Archivo,ui-sans-serif,system-ui,sans-serif;color:var(--foreground,#1c1a18)}.ds-input{display:block;width:100%;margin-top:8px;min-height:44px;padding:4px 12px;border:1px solid var(--input,#bbb7af);border-radius:3px;background:var(--background,#fbf9f5);color:inherit;font:400 16px Archivo,ui-sans-serif,system-ui,sans-serif}.ds-input:focus-visible{outline:2px solid var(--ink-violet,#483e90);outline-offset:2px}"
+    },
+    {
+      "name": "Bank Comparison",
+      "kind": "custom",
+      "refersTo": "ledger-row-blocked",
+      "description": "Security-block only: invoice account struck in red vs verified account; labels Archivo, values Courier.",
+      "html": "<dl class=\"ds-bank\"><div><dt>En la factura</dt><dd class=\"ds-bad\">Wells Fargo ****9999</dd></div><div><dt>Verificada en Blinka</dt><dd>Chase ****4321</dd></div></dl>",
+      "css": ".ds-bank{margin:0;border-top:2px solid var(--ink-red,#be241b);border-bottom:2px solid var(--ink-red,#be241b);font:14px Archivo,ui-sans-serif,system-ui,sans-serif}.ds-bank div{display:grid;grid-template-columns:10.5rem minmax(0,1fr);gap:12px;padding:8px 0}.ds-bank div:first-child{border-bottom:1px dashed var(--input,#bbb7af)}.ds-bank dt{color:var(--muted-foreground,#5c5751)}.ds-bank dd{margin:0;font:700 14px 'Courier Prime',ui-monospace,monospace;color:var(--foreground,#1c1a18)}.ds-bank .ds-bad{color:var(--ink-red,#be241b);text-decoration:line-through;text-decoration-thickness:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Notary Ledger",
+    "overview": "WinkWink reads like a notary's book of record. The ground is warm ledger paper and the text is ink. Thick ink rules frame each record and dashed hairlines separate its rows. The only color in the system is stamp ink, and it shows up where a verdict was given. The agent stamps every invoice (Aprobada, Retenida, Bloqueada, Rechazada) and writes its one-sentence reason beside the stamp. A reviewer reads the queue by scanning stamps, not pastel status pills on a gray dashboard.\n\nThe setting is dense and operational. Ruled tables, typewritten amounts and a typed audit log carry the record. Archivo sets everything a person reads or clicks. Courier Prime is kept for what the record itself \"typed\": stamps, amounts, IDs, counts and audit lines. Surfaces are flat paper divided by rules, never floating cards. Light and dark are both full themes: in dark mode the paper turns to a warm near-black, the ink turns to paper, and the stamp inks lighten so they still read.\n\nMotion is limited to one gesture with meaning: the stamp lands (scale 1.6, then 0.96, then 1 over 280ms) when a decision is shown. Everything else is a quick press (scale 0.97) or a short fade.",
+    "keyCharacteristics": [
+      "Ledger paper ground, ink text, 2px ink rules framing every record, dashed hairlines between rows.",
+      "Color is stamp ink: green approves, violet holds, red blocks or rejects. Violet is also the brand ink for the seal, the active tab and the focus ring.",
+      "Every state is told three ways: stamp word, stamp shape (tilt, dashed border) and ink color.",
+      "Archivo for the interface, Courier Prime for the typed record, with tabular figures on every amount.",
+      "Square 3px corners, no soft shadows, no floating cards."
+    ],
+    "rules": [
+      {
+        "name": "The Stamp Ink Rule",
+        "body": "State color exists only as stamp ink: green approves, violet holds, red blocks or rejects. No other component may use these hues to mean anything else.",
+        "section": "colors"
+      },
+      {
+        "name": "The Approved-Not-Paid Rule",
+        "body": "The green stamp reads APROBADA / Approved. It never says Pagada / Paid, because WinkWink decides and never moves money.",
+        "section": "colors"
+      },
+      {
+        "name": "The Typewriter Rule",
+        "body": "Courier Prime is used only for the typed record: stamps, amounts, invoice numbers, dates, counts and audit-log lines. Labels, headings and buttons stay in Archivo. The bank comparison follows this rule: labels in Archivo, account values in Courier.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Figures Rule",
+        "body": "Every amount uses tabular figures and is right-aligned in its column, so the eye can compare amounts down the ledger.",
+        "section": "typography"
+      },
+      {
+        "name": "The Reason-Beside-the-Stamp Rule",
+        "body": "Every verdict appears with its one-sentence reason in the same row or the same block. A stamp is never shown alone.",
+        "section": "layout"
+      },
+      {
+        "name": "The Ruled-Not-Raised Rule",
+        "body": "Separation is drawn with rules (2px ink for a record, 1px dashed field line for rows, 1px hairline for minor divisions). Nothing floats on a shadow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Tilt Rule",
+        "body": "Final stamps sit slightly off square, the way a hand-pressed stamp lands. Approved is -3deg, held 2deg, blocked -4deg and rejected 3deg. Pending and error stay at 0deg with a dashed border, because nothing has been decided yet.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do carry every state as a stamp word, a stamp shape and a stamp ink at the same time.",
+      "Do put the one-sentence reason next to every stamp, in red and semibold when the verdict is a security block.",
+      "Do frame every record with 2px ink rules and separate rows with dashed field-line hairlines.",
+      "Do set amounts, IDs, dates, counts and audit lines in Courier Prime with tabular figures, and everything else in Archivo.",
+      "Do keep corners at 3px (2px for inner segments) and touch targets at 44px or more.",
+      "Do play the stamp-in only at the moment a decision is shown, and let reduced motion turn it off.",
+      "Do keep light and dark both complete: stamp inks lighten in dark mode instead of keeping their light-mode values."
+    ],
+    "donts": [
+      "Don't show state as a pastel rounded pill or a colored dot. State lives in a stamp.",
+      "Don't label the approved stamp Pagada / Paid or suggest a payment was executed.",
+      "Don't use green, violet or red as decoration or a generic accent. Violet is the only exception, used as brand ink for the seal, the active tab and focus.",
+      "Don't lift surfaces with shadows or float soft rounded cards. Separate with rules and paper tone.",
+      "Don't set labels, headings or buttons in Courier Prime.",
+      "Don't delete a decision from the record. The audit log only grows."
+    ]
+  }
+}

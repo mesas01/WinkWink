@@ -45,10 +45,6 @@ const dict = {
     decisionPanel: "Evaluación IA",
     unknownVendor: "Proveedor desconocido",
     restricted: "Acceso restringido. Las reglas solo son visibles para administradores.",
-    toastPaid: "Pago ejecutado por IA",
-    toastReview: "Pago detenido — requiere revisión",
-    toastOverride: "Excepción aprobada",
-    toastRejected: "Factura rechazada",
   },
   en: {
     tagline: "Governance agent for accounts payable",
@@ -91,10 +87,6 @@ const dict = {
     decisionPanel: "AI Evaluation",
     unknownVendor: "Unknown vendor",
     restricted: "Restricted access. Rules are visible to admins only.",
-    toastPaid: "Payment executed by AI",
-    toastReview: "Payment halted — review required",
-    toastOverride: "Override approved",
-    toastRejected: "Invoice rejected",
   },
 };
 
