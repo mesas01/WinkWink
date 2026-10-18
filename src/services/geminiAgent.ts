@@ -154,18 +154,31 @@ async function callGemini(
 }
 
 /** Extracts invoice fields with Gemini, or with the labelled local parser when no key is configured. */
+/** Text the local parser can read: pasted text, or the text layer of an uploaded PDF. */
+async function localText(input: InvoiceInput): Promise<string | null> {
+  if (input.text) return input.text;
+  if (input.file?.mimeType !== "application/pdf") return null;
+  const { extractPdfText } = await import("./pdf-text.server");
+  return extractPdfText(input.file.base64) || null;
+}
+
+const NO_LOCAL_TEXT =
+  "Esta imagen necesita Gemini para leerse y no está disponible ahora. Sube un PDF con texto o pega el contenido.";
+
 export async function extractInvoice(input: InvoiceInput): Promise<ExtractionResult> {
   const apiKey = process.env["GEMINI_API_KEY"]?.trim();
   if (!apiKey) {
-    if (!input.text)
-      throw new Error("Sin GEMINI_API_KEY solo se pueden evaluar facturas en texto.");
-    return { invoice: extractOffline(input.text), source: "offline", model: null };
+    const text = await localText(input);
+    if (!text) throw new Error(NO_LOCAL_TEXT);
+    return { invoice: extractOffline(text), source: "offline", model: null };
   }
   const model = geminiModel();
   try {
     return { invoice: await callGemini(input, apiKey, model), source: "gemini", model };
   } catch (error) {
-    if (!isCapacityError(error) || !input.text) throw error;
-    return { invoice: extractOffline(input.text), source: "fallback", model };
+    if (!isCapacityError(error)) throw error;
+    const text = await localText(input);
+    if (!text) throw new Error(NO_LOCAL_TEXT);
+    return { invoice: extractOffline(text), source: "fallback", model };
   }
 }

@@ -152,7 +152,7 @@ function Nav({ c, es }: { c: C; es: boolean }) {
     supabase.auth.getUser().then(({ data }) => setSignedIn(Boolean(data.user)));
   }, []);
   return (
-    <header className="sticky top-0 z-50 border-b-2 border-rule bg-background">
+    <header className="glass-bar sticky top-0 z-40">
       <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-3 px-5 sm:px-8">
         <Logo />
         <nav
@@ -183,26 +183,48 @@ function Nav({ c, es }: { c: C; es: boolean }) {
 
 function Hero({ c, es }: { c: C; es: boolean }) {
   return (
-    <section className="mx-auto grid max-w-6xl gap-12 px-5 pb-20 pt-14 sm:px-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-center lg:pt-20">
-      <div>
-        <h1 className="text-display lg:text-[clamp(3.5rem,5.2vw,4.75rem)]">
-          {c.h1a}
-          <span className="block text-ink-violet">{c.h1b}</span>
-        </h1>
-        <p className="mt-6 max-w-xl text-lead text-muted-foreground">{c.sub}</p>
-        <div className="mt-9 flex flex-wrap items-center gap-3">
-          <Button asChild size="lg">
-            <Link to="/login">
-              {c.cta}
-              <ArrowRight />
-            </Link>
-          </Button>
-          <Button asChild size="lg" variant="outline">
-            <Link to="/agente">{c.cta2}</Link>
-          </Button>
-        </div>
-      </div>
-      <LedgerMock c={c} es={es} />
+    <section className="mx-auto max-w-6xl px-5 pb-24 pt-20 text-center sm:px-8 lg:pt-28">
+      <motion.h1
+        className="text-display mx-auto max-w-4xl"
+        initial={{ opacity: 0, y: 14, filter: "blur(8px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ duration: 0.7, ease }}
+      >
+        {c.h1a}
+        <span className="block text-muted-foreground">{c.h1b}</span>
+      </motion.h1>
+      <motion.p
+        className="mx-auto mt-6 max-w-2xl text-lead text-muted-foreground"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.12, ease }}
+      >
+        {c.sub}
+      </motion.p>
+      <motion.div
+        className="mt-9 flex flex-wrap items-center justify-center gap-3"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2, ease }}
+      >
+        <Button asChild size="lg">
+          <Link to="/agente">
+            {c.cta2}
+            <ArrowRight />
+          </Link>
+        </Button>
+        <Button asChild size="lg" variant="outline">
+          <Link to="/login">{c.cta}</Link>
+        </Button>
+      </motion.div>
+      <motion.div
+        className="mx-auto mt-16 max-w-3xl text-left"
+        initial={{ opacity: 0, y: 40, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: "spring", bounce: 0, duration: 0.9, delay: 0.3 }}
+      >
+        <LedgerMock c={c} es={es} />
+      </motion.div>
     </section>
   );
 }
@@ -217,9 +239,14 @@ const MOCK_ROWS: { id: string; vendor: string; amount: string; tone: StampTone }
 /** Synthetic example ledger. The stamps land one after another: the agent deciding, row by row. */
 function LedgerMock({ c, es }: { c: C; es: boolean }) {
   return (
-    <figure className="border-2 border-rule bg-card shadow-hero">
-      <figcaption className="flex items-center justify-between border-b-2 border-rule px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em]">
-        <span>{es ? "Cola de facturas" : "Invoice queue"}</span>
+    <figure className="overflow-hidden rounded-[22px] bg-card shadow-hero ring-1 ring-hairline">
+      <figcaption className="glass-bar flex items-center gap-3 px-4 py-3 text-[13px] font-medium">
+        <span aria-hidden className="flex gap-1.5">
+          <span className="size-3 rounded-full bg-[#ff5f57]" />
+          <span className="size-3 rounded-full bg-[#febc2e]" />
+          <span className="size-3 rounded-full bg-[#28c840]" />
+        </span>
+        <span className="flex-1">{es ? "Cola de facturas" : "Invoice queue"}</span>
         <span className="text-muted-foreground">
           {es ? "Ejemplo sintético" : "Synthetic example"}
         </span>
@@ -229,7 +256,7 @@ function LedgerMock({ c, es }: { c: C; es: boolean }) {
           <li
             key={r.id}
             className={cn(
-              "grid grid-cols-[minmax(0,1fr)_auto_7.5rem] items-center gap-4 border-b border-dashed border-input px-4 py-3.5 last:border-b-0",
+              "grid grid-cols-[minmax(0,1fr)_auto_7.5rem] items-center gap-4 border-b border-hairline px-4 py-3.5 last:border-b-0",
               r.tone === "blocked" && "bg-destructive-soft/60",
             )}
           >
@@ -247,7 +274,7 @@ function LedgerMock({ c, es }: { c: C; es: boolean }) {
           </li>
         ))}
       </ul>
-      <p className="border-t-2 border-rule px-4 py-3 text-sm font-semibold leading-relaxed text-ink-red">
+      <p className="border-t border-hairline px-4 py-3 text-sm font-semibold leading-relaxed text-danger">
         {c.blockedLog}
       </p>
     </figure>
@@ -283,7 +310,7 @@ const STEP_ICONS = [ScanLine, ShieldCheck, Scale];
 
 function How({ c }: { c: C }) {
   return (
-    <section id="how" className="scroll-mt-20 border-y-2 border-rule bg-surface">
+    <section id="how" className="scroll-mt-20 surface-group bg-surface">
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
         <h2 className="text-headline max-w-2xl">{c.howTitle}</h2>
         <p className="text-statement mt-8 max-w-4xl text-muted-foreground">{c.statement}</p>
@@ -295,10 +322,10 @@ function How({ c }: { c: C }) {
                 as="li"
                 key={s.t}
                 delay={i * 0.08}
-                className="border-t-2 border-rule py-6 md:border-l md:border-t-2 md:border-l-input md:px-6 md:first:border-l-0 md:first:pl-0"
+                className="border-t border-hairline py-6 md:border-l md:border-t-2 md:border-l-input md:px-6 md:first:border-l-0 md:first:pl-0"
               >
                 <span className="flex items-center gap-3">
-                  <span className="typed text-sm font-bold text-ink-violet">{i + 1}/3</span>
+                  <span className="typed text-sm font-bold text-brand">{i + 1}/3</span>
                   <Icon className="size-5 text-muted-foreground" strokeWidth={1.75} />
                 </span>
                 <p className="mt-4 text-xl font-bold tracking-[-0.01em]">{s.t}</p>
@@ -321,12 +348,12 @@ function Outcomes({ c, es }: { c: C; es: boolean }) {
   return (
     <section id="control" className="mx-auto max-w-6xl scroll-mt-20 px-5 py-24 sm:px-8">
       <h2 className="text-headline max-w-2xl">{c.outTitle}</h2>
-      <div className="mt-12 border-y-2 border-rule">
+      <div className="mt-12 surface-group">
         {entries.map((e, i) => (
           <Reveal
             key={e.tone}
             delay={i * 0.06}
-            className="grid gap-4 border-b border-dashed border-input py-7 last:border-b-0 md:grid-cols-[15rem_minmax(0,1fr)] md:items-start"
+            className="grid gap-4 border-b border-hairline py-7 last:border-b-0 md:grid-cols-[15rem_minmax(0,1fr)] md:items-start"
           >
             <Stamp tone={e.tone} es={es} size="lg" className="justify-self-start text-xl" />
             <div>
@@ -334,17 +361,17 @@ function Outcomes({ c, es }: { c: C; es: boolean }) {
               <p
                 className={cn(
                   "mt-2 max-w-3xl leading-relaxed",
-                  e.tone === "blocked" ? "text-ink-red" : "text-muted-foreground",
+                  e.tone === "blocked" ? "text-danger" : "text-muted-foreground",
                 )}
               >
                 {e.log}
               </p>
               {e.tone === "held" && (
                 <div className="mt-4 flex flex-wrap gap-2" aria-hidden>
-                  <span className="inline-flex min-h-9 items-center rounded-[3px] bg-foreground px-3 text-sm font-semibold text-background">
+                  <span className="inline-flex min-h-9 items-center rounded-full bg-primary px-4 text-sm font-semibold text-background">
                     {c.approve}
                   </span>
-                  <span className="inline-flex min-h-9 items-center rounded-[3px] border border-input px-3 text-sm font-semibold text-ink-red">
+                  <span className="inline-flex min-h-9 items-center rounded-full bg-card px-4 shadow-crisp text-sm font-semibold text-danger">
                     {c.reject}
                   </span>
                 </div>
@@ -359,18 +386,18 @@ function Outcomes({ c, es }: { c: C; es: boolean }) {
 
 function Rules({ c }: { c: C }) {
   return (
-    <section id="rules" className="scroll-mt-20 border-y-2 border-rule bg-surface">
+    <section id="rules" className="scroll-mt-20 surface-group bg-surface">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-24 sm:px-8 lg:grid-cols-2 lg:items-center">
         <h2 className="text-headline whitespace-pre-line">{c.rulesTitle}</h2>
-        <ul className="border-y-2 border-rule">
+        <ul className="surface-group">
           {c.rules.map((r, i) => (
             <Reveal
               as="li"
               key={r}
               delay={i * 0.06}
-              className="flex items-center gap-4 border-b border-dashed border-input py-4 last:border-b-0"
+              className="flex items-center gap-4 border-b border-hairline py-4 last:border-b-0"
             >
-              <span className="typed text-sm font-bold text-ink-violet">R{i + 1}</span>
+              <span className="typed text-sm font-bold text-brand">R{i + 1}</span>
               <span className="min-w-0 flex-1 font-semibold">{r}</span>
               <span aria-hidden className="relative h-6 w-10 shrink-0 rounded-full bg-foreground">
                 <span className="absolute right-0.5 top-0.5 size-5 rounded-full bg-background" />
@@ -394,7 +421,7 @@ function Final({ c }: { c: C }) {
             <ArrowRight />
           </Link>
         </Button>
-        <footer className="mt-24 flex flex-col gap-4 border-t-2 border-rule py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <footer className="mt-24 flex flex-col gap-4 border-t border-hairline py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <span>{c.foot} · Santiago Mesa</span>
           <LegalLinks />
         </footer>

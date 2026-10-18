@@ -82,7 +82,7 @@ function CameraDialog({
           playsInline
           muted
           onLoadedData={() => setReady(true)}
-          className="aspect-[4/3] w-full border-2 border-rule bg-foreground object-cover"
+          className="aspect-[4/3] w-full surface-card bg-foreground object-cover"
         />
         <div className="flex flex-wrap gap-2">
           <Button onClick={shoot} disabled={!ready}>

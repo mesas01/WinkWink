@@ -14,19 +14,8 @@ const LABELS: Record<StampTone, StampLabel> = {
   error: { es: "Error", en: "Error" },
 };
 
-const TILTS: Record<StampTone, string> = {
-  approved: "-3deg",
-  held: "2deg",
-  blocked: "-4deg",
-  rejected: "3deg",
-  pending: "0deg",
-  error: "0deg",
-};
-
 export const stampLabel = (tone: StampTone, es: boolean): string =>
   es ? LABELS[tone].es : LABELS[tone].en;
-
-export const stampTilt = (tone: StampTone): string => TILTS[tone];
 
 interface InvoiceStampInput {
   status: string;

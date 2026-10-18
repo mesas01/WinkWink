@@ -90,12 +90,12 @@ export function SecurityBadge({ status, es }: { status: string | null; es: boole
   return (
     <span
       className={cn(
-        "typed inline-flex max-w-full items-center gap-2 rounded-[3px] border-2 border-current px-2 py-1 text-xs font-bold uppercase tracking-[0.04em] whitespace-normal",
+        "inline-flex max-w-full items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold tracking-[0.04em] whitespace-normal",
         status === "blocked"
-          ? "bg-destructive-soft text-ink-red"
+          ? "bg-destructive-soft text-danger"
           : status === "passed"
-            ? "text-ink-green"
-            : "text-ink-violet",
+            ? "bg-success-soft text-ok"
+            : "bg-warning-soft text-hold",
       )}
     >
       {status === "passed" ? (

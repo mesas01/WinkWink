@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Stamp } from "@/components/stamp";
 import { decisionStampTone } from "@/lib/stamp";
 import type { DecisionStatus } from "@/domain/agent/types";
@@ -30,17 +31,28 @@ export function AgentQueue({
 }: QueueProps) {
   if (invoices.length === 0)
     return (
-      <p className="border-y-2 border-rule py-10 text-center text-sm text-muted-foreground">
+      <p className="surface-group py-10 text-center text-sm text-muted-foreground">
         {es ? "No hay facturas en esta vista." : "No invoices in this view."}
       </p>
     );
   return (
-    <ul className="border-y-2 border-rule">
-      {invoices.map((i) => {
+    <ul className="surface-group">
+      {invoices.map((i, index) => {
         const tone = decisionStampTone(statusOf(i.id));
         const selected = i.id === selectedId;
         return (
-          <li key={i.id} className="border-b border-dashed border-input last:border-b-0">
+          <motion.li
+            key={i.id}
+            layout="position"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.32,
+              delay: Math.min(index, 8) * 0.04,
+              ease: [0.23, 1, 0.32, 1],
+            }}
+            className="border-b border-hairline last:border-b-0"
+          >
             <button
               type="button"
               aria-current={selected ? "true" : undefined}
@@ -48,7 +60,7 @@ export function AgentQueue({
               className={cn(
                 "grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 px-3 py-3.5 text-left transition-colors hover:bg-card",
                 tone === "blocked" && "bg-destructive-soft/50",
-                selected && "bg-card shadow-[inset_3px_0_0_var(--ink-violet)]",
+                selected && "bg-primary-soft/60 shadow-[inset_3px_0_0_var(--brand)]",
               )}
             >
               <span className="min-w-0">
@@ -63,7 +75,7 @@ export function AgentQueue({
                 <Stamp tone={tone} es={es} />
               </span>
             </button>
-          </li>
+          </motion.li>
         );
       })}
     </ul>

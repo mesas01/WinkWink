@@ -12,10 +12,10 @@ export function BankMismatch({
 }) {
   if (!comparison) return null;
   return (
-    <dl className="mt-4 border-y-2 border-ink-red text-sm">
-      <div className="grid grid-cols-[10.5rem_minmax(0,1fr)] gap-3 border-b border-dashed border-input py-2">
+    <dl className="mt-4 overflow-hidden rounded-2xl bg-destructive-soft px-4 text-sm">
+      <div className="grid grid-cols-[10.5rem_minmax(0,1fr)] gap-3 border-b border-hairline py-2">
         <dt className="text-muted-foreground">{es ? "En la factura" : "On the invoice"}</dt>
-        <dd className="typed font-bold text-ink-red line-through decoration-2">
+        <dd className="typed font-bold text-danger line-through decoration-2">
           {comparison.invoiceAccount}
         </dd>
       </div>
@@ -53,7 +53,7 @@ export function SupplierReferenceLine({ status, es }: { status: string | null; e
     <p
       className={cn(
         "mt-4 flex items-center gap-2 text-sm font-semibold",
-        key === "blocked" ? "text-ink-red" : "text-foreground",
+        key === "blocked" ? "text-danger" : "text-foreground",
       )}
     >
       <Icon className={cn("size-4 shrink-0", key !== "blocked" && "text-muted-foreground")} />

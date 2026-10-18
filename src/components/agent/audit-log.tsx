@@ -22,7 +22,7 @@ export function AuditLog({
 }) {
   const replaced = supersededIds(events);
   return (
-    <section className="mt-6 border-t-2 border-rule pt-4">
+    <section className="mt-6 border-t border-hairline pt-4">
       <h3 className="text-sm font-bold">{es ? "Registro de auditoría" : "Audit log"}</h3>
       <ol className="mt-3 grid gap-3">
         {events.map((e) => {

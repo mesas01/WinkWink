@@ -67,7 +67,8 @@ function render(seconds) {
       }
       // Hi-hat on the off-beats
       const s0 = Math.floor((bt + BEAT * 0.5) * SR);
-      for (let k = 0; k < SR * 0.05; k++) add(s0 + k, (Math.random() * 2 - 1) * Math.exp(-(k / SR) * 90) * 0.02, 0.2);
+      for (let k = 0; k < SR * 0.05; k++)
+        add(s0 + k, (Math.random() * 2 - 1) * Math.exp(-(k / SR) * 90) * 0.02, 0.2);
     }
   }
   // Gentle low-pass for warmth, then normalize with fade in/out

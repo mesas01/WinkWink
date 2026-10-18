@@ -34,12 +34,12 @@ function SelectedFile({ file, es, onClear }: { file: File; es: boolean; onClear:
     return () => URL.revokeObjectURL(u);
   }, [file]);
   return (
-    <div className="flex items-start gap-3 border border-dashed border-input p-2">
+    <div className="flex items-start gap-3 border border-hairline p-2">
       {url && (
         <img
           src={url}
           alt={es ? "Vista previa de la factura" : "Invoice preview"}
-          className="h-28 w-auto border border-rule object-contain"
+          className="h-28 w-auto border border-hairline object-contain"
         />
       )}
       <div className="min-w-0 flex-1 text-sm">
@@ -95,7 +95,7 @@ export function NewInvoiceForm({
   }
 
   return (
-    <form onSubmit={submit} className="grid gap-3 border-y-2 border-rule py-4">
+    <form onSubmit={submit} className="grid gap-3 surface-group py-4">
       <label className="text-sm font-semibold" htmlFor="invoice-text">
         {es ? "Texto de la factura" : "Invoice text"}
       </label>
@@ -115,7 +115,7 @@ export function NewInvoiceForm({
         {es ? "o un PDF / imagen" : "or a PDF / image"}
         {!geminiReady && (
           <span className="ml-2 font-normal text-muted-foreground">
-            {es ? "(requiere GEMINI_API_KEY)" : "(requires GEMINI_API_KEY)"}
+            {es ? "(las fotos requieren Gemini)" : "(photos require Gemini)"}
           </span>
         )}
       </label>
@@ -123,8 +123,7 @@ export function NewInvoiceForm({
         <Input
           id="invoice-file"
           type="file"
-          accept={TYPES.join(",")}
-          disabled={!geminiReady}
+          accept={geminiReady ? TYPES.join(",") : "application/pdf"}
           onChange={async (e) => {
             const picked = e.target.files?.[0];
             e.target.value = "";

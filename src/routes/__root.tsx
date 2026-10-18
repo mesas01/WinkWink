@@ -147,6 +147,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <MotionConfig reducedMotion="user">
+        <div aria-hidden className="ambient" />
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] bg-background p-3"
@@ -157,7 +158,11 @@ function RootComponent() {
           <Outlet />
         </main>
       </MotionConfig>
-      <Toaster position="bottom-right" theme={theme} toastOptions={{ className: "font-sans" }} />
+      <Toaster
+        position="bottom-center"
+        theme={theme}
+        toastOptions={{ className: "font-sans !rounded-2xl !shadow-[var(--shadow-lift)]" }}
+      />
     </QueryClientProvider>
   );
 }

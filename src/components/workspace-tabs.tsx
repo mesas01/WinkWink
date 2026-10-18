@@ -1,5 +1,6 @@
 import { Eye, FileText, FolderOpen, Settings, ShieldCheck, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Segmented } from "@/components/segmented";
 
 export type WorkspaceView = "history" | "rules" | "privacy" | "demo";
 
@@ -34,40 +35,36 @@ interface WorkspaceTabsProps {
   es: boolean;
 }
 
-const tabClass = (active: boolean) =>
-  cn(
-    "press relative -mb-px inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-1 text-sm font-semibold transition-colors",
-    active
-      ? "border-ink-violet text-foreground"
-      : "border-transparent text-muted-foreground hover:text-foreground",
-  );
-
 export function WorkspaceTabs(props: WorkspaceTabsProps) {
   const { view, onView, adminUi, isAdmin, employeePreview, onTogglePreview, es } = props;
   const visible = TABS.filter((t) => adminUi || !t.adminOnly);
   return (
     <nav
       aria-label={es ? "Espacio de trabajo" : "Workspace"}
-      className="-mx-4 flex items-end gap-x-6 overflow-x-auto border-b px-4 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0"
+      className="flex flex-wrap items-center justify-between gap-3"
     >
-      {visible.map(({ id, icon: Icon, es: labelEs, en }) => (
-        <button
-          key={id}
-          type="button"
-          aria-current={view === id ? "page" : undefined}
-          onClick={() => onView(id)}
-          className={tabClass(view === id)}
-        >
-          <Icon className="size-4" />
-          {es ? labelEs : en}
-        </button>
-      ))}
+      <Segmented
+        role="page"
+        label={es ? "Secciones" : "Sections"}
+        value={view}
+        onChange={onView}
+        options={visible.map(({ id, icon, es: labelEs, en }) => ({
+          id,
+          icon,
+          label: es ? labelEs : en,
+        }))}
+      />
       {isAdmin && (
         <button
           type="button"
           aria-pressed={employeePreview}
           onClick={onTogglePreview}
-          className={cn(tabClass(employeePreview), "sm:ml-auto")}
+          className={cn(
+            "press inline-flex min-h-9 items-center gap-1.5 rounded-full px-4 text-[13px] font-medium",
+            employeePreview
+              ? "bg-foreground text-background"
+              : "glass text-muted-foreground hover:text-foreground",
+          )}
         >
           <Eye className="size-4" />
           {es ? "Vista de empleado" : "Employee view"}

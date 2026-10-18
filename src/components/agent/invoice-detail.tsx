@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { motion } from "framer-motion";
 import { Check, Lock, Play, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -77,7 +78,7 @@ function AdminActions({
   return (
     <div className="mt-5 grid gap-3 sm:grid-cols-2">
       {status === "SECURITY_BLOCKED" ? (
-        <p className="flex items-start gap-2 text-sm font-semibold text-ink-red">
+        <p className="flex items-start gap-2 text-sm font-semibold text-danger">
           <Lock className="mt-0.5 size-4 shrink-0" />
           {es
             ? "Aprobación bloqueada: la cuenta no coincide con la verificada en Blinka."
@@ -105,15 +106,22 @@ export function InvoiceDetail({ invoice, status, role, agent, es, lang }: Detail
   const reason = currentDecisionEvent(events, invoice.id)?.message ?? invoice.decision?.reason;
   const tone = decisionStampTone(status);
   return (
-    <article aria-label={invoice.title}>
+    <motion.article
+      aria-label={invoice.title}
+      initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
+      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      transition={{ duration: 0.28, ease: [0.23, 1, 0.32, 1] }}
+    >
       <p className="typed text-xs text-muted-foreground">
         {invoice.id} · {invoice.submittedBy}
       </p>
-      <h2 className="mt-1 text-2xl font-extrabold tracking-[-0.02em]">{invoice.title}</h2>
+      <h2 className="mt-1 text-[26px] font-semibold leading-tight tracking-[-0.022em]">
+        {invoice.title}
+      </h2>
       {!decided && (
         <>
           {invoice.text && (
-            <pre className="typed mt-4 max-h-56 overflow-auto whitespace-pre-wrap border-y border-dashed border-input py-3 text-[13px] leading-relaxed">
+            <pre className="typed mt-4 max-h-56 overflow-auto whitespace-pre-wrap border-y border-hairline py-3 text-[13px] leading-relaxed">
               {invoice.text}
             </pre>
           )}
@@ -134,7 +142,7 @@ export function InvoiceDetail({ invoice, status, role, agent, es, lang }: Detail
           <p
             className={
               tone === "blocked"
-                ? "mt-4 font-semibold leading-relaxed text-ink-red"
+                ? "mt-4 font-semibold leading-relaxed text-danger"
                 : "mt-4 leading-relaxed"
             }
           >
@@ -158,6 +166,6 @@ export function InvoiceDetail({ invoice, status, role, agent, es, lang }: Detail
         </div>
       )}
       <AuditLog events={events} lang={lang} es={es} />
-    </article>
+    </motion.article>
   );
 }

@@ -45,10 +45,10 @@ export function LedgerFilters({ invoices, filter, onFilter, es }: FilterBarProps
           aria-pressed={filter === f.id}
           onClick={() => onFilter(f.id)}
           className={cn(
-            "press inline-flex min-h-10 items-center gap-2 rounded-[3px] border px-3 text-sm font-semibold",
+            "press inline-flex min-h-9 items-center gap-2 rounded-full px-4 text-[13px] font-medium",
             filter === f.id
-              ? "border-foreground bg-foreground text-background"
-              : "border-input text-muted-foreground hover:border-foreground hover:text-foreground",
+              ? "bg-foreground text-background"
+              : "glass text-muted-foreground hover:text-foreground",
           )}
         >
           {es ? f.es : f.en}
@@ -83,7 +83,7 @@ function LedgerRow({ invoice: i, adminUi, es, lang, onOpen }: RowProps) {
   const tone = invoiceStampTone(i);
   const missing = es ? "Sin identificar" : "Not identified";
   return (
-    <li className="border-b border-dashed border-input last:border-b-0">
+    <li className="border-b border-hairline last:border-b-0">
       <button
         type="button"
         onClick={() => onOpen(i.id)}
@@ -109,7 +109,7 @@ function LedgerRow({ invoice: i, adminUi, es, lang, onOpen }: RowProps) {
           <span
             className={cn(
               "mt-1.5 line-clamp-2 text-sm",
-              tone === "blocked" ? "font-semibold text-ink-red" : "text-muted-foreground",
+              tone === "blocked" ? "font-semibold text-danger" : "text-muted-foreground",
             )}
           >
             {reasonFor(i, es)}
@@ -136,7 +136,7 @@ interface LedgerProps {
 export function InvoiceLedger({ invoices, adminUi, es, lang, onOpen, onUpload }: LedgerProps) {
   if (invoices.length === 0)
     return (
-      <div className="mt-5 border-y-2 border-rule py-16 text-center">
+      <div className="mt-5 surface-group py-16 text-center">
         <FileText className="mx-auto size-9 text-muted-foreground" strokeWidth={1.5} />
         <h2 className="mt-4 text-xl font-bold">
           {es ? "No hay facturas en esta vista" : "No invoices in this view"}
@@ -153,10 +153,10 @@ export function InvoiceLedger({ invoices, adminUi, es, lang, onOpen, onUpload }:
       </div>
     );
   return (
-    <div className="mt-5 border-y-2 border-rule">
+    <div className="mt-5 surface-group">
       <div
         aria-hidden
-        className="hidden grid-cols-[minmax(0,1fr)_160px_150px] gap-x-6 border-b border-rule px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground sm:grid"
+        className="hidden grid-cols-[minmax(0,1fr)_160px_150px] gap-x-6 border-b border-hairline px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground sm:grid"
       >
         <span>{es ? "Factura" : "Invoice"}</span>
         <span className="text-right">{es ? "Monto" : "Amount"}</span>

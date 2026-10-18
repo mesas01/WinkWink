@@ -50,6 +50,13 @@ interface AgentState {
   reset: () => void;
 }
 
+/** Uploaded files are named after what the agent read, not after the file name. */
+function titleFor(invoice: AgentInvoice, extraction: ExtractionResult): string {
+  const { vendor, invoiceNumber } = extraction.invoice;
+  if (!invoice.fileName || !vendor) return invoice.title;
+  return invoiceNumber ? `${vendor} · ${invoiceNumber}` : vendor;
+}
+
 const seedInvoices = (): AgentInvoice[] =>
   SAMPLE_INVOICES.map((s, i) => ({
     id: s.id,
@@ -109,7 +116,9 @@ export const useAgentStore = create<AgentState>()(
       recordRun: (invoiceId, extraction, run) =>
         set((s) => ({
           invoices: s.invoices.map((i) =>
-            i.id === invoiceId ? { ...i, extraction, decision: run.decision } : i,
+            i.id === invoiceId
+              ? { ...i, title: titleFor(i, extraction), extraction, decision: run.decision }
+              : i,
           ),
           events: [
             ...s.events.filter((e) => e.invoiceId !== invoiceId || e.kind === "submitted"),

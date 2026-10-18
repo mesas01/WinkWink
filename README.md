@@ -144,7 +144,7 @@ con la cuenta pre-verificada de AWS en Blinka (Chase ****4321). Pago bloqueado p
 | Motor de decisión | TypeScript puro y determinista (`src/domain/agent`), **16 tests** propios |
 | App | TanStack Start · React 19 · Tailwind v4 · shadcn/Radix · zustand · sonner |
 | Backend existente | Supabase (auth y panel principal) |
-| Diseño | Sistema "Sello notarial": papel de libro, tinta y sellos. Ver [`DESIGN.md`](DESIGN.md) |
+| Diseño | Estilo Apple: tipografía del sistema, vidrio translúcido, un solo acento azul y animaciones con resortes. Ver [`DESIGN.md`](DESIGN.md) |
 
 La llave de Gemini vive **solo en el servidor** (`.env`, ignorado por git); el navegador nunca la ve.
 
@@ -166,6 +166,8 @@ npm install
 cp .env.example .env      # agrega tu GEMINI_API_KEY
 npm run dev               # abre http://localhost:8080/agente
 ```
+
+**Facturas de prueba:** en [`test-invoices/`](test-invoices) hay 8 PDFs sintéticos listos para subir en *Nueva factura* (aprobadas, retenidas y dos fraudes: cuenta cambiada y Tax ID falso). Cada uno indica el resultado esperado en su [README](test-invoices/README.md). Regenéralos con `npm run invoices:generate`.
 
 Consigue la llave gratis en [Google AI Studio](https://aistudio.google.com/apikey). Sin llave, la demo igual funciona: el agente usa una extracción local de texto y lo indica en pantalla.
 

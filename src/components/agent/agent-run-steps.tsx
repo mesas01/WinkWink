@@ -34,13 +34,13 @@ export function AgentRunSteps({
             key={s.en}
             className={cn("flex items-center gap-2", !done && !active && "text-muted-foreground")}
           >
-            <span className="typed w-5 text-xs font-bold text-ink-violet">
+            <span className="typed w-5 text-xs font-bold text-brand">
               {String.fromCharCode(64 + n)}
             </span>
             {done ? (
               <Check className="size-4 text-foreground" />
             ) : active ? (
-              <Loader2 className="size-4 animate-spin text-ink-violet" />
+              <Loader2 className="size-4 animate-spin text-brand" />
             ) : (
               <span className="size-4" />
             )}

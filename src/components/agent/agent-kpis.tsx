@@ -35,17 +35,17 @@ export function AgentKpis({ statuses, kinds, es }: KpiProps) {
     },
   ];
   return (
-    <dl className="grid grid-cols-2 border-y-2 border-rule md:grid-cols-4">
+    <dl className="grid grid-cols-2 surface-group md:grid-cols-4">
       {items.map((k) => (
         <div
           key={k.label}
-          className="border-b border-dashed border-input px-4 py-3 md:border-b-0 md:border-l md:first:border-l-0"
+          className="border-b border-hairline px-4 py-3 md:border-b-0 md:border-l md:first:border-l-0"
         >
           <dt className="text-xs text-muted-foreground">{k.label}</dt>
           <dd
             className={
               k.red && k.value !== "0"
-                ? "typed text-2xl font-bold text-ink-red"
+                ? "typed text-2xl font-bold text-danger"
                 : "typed text-2xl font-bold"
             }
           >

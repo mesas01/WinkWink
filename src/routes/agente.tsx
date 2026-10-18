@@ -5,6 +5,7 @@ import { FastForward, RotateCcw } from "lucide-react";
 import { Logo, LangSwitch, ThemeToggle } from "@/components/blinka";
 import { Button } from "@/components/ui/button";
 import { RoleSwitch } from "@/components/agent/role-switch";
+import { Segmented } from "@/components/segmented";
 import { AccessCodeField } from "@/components/agent/access-code-field";
 import { AgentKpis } from "@/components/agent/agent-kpis";
 import { AgentQueue } from "@/components/agent/agent-queue";
@@ -18,7 +19,6 @@ import { useApp } from "@/lib/store";
 import { invoiceStatus, useAgentStore, type AgentInvoice } from "@/stores/agent-store";
 import { ADMIN_NAME } from "@/domain/agent/samples";
 import { currentDecisionEvent } from "@/domain/agent/audit";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/agente")({
   ssr: false,
@@ -62,7 +62,7 @@ function useGeminiStatus() {
 function GeminiBadge({ status, es }: { status: ReturnType<typeof useGeminiStatus>; es: boolean }) {
   if (!status) return null;
   return (
-    <p className="typed text-xs text-muted-foreground">
+    <p className="mt-2 text-[13px] text-muted-foreground">
       {status.gemini
         ? `Gemini · ${status.model}`
         : es
@@ -126,7 +126,7 @@ function AgentPage() {
 
   return (
     <div className="min-h-dvh bg-background">
-      <header className="border-b-2 border-rule">
+      <header className="glass-bar sticky top-0 z-40">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-8">
           <Logo />
           <div className="flex flex-wrap items-center gap-2">
@@ -139,7 +139,7 @@ function AgentPage() {
       <main className="mx-auto max-w-7xl px-4 py-7 sm:px-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-[-0.025em] sm:text-4xl">
+            <h1 className="text-headline">
               {role === "admin"
                 ? es
                   ? "Agente de cuentas por pagar"
@@ -188,27 +188,18 @@ function AgentPage() {
             />
           </div>
         )}
-        <nav
-          aria-label={es ? "Secciones del agente" : "Agent sections"}
-          className="-mx-4 mt-6 flex gap-x-6 overflow-x-auto border-b px-4 sm:mx-0 sm:px-0"
-        >
-          {TABS.filter((t) => !t.admin || role === "admin").map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              aria-current={activeTab === t.id ? "page" : undefined}
-              onClick={() => setTab(t.id)}
-              className={cn(
-                "press -mb-px min-h-11 shrink-0 whitespace-nowrap border-b-2 px-1 text-sm font-semibold",
-                activeTab === t.id
-                  ? "border-ink-violet text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {es ? t.es : t.en}
-            </button>
-          ))}
-        </nav>
+        <div className="mt-8">
+          <Segmented
+            role="page"
+            label={es ? "Secciones del agente" : "Agent sections"}
+            value={activeTab}
+            onChange={setTab}
+            options={TABS.filter((t) => !t.admin || role === "admin").map((t) => ({
+              id: t.id,
+              label: es ? t.es : t.en,
+            }))}
+          />
+        </div>
         <div className="mt-6">
           {activeTab === "queue" && (
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
@@ -220,9 +211,10 @@ function AgentPage() {
                 showSubmitter={role === "admin"}
                 es={es}
               />
-              <div className="lg:sticky lg:top-6 lg:self-start lg:border-l lg:border-input lg:pl-8">
+              <div className="surface-card p-6 sm:p-8 lg:sticky lg:top-24 lg:self-start">
                 {selected ? (
                   <InvoiceDetail
+                    key={selected.id}
                     invoice={selected}
                     status={statusOf(selected.id)}
                     role={role}

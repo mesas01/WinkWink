@@ -229,7 +229,7 @@ export function LegalPage({ kind }: { kind: keyof typeof policies }) {
   const c = policies[kind][lang];
   return (
     <div className="min-h-dvh bg-background">
-      <header className="mx-auto grid max-w-4xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-5">
+      <header className="glass-bar sticky top-0 z-40 mx-auto grid max-w-4xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-5">
         <Logo />
         <div className="flex items-center gap-2">
           <ThemeToggle />

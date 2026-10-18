@@ -202,7 +202,7 @@ export function TransferDemo({
           }
         </div>
       )}
-      <ul className="mt-5 divide-y divide-dashed divide-input border-y-2 border-rule">
+      <ul className="mt-5 divide-y divide-dashed divide-input surface-group">
         {list.map((i) => (
           <li key={i.id} className="grid min-w-0 gap-4 py-5 md:grid-cols-[minmax(0,1fr)_auto]">
             <div className="min-w-0">

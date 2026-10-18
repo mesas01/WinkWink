@@ -119,7 +119,7 @@ function Login() {
   }
   return (
     <div className="min-h-dvh bg-surface">
-      <header className="border-b-2 border-rule bg-background">
+      <header className="glass-bar sticky top-0 z-40">
         <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-8">
           <Logo />
           <div className="flex items-center gap-2">
@@ -132,7 +132,7 @@ function Login() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.25 }}
-        className="mx-auto my-10 max-w-md border-2 border-rule bg-card px-6 py-8 shadow-lift sm:my-16 sm:px-8"
+        className="mx-auto my-10 max-w-md surface-card bg-card px-6 py-8 shadow-lift sm:my-16 sm:px-8"
       >
         <h1 className="text-3xl font-extrabold tracking-[-0.025em]">
           {mode === "signup"
@@ -199,7 +199,7 @@ function Login() {
               {es
                 ? "Al crear una cuenta se almacena tu correo y nombre para el acceso. La autorización para usar documentos se solicita después de entrar."
                 : "Account creation stores your email and name for access. Document-processing authorization is requested after sign-in."}{" "}
-              <Link to="/privacy" className="font-semibold text-ink-violet underline">
+              <Link to="/privacy" className="font-semibold text-brand underline">
                 {es ? "Privacidad" : "Privacy"}
               </Link>
             </p>

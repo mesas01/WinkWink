@@ -17,15 +17,22 @@ const H = 900;
 
 /** The narration. Each line is spoken and shown as a caption while the screen acts it out. */
 const LINES = {
-  intro: "Esto es WinkWink: un agente de inteligencia artificial que revisa las facturas de tu empresa en Blinka.",
-  problem: "El fraude más común en cuentas por pagar es una factura real… con la cuenta bancaria cambiada.",
-  laura: "Laura, del equipo de ingeniería, necesita pagar la factura de AWS. Solo tiene que subirla.",
+  intro:
+    "Esto es WinkWink: un agente de inteligencia artificial que revisa las facturas de tu empresa en Blinka.",
+  problem:
+    "El fraude más común en cuentas por pagar es una factura real… con la cuenta bancaria cambiada.",
+  laura:
+    "Laura, del equipo de ingeniería, necesita pagar la factura de AWS. Solo tiene que subirla.",
   typing: "Puede escribirla, subir un PDF o tomarle una foto con el celular.",
-  running: "En segundos, el agente la lee, verifica la cuenta contra la registrada en Blinka y aplica las reglas de la empresa.",
-  approved: "La cuenta coincide y el monto cumple la política. Aprobada automáticamente, sin esperar a nadie, y con su razón por escrito.",
+  running:
+    "En segundos, el agente la lee, verifica la cuenta contra la registrada en Blinka y aplica las reglas de la empresa.",
+  approved:
+    "La cuenta coincide y el monto cumple la política. Aprobada automáticamente, sin esperar a nadie, y con su razón por escrito.",
   camila: "Ahora llega otra factura de AWS. Parece idéntica… pero pide pagar a una cuenta nueva.",
-  blocked: "El agente detecta que la cuenta no coincide con la verificada. Bloqueo rojo inmediato: el pago se niega para prevenir el fraude.",
-  admin: "Finanzas lo ve al instante. Ni siquiera un administrador puede aprobar esta factura: solo rechazarla.",
+  blocked:
+    "El agente detecta que la cuenta no coincide con la verificada. Bloqueo rojo inmediato: el pago se niega para prevenir el fraude.",
+  admin:
+    "Finanzas lo ve al instante. Ni siquiera un administrador puede aprobar esta factura: solo rechazarla.",
   audit: "Todo queda en un registro de auditoría. La decisión anterior se tacha, nunca se borra.",
   kpis: "Y el panel muestra la autonomía del agente: cuántas facturas se aprobaron solas, cuántas esperan revisión y cuántos fraudes se frenaron.",
   outro: "WinkWink. La inteligencia artificial lee; las reglas deciden.",
@@ -52,8 +59,22 @@ const INVOICE_FRAUD = [
 ].join("\n");
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const sh = (cmd, args) => execFileSync(cmd, args, { stdio: ["ignore", "pipe", "pipe"] }).toString().trim();
-const duration = (file) => Number(sh("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", file]));
+const sh = (cmd, args) =>
+  execFileSync(cmd, args, { stdio: ["ignore", "pipe", "pipe"] })
+    .toString()
+    .trim();
+const duration = (file) =>
+  Number(
+    sh("ffprobe", [
+      "-v",
+      "error",
+      "-show_entries",
+      "format=duration",
+      "-of",
+      "default=nw=1:nk=1",
+      file,
+    ]),
+  );
 
 function synthesizeVoices() {
   const durations = {};
@@ -233,7 +254,12 @@ async function story(page, nar) {
   // Intro over the landing page
   await page.goto(`${BASE}/`, { waitUntil: "networkidle0" });
   await sleep(800);
-  await card(page, "WinkWink", "Agente antifraude para cuentas por pagar en Blinka", "Reto Blinka · 30X Hackathon");
+  await card(
+    page,
+    "WinkWink",
+    "Agente antifraude para cuentas por pagar en Blinka",
+    "Reto Blinka · 30X Hackathon",
+  );
   await sleep(1200);
   let voice = nar.say("intro");
   await voice;
@@ -257,7 +283,10 @@ async function story(page, nar) {
   await voice;
   await find(page, ".//article//span[contains(., 'Aprobada')]");
   voice = nar.say("approved");
-  await pointAt(page, await find(page, ".//article//span[contains(., 'Aprobada') or contains(., 'APROBADA')]"));
+  await pointAt(
+    page,
+    await find(page, ".//article//span[contains(., 'Aprobada') or contains(., 'APROBADA')]"),
+  );
   await voice;
 
   // Case 2: Camila's invoice with a changed bank account is blocked
@@ -286,7 +315,10 @@ async function story(page, nar) {
   const log = await find(page, ".//article//section[contains(., 'Registro de auditoría')]");
   await log.evaluate((n) => n.scrollIntoView({ block: "center", behavior: "smooth" }));
   await sleep(700);
-  await pointAt(page, await find(page, ".//article//section//span[contains(@class,'line-through')]"));
+  await pointAt(
+    page,
+    await find(page, ".//article//section//span[contains(@class,'line-through')]"),
+  );
   await voice;
   voice = nar.say("kpis");
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "smooth" }));
@@ -296,7 +328,12 @@ async function story(page, nar) {
 
   // Outro
   await nar.hide();
-  await card(page, "La IA lee. Las reglas deciden.", "winkwink-seven.vercel.app/agente", "github.com/mesas01/WinkWink · Santiago Mesa");
+  await card(
+    page,
+    "La IA lee. Las reglas deciden.",
+    "winkwink-seven.vercel.app/agente",
+    "github.com/mesas01/WinkWink · Santiago Mesa",
+  );
   voice = nar.say("outro");
   await voice;
   await nar.hide();
@@ -310,7 +347,9 @@ function mixAudio(cues, videoSeconds) {
   const parts = [];
   cues.forEach((c, i) => {
     inputs.push("-i", `${BUILD}${c.id}.aiff`);
-    parts.push(`[${i + 1}:a]aresample=44100,pan=stereo|c0=c0|c1=c0,adelay=${c.at}|${c.at},volume=1.3[v${i}]`);
+    parts.push(
+      `[${i + 1}:a]aresample=44100,pan=stereo|c0=c0|c1=c0,adelay=${c.at}|${c.at},volume=1.3[v${i}]`,
+    );
   });
   const voices = cues.map((_, i) => `[v${i}]`).join("");
   const filter = [
@@ -322,7 +361,19 @@ function mixAudio(cues, videoSeconds) {
     `[ducked][vmix]amix=inputs=2:normalize=0,alimiter=limit=0.95[out]`,
   ].join(";");
   const mix = `${BUILD}mix.wav`;
-  sh("ffmpeg", ["-y", "-v", "error", ...inputs, "-filter_complex", filter, "-map", "[out]", "-t", String(videoSeconds), mix]);
+  sh("ffmpeg", [
+    "-y",
+    "-v",
+    "error",
+    ...inputs,
+    "-filter_complex",
+    filter,
+    "-map",
+    "[out]",
+    "-t",
+    String(videoSeconds),
+    mix,
+  ]);
   return mix;
 }
 
@@ -361,12 +412,43 @@ async function run() {
   // Puppeteer stamps frames at a fixed rate while Chrome delivers them faster, so the raw
   // WebM runs long. Rescale it to the measured wall-clock length so it matches the voice cues.
   const raw = `${BUILD}raw.mp4`;
-  sh("ffmpeg", ["-y", "-v", "error", "-i", webm, "-c:v", "libx264", "-preset", "veryfast", "-crf", "16", "-an", raw]);
+  sh("ffmpeg", [
+    "-y",
+    "-v",
+    "error",
+    "-i",
+    webm,
+    "-c:v",
+    "libx264",
+    "-preset",
+    "veryfast",
+    "-crf",
+    "16",
+    "-an",
+    raw,
+  ]);
   const factor = wallSeconds / duration(raw);
   const video = `${BUILD}video.mp4`;
   sh("ffmpeg", [
-    "-y", "-v", "error", "-i", raw, "-vf", `setpts=PTS*${factor.toFixed(6)}`,
-    "-c:v", "libx264", "-preset", "slow", "-crf", "18", "-pix_fmt", "yuv420p", "-r", "30", "-an", video,
+    "-y",
+    "-v",
+    "error",
+    "-i",
+    raw,
+    "-vf",
+    `setpts=PTS*${factor.toFixed(6)}`,
+    "-c:v",
+    "libx264",
+    "-preset",
+    "slow",
+    "-crf",
+    "18",
+    "-pix_fmt",
+    "yuv420p",
+    "-r",
+    "30",
+    "-an",
+    video,
   ]);
   const seconds = duration(video);
   console.log(`   reloj real ${wallSeconds.toFixed(1)} s · factor ${factor.toFixed(3)}`);
@@ -377,8 +459,23 @@ async function run() {
   const mp4 = `${OUT}winkwink-demo.mp4`;
   if (existsSync(mp4)) rmSync(mp4);
   sh("ffmpeg", [
-    "-y", "-v", "error", "-i", video, "-i", mix,
-    "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", mp4,
+    "-y",
+    "-v",
+    "error",
+    "-i",
+    video,
+    "-i",
+    mix,
+    "-c:v",
+    "copy",
+    "-c:a",
+    "aac",
+    "-b:a",
+    "192k",
+    "-shortest",
+    "-movflags",
+    "+faststart",
+    mp4,
   ]);
   console.log(`Video listo (${seconds.toFixed(1)} s): ${mp4}`);
 }

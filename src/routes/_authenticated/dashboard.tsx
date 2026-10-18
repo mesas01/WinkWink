@@ -234,7 +234,7 @@ function Dashboard() {
   }
   return (
     <div className="min-h-dvh bg-background">
-      <header className="border-b-2 border-rule bg-background">
+      <header className="glass-bar sticky top-0 z-40">
         <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-8">
           <Logo />
           <div className="flex shrink-0 items-center gap-2">
@@ -340,7 +340,7 @@ function Dashboard() {
                 <LedgerFilters invoices={own} filter={filter} onFilter={setFilter} es={es} />
                 {busy && (
                   <div role="status" className="mt-5">
-                    <p className="text-sm font-semibold text-ink-violet">
+                    <p className="text-sm font-semibold text-brand">
                       {es ? "Guardando y evaluando documento…" : "Saving and evaluating document…"}
                     </p>
                     <ScanChecklist es={es} running={busy} />
@@ -598,8 +598,8 @@ function Dashboard() {
                   </p>
                   <p
                     className={cn(
-                      "mt-3 break-words border-t border-dashed border-input pt-3 text-[15px] leading-relaxed",
-                      inv.security_status === "blocked" && "font-semibold text-ink-red",
+                      "mt-3 break-words border-t border-hairline pt-3 text-[15px] leading-relaxed",
+                      inv.security_status === "blocked" && "font-semibold text-danger",
                     )}
                   >
                     {inv.error_message || (es ? inv.explanation_es : inv.explanation_en)}
@@ -672,7 +672,7 @@ function Dashboard() {
                   {adminUi && inv.status === "review" && (
                     <div className="mt-5 grid grid-cols-2 gap-2">
                       {inv.security_status === "blocked" ? (
-                        <p className="flex items-start gap-2 text-sm font-semibold text-ink-red">
+                        <p className="flex items-start gap-2 text-sm font-semibold text-danger">
                           <Lock className="mt-0.5 size-4 shrink-0" />
                           {es
                             ? "Aprobación bloqueada: la cuenta no coincide con la verificada en Blinka."

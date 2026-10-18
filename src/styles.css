@@ -1,26 +1,30 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
-@import "@fontsource/archivo/400.css";
-@import "@fontsource/archivo/500.css";
-@import "@fontsource/archivo/600.css";
-@import "@fontsource/archivo/800.css";
-@import "@fontsource/courier-prime/400.css";
-@import "@fontsource/courier-prime/700.css";
+@import "@fontsource/geist/400.css";
+@import "@fontsource/geist/500.css";
+@import "@fontsource/geist/600.css";
+@import "@fontsource/geist/700.css";
+@import "@fontsource/geist-mono/400.css";
+@import "@fontsource/geist-mono/500.css";
 
 @custom-variant dark (&:is(.dark *));
 
-/* WinkWink · notary ledger world.
-   Ground is ledger paper, text is ink, and state color exists only as stamp ink:
-   green = APROBADA, violet = RETENIDA, red = BLOQUEADA / RECHAZADA. */
+/* WinkWink · clean glass.
+   Apple-style system type, one blue accent, neutral cool grays, translucent chrome over a soft
+   ambient field, white surfaces with diffuse shadows. Status lives in soft pastel chips only. */
 @theme inline {
-  --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Courier Prime", ui-monospace, monospace;
-  --radius-sm: 2px;
-  --radius-md: 3px;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Geist", system-ui,
+    sans-serif;
+  --font-display:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Geist", system-ui, sans-serif;
+  --font-mono: "SF Mono", "Geist Mono", ui-monospace, monospace;
+  --radius-sm: 8px;
+  --radius-md: 10px;
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 2px);
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
   --color-overlay: var(--overlay);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -45,84 +49,97 @@
   --color-success-soft: var(--success-soft);
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
-  --color-ink-violet: var(--ink-violet);
-  --color-ink-green: var(--ink-green);
-  --color-ink-red: var(--ink-red);
-  --color-rule: var(--rule);
+  --color-brand: var(--brand);
+  --color-ok: var(--ok);
+  --color-hold: var(--hold);
+  --color-danger: var(--danger);
+  --color-hairline: var(--hairline);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --shadow-crisp: 0 0 0 1px var(--border);
-  --shadow-lift: none;
-  --shadow-cta: none;
-  --shadow-hero: none;
+  --shadow-crisp: 0 0 0 1px var(--hairline);
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(15 23 42 / 0.12);
+  --shadow-lift: 0 2px 6px rgb(15 23 42 / 0.05), 0 24px 48px -24px rgb(15 23 42 / 0.22);
+  --shadow-hero: 0 4px 12px rgb(15 23 42 / 0.05), 0 40px 80px -40px rgb(15 23 42 / 0.32);
+  --shadow-cta: 0 1px 2px rgb(0 113 227 / 0.25);
   --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 :root {
-  --radius: 3px;
-  --overlay: oklch(0.2 0.01 60 / 0.55);
-  --background: oklch(0.982 0.006 80);
-  --surface: oklch(0.982 0.006 80);
-  --foreground: oklch(0.22 0.005 60);
-  --card: oklch(0.995 0.003 80);
-  --card-foreground: oklch(0.22 0.005 60);
-  --popover: oklch(0.995 0.003 80);
-  --popover-foreground: oklch(0.22 0.005 60);
-  --primary: oklch(0.22 0.005 60);
-  --primary-foreground: oklch(0.982 0.006 80);
-  --primary-soft: oklch(0.94 0.03 285);
-  --secondary: oklch(0.93 0.012 80);
-  --secondary-foreground: oklch(0.22 0.005 60);
-  --muted: oklch(0.935 0.01 80);
-  --muted-foreground: oklch(0.46 0.012 70);
-  --accent: oklch(0.93 0.012 80);
-  --accent-foreground: oklch(0.22 0.005 60);
-  --ink-violet: oklch(0.42 0.13 285);
-  --ink-green: oklch(0.49 0.12 152);
-  --ink-red: oklch(0.52 0.19 29);
-  --destructive: var(--ink-red);
-  --destructive-foreground: oklch(0.99 0 0);
-  --destructive-soft: oklch(0.95 0.03 29);
-  --success: var(--ink-green);
-  --success-soft: oklch(0.95 0.03 152);
-  --warning: var(--ink-violet);
-  --warning-soft: oklch(0.95 0.025 285);
-  --rule: oklch(0.22 0.005 60);
-  --border: oklch(0.87 0.012 80);
-  --input: oklch(0.78 0.012 80);
-  --ring: var(--ink-violet);
+  --radius: 14px;
+  --overlay: rgb(10 10 12 / 0.32);
+  --background: #f5f5f7;
+  --surface: #fbfbfd;
+  --foreground: #1d1d1f;
+  --card: #ffffff;
+  --card-foreground: #1d1d1f;
+  --popover: rgb(255 255 255 / 0.86);
+  --popover-foreground: #1d1d1f;
+  --brand: #0071e3;
+  --primary: #0071e3;
+  --primary-foreground: #ffffff;
+  --primary-soft: #e8f1fc;
+  --secondary: #ebebf0;
+  --secondary-foreground: #1d1d1f;
+  --muted: #ebebf0;
+  --muted-foreground: #6e6e73;
+  --accent: #ebebf0;
+  --accent-foreground: #1d1d1f;
+  --ok: #1d7a3e;
+  --hold: #a35a00;
+  --danger: #c9302c;
+  --destructive: var(--danger);
+  --destructive-foreground: #ffffff;
+  --destructive-soft: #fdeceb;
+  --success: var(--ok);
+  --success-soft: #e7f5ec;
+  --warning: var(--hold);
+  --warning-soft: #fff3e0;
+  --hairline: rgb(0 0 0 / 0.08);
+  --border: rgb(0 0 0 / 0.08);
+  --input: rgb(0 0 0 / 0.14);
+  --ring: rgb(0 113 227 / 0.55);
+  --glass: rgb(255 255 255 / 0.66);
+  --glass-edge: rgb(255 255 255 / 0.7);
+  --ambient-a: rgb(0 113 227 / 0.1);
+  --ambient-b: rgb(160 120 255 / 0.07);
 }
 
 .dark {
-  --overlay: oklch(0.08 0.005 60 / 0.7);
-  --background: oklch(0.19 0.006 60);
-  --surface: oklch(0.19 0.006 60);
-  --foreground: oklch(0.94 0.01 80);
-  --card: oklch(0.22 0.007 60);
-  --card-foreground: oklch(0.94 0.01 80);
-  --popover: oklch(0.22 0.007 60);
-  --popover-foreground: oklch(0.94 0.01 80);
-  --primary: oklch(0.94 0.01 80);
-  --primary-foreground: oklch(0.19 0.006 60);
-  --primary-soft: oklch(0.3 0.06 285);
-  --secondary: oklch(0.26 0.007 60);
-  --secondary-foreground: oklch(0.94 0.01 80);
-  --muted: oklch(0.25 0.007 60);
-  --muted-foreground: oklch(0.74 0.012 75);
-  --accent: oklch(0.26 0.007 60);
-  --accent-foreground: oklch(0.94 0.01 80);
-  --ink-violet: oklch(0.75 0.12 285);
-  --ink-green: oklch(0.78 0.13 152);
-  --ink-red: oklch(0.72 0.17 29);
-  --destructive-foreground: oklch(0.19 0.006 60);
-  --destructive-soft: oklch(0.3 0.07 29);
-  --success-soft: oklch(0.29 0.05 152);
-  --warning-soft: oklch(0.3 0.05 285);
-  --rule: oklch(0.94 0.01 80);
-  --border: oklch(1 0 0 / 11%);
-  --input: oklch(1 0 0 / 20%);
+  --overlay: rgb(0 0 0 / 0.55);
+  --background: #000000;
+  --surface: #0f0f11;
+  --foreground: #f5f5f7;
+  --card: #1c1c1e;
+  --card-foreground: #f5f5f7;
+  --popover: rgb(28 28 30 / 0.86);
+  --popover-foreground: #f5f5f7;
+  --brand: #2997ff;
+  --primary: #0a84ff;
+  --primary-foreground: #ffffff;
+  --primary-soft: rgb(10 132 255 / 0.18);
+  --secondary: #2c2c2e;
+  --secondary-foreground: #f5f5f7;
+  --muted: #2c2c2e;
+  --muted-foreground: #a1a1a6;
+  --accent: #2c2c2e;
+  --accent-foreground: #f5f5f7;
+  --ok: #4cd178;
+  --hold: #ffb340;
+  --danger: #ff6961;
+  --destructive-soft: rgb(255 105 97 / 0.16);
+  --success-soft: rgb(76 209 120 / 0.14);
+  --warning-soft: rgb(255 179 64 / 0.14);
+  --hairline: rgb(255 255 255 / 0.1);
+  --border: rgb(255 255 255 / 0.1);
+  --input: rgb(255 255 255 / 0.18);
+  --ring: rgb(10 132 255 / 0.65);
+  --glass: rgb(28 28 30 / 0.62);
+  --glass-edge: rgb(255 255 255 / 0.08);
+  --ambient-a: rgb(10 132 255 / 0.16);
+  --ambient-b: rgb(160 120 255 / 0.1);
 }
 
 /* No transitions while swapping theme, so colors change in one frame */
@@ -139,23 +156,27 @@
   html {
     scroll-behavior: smooth;
     scrollbar-color: var(--input) transparent;
+    -webkit-text-size-adjust: 100%;
   }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.47;
+    letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
-    caret-color: var(--ink-violet);
+    caret-color: var(--brand);
   }
   ::selection {
-    background: color-mix(in oklab, var(--ink-violet) 24%, transparent);
-    color: var(--foreground);
+    background: rgb(0 113 227 / 0.2);
   }
   a {
     text-underline-offset: 3px;
   }
   button {
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
   :focus-visible {
     outline: 2px solid var(--ring);
@@ -164,93 +185,122 @@
   button,
   input,
   select {
-    min-height: 44px;
+    min-height: 40px;
   }
+}
+
+/* Ambient field behind glass: two very soft light spots on a fixed layer. */
+@utility ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 38% at 18% 8%, var(--ambient-a), transparent 70%),
+    radial-gradient(36% 34% at 86% 22%, var(--ambient-b), transparent 70%);
+}
+
+/* Translucent chrome: nav bars and floating controls. Never stack glass on glass. */
+@utility glass {
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge),
+    0 0 0 1px var(--hairline);
+}
+@utility glass-bar {
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* Solid surfaces */
+@utility surface-card {
+  background: var(--card);
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+}
+@utility surface-group {
+  background: var(--card);
+  border-radius: 18px;
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
 }
 
 @utility tnum {
   font-variant-numeric: tabular-nums;
 }
+/* Figures and identifiers: tabular numerals in the UI face. */
+@utility typed {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.005em;
+}
+@utility mono {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  letter-spacing: 0;
+}
+
 @utility press {
   transition:
     transform 160ms var(--ease-out-quint),
-    background-color 160ms var(--ease-out-quint),
-    color 160ms var(--ease-out-quint);
+    background-color 200ms ease,
+    color 200ms ease,
+    box-shadow 200ms ease;
   &:active {
     transform: scale(0.97);
   }
 }
 
-/* Lovable sign-in button, restyled into the ledger world (outline, square) */
-.lovable-auth-button.lovable-auth-button {
-  border-radius: 3px;
-  border: 1px solid var(--input);
-  background: var(--background);
-  color: var(--foreground);
-  box-shadow: none;
-}
-.lovable-auth-button.lovable-auth-button:hover {
-  border-color: var(--foreground);
-}
-
-/* Typewritten record: amounts, IDs and audit lines */
-@utility typed {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-}
-
-/* Ledger rules */
-@utility rule-ink {
-  border-color: var(--rule);
-}
-@utility rule-dashed {
-  border-style: dashed;
-}
-
-/* Type scale */
+/* Type scale: size-specific tracking, tight leading on display sizes */
 @utility text-display {
-  font-size: clamp(2.75rem, 6.4vw, 5.5rem);
-  line-height: 0.98;
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 6.6vw, 5.25rem);
+  line-height: 1.04;
   letter-spacing: -0.035em;
-  font-weight: 800;
+  font-weight: 700;
   text-wrap: balance;
 }
 @utility text-headline {
-  font-size: clamp(2rem, 4vw, 3.25rem);
-  line-height: 1.04;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.08;
   letter-spacing: -0.028em;
-  font-weight: 800;
+  font-weight: 700;
   text-wrap: balance;
 }
 @utility text-statement {
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
-  line-height: 1.22;
-  letter-spacing: -0.015em;
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 2.6vw, 1.875rem);
+  line-height: 1.25;
+  letter-spacing: -0.018em;
   font-weight: 600;
   text-wrap: balance;
 }
 @utility text-lead {
-  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
-  line-height: 1.5;
+  font-size: clamp(1.0625rem, 1.5vw, 1.3125rem);
+  line-height: 1.45;
+  letter-spacing: -0.012em;
+  text-wrap: pretty;
 }
 
-/* Signature move: the stamp lands. Scale from slightly larger, settle on its tilt. */
-@keyframes stamp-in {
-  0% {
+/* Decision chip lands by materializing: slight scale with blur clearing, ease-out under 300ms. */
+@keyframes materialize {
+  from {
     opacity: 0;
-    transform: scale(1.6);
+    transform: scale(0.94);
+    filter: blur(6px);
   }
-  60% {
-    opacity: 1;
-    transform: scale(0.96);
-  }
-  100% {
+  to {
     opacity: 1;
     transform: scale(1);
+    filter: blur(0);
   }
 }
 @utility animate-stamp {
-  animation: stamp-in 280ms var(--ease-out-quint) both;
+  animation: materialize 320ms var(--ease-out-quint) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -266,4 +316,24 @@
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-bar {
+    background: var(--card) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* Lovable sign-in button, restyled to match the secondary pill button */
+.lovable-auth-button.lovable-auth-button {
+  border-radius: 9999px;
+  border: 1px solid var(--input);
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: none;
+}
+.lovable-auth-button.lovable-auth-button:hover {
+  background: var(--secondary);
 }

@@ -7,8 +7,8 @@ import { readAccessCode, saveAccessCode } from "@/lib/access-code";
 export function AccessCodeField({ es }: { es: boolean }) {
   const [code, setCode] = useState(() => readAccessCode() ?? "");
   return (
-    <label className="flex max-w-md items-center gap-2 border-y border-dashed border-input py-2 text-sm">
-      <KeyRound className="size-4 shrink-0 text-ink-violet" />
+    <label className="flex max-w-md items-center gap-2 border-y border-hairline py-2 text-sm">
+      <KeyRound className="size-4 shrink-0 text-brand" />
       <span className="shrink-0 font-semibold">{es ? "Código de la demo" : "Demo code"}</span>
       <Input
         type="password"
