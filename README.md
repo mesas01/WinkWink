@@ -13,9 +13,7 @@
 
 ### 🌐 [Pruébalo en vivo → winkwink-seven.vercel.app/agente](https://winkwink-seven.vercel.app/agente)
 
-<a href="https://winkwink-seven.vercel.app/demo/winkwink-demo.mp4">
-  <img src="docs/demo/video-poster.jpg" alt="Ver el video demo de WinkWink (2:31, con voz)" width="760">
-</a>
+https://github.com/user-attachments/assets/0f4c3db2-db8f-4676-a9ce-db4828d351fe
 
 🎬 **[Ver el video demo (2:31, con voz)](https://winkwink-seven.vercel.app/demo/winkwink-demo.mp4)**: una factura legítima aprobada sola, una con la cuenta cambiada bloqueada, el panel de finanzas y cómo probarlo tú mismo.
 
