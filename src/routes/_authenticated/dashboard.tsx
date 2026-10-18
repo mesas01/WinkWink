@@ -3,7 +3,7 @@ import { InvoiceDecision } from "@/components/invoice-decision";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   FileText,
@@ -35,6 +35,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { AdminPanel } from "@/components/admin-panel";
+import { CameraCapture } from "@/components/camera-capture";
 import { WorkspaceTabs, viewTitle } from "@/components/workspace-tabs";
 import {
   InvoiceLedger,
@@ -76,6 +77,15 @@ function Dashboard() {
   const [view, setView] = useState<"history" | "rules" | "privacy" | "demo">("demo");
   const [filter, setFilter] = useState<LedgerFilter>("all");
   const [uploadOpen, setUploadOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  /** Places a camera photo into the form's file input, so the existing upload flow sends it. */
+  const putCapturedPhoto = (photo: File) => {
+    if (!fileInputRef.current) return;
+    const transfer = new DataTransfer();
+    transfer.items.add(photo);
+    fileInputRef.current.files = transfer.files;
+    toast.success(es ? `Foto lista: ${photo.name}` : `Photo ready: ${photo.name}`);
+  };
   const [ruleOpen, setRuleOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -455,6 +465,7 @@ function Dashboard() {
             <label className="block text-sm font-medium">
               {es ? "Foto o archivo" : "Photo or file"}
               <Input
+                ref={fileInputRef}
                 name="file"
                 type="file"
                 accept="application/pdf,image/jpeg,image/png,image/webp"
@@ -462,6 +473,7 @@ function Dashboard() {
                 className="mt-2 h-auto py-3"
               />
             </label>
+            <CameraCapture onCapture={putCapturedPhoto} es={es} />
             <label className="flex items-start gap-3 text-sm leading-6">
               <input required type="checkbox" className="mt-1 size-5 shrink-0" />
               {es

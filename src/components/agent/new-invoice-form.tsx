@@ -1,9 +1,11 @@
-import { useState } from "react";
-import { Upload } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { CameraCapture } from "@/components/camera-capture";
+import { normalizePhoto } from "@/lib/image-capture";
 
 const MAX_BYTES = 8 * 1024 * 1024;
 const TYPES = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
@@ -20,6 +22,40 @@ async function toBase64(file: File): Promise<string> {
   for (let i = 0; i < bytes.length; i += 0x8000)
     binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
   return btoa(binary);
+}
+
+/** Shows the chosen photo (or PDF name) before it is sent, so a blurry shot can be retaken. */
+function SelectedFile({ file, es, onClear }: { file: File; es: boolean; onClear: () => void }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!file.type.startsWith("image/")) return;
+    const u = URL.createObjectURL(file);
+    setUrl(u);
+    return () => URL.revokeObjectURL(u);
+  }, [file]);
+  return (
+    <div className="flex items-start gap-3 border border-dashed border-input p-2">
+      {url && (
+        <img
+          src={url}
+          alt={es ? "Vista previa de la factura" : "Invoice preview"}
+          className="h-28 w-auto border border-rule object-contain"
+        />
+      )}
+      <div className="min-w-0 flex-1 text-sm">
+        <p className="truncate font-semibold">{file.name}</p>
+        <p className="typed text-xs text-muted-foreground">{(file.size / 1024).toFixed(0)} KB</p>
+      </div>
+      <button
+        type="button"
+        onClick={onClear}
+        aria-label={es ? "Quitar archivo" : "Remove file"}
+        className="press grid size-9 place-items-center text-muted-foreground hover:text-foreground"
+      >
+        <X className="size-4" />
+      </button>
+    </div>
+  );
 }
 
 /** Submit a synthetic invoice as pasted text or as a PDF/image read by Gemini. */
@@ -83,14 +119,22 @@ export function NewInvoiceForm({
           </span>
         )}
       </label>
-      <Input
-        id="invoice-file"
-        type="file"
-        accept={TYPES.join(",")}
-        disabled={!geminiReady}
-        onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-        className="h-auto py-2"
-      />
+      <div className="flex flex-wrap items-center gap-2">
+        <Input
+          id="invoice-file"
+          type="file"
+          accept={TYPES.join(",")}
+          disabled={!geminiReady}
+          onChange={async (e) => {
+            const picked = e.target.files?.[0];
+            e.target.value = "";
+            if (picked) setFile(await normalizePhoto(picked));
+          }}
+          className="h-auto max-w-sm py-2"
+        />
+        <CameraCapture onCapture={setFile} es={es} disabled={!geminiReady} />
+      </div>
+      {file && <SelectedFile file={file} es={es} onClear={() => setFile(null)} />}
       <p className="text-xs text-muted-foreground">
         {es
           ? "Solo documentos de prueba sin datos reales."
