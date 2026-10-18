@@ -151,3 +151,23 @@ describe("typed audit events and overrides", () => {
     });
   });
 });
+
+import { createRateLimiter, safeEqual } from "@/lib/rate-limit";
+
+describe("rate limiter and access code", () => {
+  it("blocks after the limit and resets after the window", () => {
+    const hit = createRateLimiter({ limit: 2, windowMs: 1000 });
+    expect(hit("ip", 0).allowed).toBe(true);
+    expect(hit("ip", 10).allowed).toBe(true);
+    const blocked = hit("ip", 20);
+    expect(blocked.allowed).toBe(false);
+    expect(blocked.retryAfterMs).toBe(980);
+    expect(hit("other", 20).allowed).toBe(true);
+    expect(hit("ip", 1001).allowed).toBe(true);
+  });
+  it("compares access codes exactly", () => {
+    expect(safeEqual("jurado-30x", "jurado-30x")).toBe(true);
+    expect(safeEqual("jurado-30x", "jurado-30y")).toBe(false);
+    expect(safeEqual("jurado", "jurado-30x")).toBe(false);
+  });
+});

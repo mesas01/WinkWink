@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { extractInvoiceFields } from "@/services/agent.functions";
+import { readAccessCode } from "@/lib/access-code";
 import { runAgentDecision } from "@/domain/agent/decide";
 import { useAgentStore, type AgentInvoice } from "@/stores/agent-store";
 
@@ -25,7 +26,9 @@ export function useAgentRun() {
     setRunning(true);
     setStep(1);
     try {
-      const res = await extract({ data: { text: invoice.text, file } });
+      const res = await extract({
+        data: { text: invoice.text, file, accessCode: readAccessCode() },
+      });
       if (!res.ok) throw new Error(res.message);
       const { vendors, rules } = useAgentStore.getState();
       const result = runAgentDecision(invoice.id, res.result, vendors, rules);

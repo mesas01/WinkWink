@@ -9,3 +9,5 @@ routeTree.gen.ts
 .agents
 .claude
 .impeccable
+.vercel
+.output

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { CameraCapture } from "@/components/camera-capture";
 import { normalizePhoto } from "@/lib/image-capture";
 
-const MAX_BYTES = 8 * 1024 * 1024;
+const MAX_BYTES = 3 * 1024 * 1024;
 const TYPES = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
 
 export interface NewInvoicePayload {
@@ -78,8 +78,8 @@ export function NewInvoiceForm({
     if (file && (!TYPES.includes(file.type) || file.size > MAX_BYTES)) {
       toast.error(
         es
-          ? "Usa un PDF, PNG, JPG o WebP de hasta 8 MB."
-          : "Use a PDF, PNG, JPG or WebP up to 8 MB.",
+          ? "Usa un PDF, PNG, JPG o WebP de hasta 3 MB."
+          : "Use a PDF, PNG, JPG or WebP up to 3 MB.",
       );
       return;
     }

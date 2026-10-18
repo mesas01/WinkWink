@@ -5,6 +5,7 @@ import { FastForward, RotateCcw } from "lucide-react";
 import { Logo, LangSwitch, ThemeToggle } from "@/components/blinka";
 import { Button } from "@/components/ui/button";
 import { RoleSwitch } from "@/components/agent/role-switch";
+import { AccessCodeField } from "@/components/agent/access-code-field";
 import { AgentKpis } from "@/components/agent/agent-kpis";
 import { AgentQueue } from "@/components/agent/agent-queue";
 import { InvoiceDetail } from "@/components/agent/invoice-detail";
@@ -45,11 +46,15 @@ const TABS: { id: Tab; es: string; en: string; admin?: boolean }[] = [
 
 function useGeminiStatus() {
   const fetchStatus = useServerFn(agentStatus);
-  const [status, setStatus] = useState<{ gemini: boolean; model: string | null } | null>(null);
+  const [status, setStatus] = useState<{
+    gemini: boolean;
+    model: string | null;
+    accessCodeRequired: boolean;
+  } | null>(null);
   useEffect(() => {
     fetchStatus()
       .then(setStatus)
-      .catch(() => setStatus({ gemini: false, model: null }));
+      .catch(() => setStatus({ gemini: false, model: null, accessCodeRequired: false }));
   }, [fetchStatus]);
   return status;
 }
@@ -144,6 +149,11 @@ function AgentPage() {
                   : "My invoices"}
             </h1>
             <GeminiBadge status={gemini} es={es} />
+            <p className="mt-1 text-xs text-muted-foreground">
+              {es
+                ? "Demo: los roles se simulan en este navegador y no se mueve dinero."
+                : "Demo: roles are simulated in this browser and no money moves."}
+            </p>
           </div>
           {role === "admin" && (
             <div className="flex flex-wrap gap-2">
@@ -164,6 +174,11 @@ function AgentPage() {
             </div>
           )}
         </div>
+        {gemini?.accessCodeRequired && (
+          <div className="mt-4">
+            <AccessCodeField es={es} />
+          </div>
+        )}
         {role === "admin" && (
           <div className="mt-6">
             <AgentKpis
