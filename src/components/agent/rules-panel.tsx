@@ -16,7 +16,7 @@ export function RulesPanel({ es }: { es: boolean }) {
         {rules.map((r, i) => (
           <li
             key={r.id}
-            className="flex items-center gap-4 border-b border-hairline py-4 last:border-b-0"
+            className="flex items-center gap-4 border-b border-hairline px-5 py-4 last:border-b-0"
           >
             <span className="typed text-sm font-bold text-brand">R{i + 1}</span>
             <label htmlFor={`rule-${r.id}`} className="min-w-0 flex-1 font-semibold">

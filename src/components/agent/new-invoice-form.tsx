@@ -34,12 +34,12 @@ function SelectedFile({ file, es, onClear }: { file: File; es: boolean; onClear:
     return () => URL.revokeObjectURL(u);
   }, [file]);
   return (
-    <div className="flex items-start gap-3 border border-hairline p-2">
+    <div className="flex items-start gap-3 rounded-2xl bg-secondary/60 p-3">
       {url && (
         <img
           src={url}
           alt={es ? "Vista previa de la factura" : "Invoice preview"}
-          className="h-28 w-auto border border-hairline object-contain"
+          className="h-28 w-auto rounded-xl object-contain shadow-crisp"
         />
       )}
       <div className="min-w-0 flex-1 text-sm">
@@ -95,7 +95,7 @@ export function NewInvoiceForm({
   }
 
   return (
-    <form onSubmit={submit} className="grid gap-3 surface-group py-4">
+    <form onSubmit={submit} className="surface-card grid max-w-3xl gap-3 p-6 sm:p-8">
       <label className="text-sm font-semibold" htmlFor="invoice-text">
         {es ? "Texto de la factura" : "Invoice text"}
       </label>

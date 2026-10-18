@@ -2,16 +2,16 @@
 version: 1
 slug: "src-routes-authenticated-dashboard-tsx"
 primary_target: "src/routes/_authenticated/dashboard.tsx"
-related_targets: ["src/routes/index.tsx","src/routes/login.tsx"]
+related_targets: ["src/routes/index.tsx","src/routes/login.tsx","src/routes/agente.tsx"]
 ---
 
-Scope: WinkWink app shell, invoice queue/dashboard, login and landing. Visitor mode: Operate (the landing page is Persuade, but it borrows the same world).
-Audience/job: finance admins clear the exception queue; employees check the status of their own invoices. Proof: synthetic invoice corpus only.
+Scope: WinkWink app shell, agent demo (/agente), dashboard, login and landing. Visitor mode: Operate (landing is Persuade in the same world).
+Audience/job: finance admins clear the exception queue; employees check the status of their own invoices. Proof: synthetic invoice corpus and test PDFs only.
 
 ## Direction contract
-THESIS: The agent stamps every invoice with its verdict and writes the reason in the margin. This refuses the category default of pastel status pills on a gray SaaS dashboard.
-OWN-WORLD: Notary ledger. Warm ledger white (#FAF8F4) ground, ink black (#1A1A1A) text and 2px ink rules, stamp inks as the only state color: green PAGADA, violet RETENIDA (also the brand/primary ink), red BLOQUEADA/RECHAZADA. Archivo for UI; Courier Prime only for stamps, amounts and the audit log (typewritten record). Dashed hairlines separate rows. Square 3px corners. No soft cards.
-STORY: The visitor scans the queue and reads every verdict at a glance from its stamp. They open one invoice, see the large stamp with the one-sentence reason under it, and act on it (approve or reject) when their role allows.
-FIRST VIEWPORT: A top bar with the wordmark seal, workspace tabs underlined in violet ink, and language/theme/sign-out on the right. Under it a page title with the primary action (Upload invoice) on its right, filter tabs, and a dense ruled table: invoice, vendor, amount in typewriter tabular figures, and the stamp column. The detail dialog shows the large stamp, a bank-account comparison when the verdict is a security block, and the typed audit log.
-FORM: Sello notarial, IMPECCABLE'S PICK (grounded candidate #1 of 7). seed:818662d5fa7fff12. Signature move: the stamp-in, where a verdict stamp lands with a quick scale-down and ink settle at the moment of decision. Raises: revoked decisions are struck through instead of removed; state is carried by stamp word and shape as well as ink color.
+THESIS: Clean glass, pinned by the user: an Apple-like, minimal interface where the agent's verdict is the one thing in color. It refuses busy SaaS dashboards with many accents.
+OWN-WORLD: System type (SF Pro, with Geist as fallback), one Action Blue, cool neutral grays, translucent chrome (blurred bars, segmented controls) over a soft ambient field, opaque white cards with diffuse shadows, pastel status chips with icons. No glass on glass.
+STORY: The visitor sees the queue and reads each decision from its chip, opens one, and reads the reason and the account comparison, then acts if the role allows.
+FIRST VIEWPORT: Glass top bar (mark, role, language, theme), a large headline with the primary action on its right, KPI strip card, segmented tabs, queue card on the left and decision card on the right.
+FORM: Clean glass (user-pinned redesign; supersedes "Sello notarial"). seed: none (unavailable). Signature moves: the segmented thumb glides on a critically damped spring; decision chips materialize (scale with blur clearing); the detail crossfades with blur.
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

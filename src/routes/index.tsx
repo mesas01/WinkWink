@@ -310,7 +310,7 @@ const STEP_ICONS = [ScanLine, ShieldCheck, Scale];
 
 function How({ c }: { c: C }) {
   return (
-    <section id="how" className="scroll-mt-20 surface-group bg-surface">
+    <section id="how" className="scroll-mt-20 border-y border-hairline bg-surface">
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
         <h2 className="text-headline max-w-2xl">{c.howTitle}</h2>
         <p className="text-statement mt-8 max-w-4xl text-muted-foreground">{c.statement}</p>
@@ -353,7 +353,7 @@ function Outcomes({ c, es }: { c: C; es: boolean }) {
           <Reveal
             key={e.tone}
             delay={i * 0.06}
-            className="grid gap-4 border-b border-hairline py-7 last:border-b-0 md:grid-cols-[15rem_minmax(0,1fr)] md:items-start"
+            className="grid gap-4 border-b border-hairline px-6 py-7 last:border-b-0 sm:px-8 md:grid-cols-[15rem_minmax(0,1fr)] md:items-start"
           >
             <Stamp tone={e.tone} es={es} size="lg" className="justify-self-start text-xl" />
             <div>
@@ -368,7 +368,7 @@ function Outcomes({ c, es }: { c: C; es: boolean }) {
               </p>
               {e.tone === "held" && (
                 <div className="mt-4 flex flex-wrap gap-2" aria-hidden>
-                  <span className="inline-flex min-h-9 items-center rounded-full bg-primary px-4 text-sm font-semibold text-background">
+                  <span className="inline-flex min-h-9 items-center rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground">
                     {c.approve}
                   </span>
                   <span className="inline-flex min-h-9 items-center rounded-full bg-card px-4 shadow-crisp text-sm font-semibold text-danger">
@@ -386,7 +386,7 @@ function Outcomes({ c, es }: { c: C; es: boolean }) {
 
 function Rules({ c }: { c: C }) {
   return (
-    <section id="rules" className="scroll-mt-20 surface-group bg-surface">
+    <section id="rules" className="scroll-mt-20 border-y border-hairline bg-surface">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-24 sm:px-8 lg:grid-cols-2 lg:items-center">
         <h2 className="text-headline whitespace-pre-line">{c.rulesTitle}</h2>
         <ul className="surface-group">
@@ -395,7 +395,7 @@ function Rules({ c }: { c: C }) {
               as="li"
               key={r}
               delay={i * 0.06}
-              className="flex items-center gap-4 border-b border-hairline py-4 last:border-b-0"
+              className="flex items-center gap-4 border-b border-hairline px-5 py-4 last:border-b-0"
             >
               <span className="typed text-sm font-bold text-brand">R{i + 1}</span>
               <span className="min-w-0 flex-1 font-semibold">{r}</span>
