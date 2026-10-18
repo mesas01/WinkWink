@@ -11,6 +11,8 @@
 
 **Gobernanza y antifraude para cuentas por pagar sobre Blinka** · Reto Blinka · 30X Hackathon (HackRadar)
 
+### 🌐 [Pruébalo en vivo → winkwink-seven.vercel.app/agente](https://winkwink-seven.vercel.app/agente)
+
 [![Gemini](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)](https://ai.google.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React%2019-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
@@ -145,6 +147,13 @@ con la cuenta pre-verificada de AWS en Blinka (Chase ****4321). Pago bloqueado p
 | Diseño | Sistema "Sello notarial": papel de libro, tinta y sellos. Ver [`DESIGN.md`](DESIGN.md) |
 
 La llave de Gemini vive **solo en el servidor** (`.env`, ignorado por git); el navegador nunca la ve.
+
+**Seguridad en el despliegue público:**
+- 🚦 Límite de uso de Gemini por visitante (8 por minuto y 60 por día) y por instancia.
+- 🔑 Código de acceso opcional para la demo (`DEMO_ACCESS_CODE`), comparado en tiempo constante.
+- 🧱 Encabezados HSTS, `nosniff`, anti-iframe (`frame-ancestors 'none'`) y cámara permitida solo para el propio sitio.
+- 🪂 Si Gemini se queda sin cuota, el agente sigue funcionando con extracción local y lo indica.
+- 📷 Fotos con la cámara del móvil o la webcam, reducidas a 1600 px antes de subirlas.
 
 ---
 
