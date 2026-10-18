@@ -41,3 +41,7 @@ dist-ssr
 .impeccable/mocks/
 .vercel
 .env*
+
+# Demo video renders
+demo/*.mp4
+demo/*.webm

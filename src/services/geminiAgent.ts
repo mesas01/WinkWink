@@ -102,10 +102,16 @@ function toExtracted(raw: z.infer<typeof extractionSchema>): ExtractedInvoice {
 const RETRYABLE = new Set([429, 500, 503]);
 const RETRY_DELAYS_MS = [700, 1500, 3000];
 
+/** A spent daily/plan quota will not recover in seconds, so retrying it only adds latency. */
+async function isQuotaExhausted(res: Response): Promise<boolean> {
+  if (res.status !== 429) return false;
+  return /quota/i.test(await res.clone().text());
+}
+
 async function fetchWithRetry(url: string, init: RequestInit): Promise<Response> {
   let res = await fetch(url, init);
   for (const delay of RETRY_DELAYS_MS) {
-    if (!RETRYABLE.has(res.status)) return res;
+    if (!RETRYABLE.has(res.status) || (await isQuotaExhausted(res))) return res;
     await new Promise((r) => setTimeout(r, delay));
     res = await fetch(url, init);
   }
