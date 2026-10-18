@@ -3,6 +3,7 @@
 // Output: demo/winkwink-demo.mp4 (needs macOS, Google Chrome and ffmpeg).
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import puppeteer from "puppeteer-core";
 
 const BASE = process.argv[2] ?? "https://winkwink-seven.vercel.app";
@@ -10,8 +11,6 @@ const ROOT = new URL("../", import.meta.url).pathname;
 const OUT = `${ROOT}demo/`;
 const BUILD = `${OUT}build/`;
 const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
-const VOICE = "Paulina";
-const RATE = "182";
 const W = 1440;
 const H = 900;
 
@@ -53,6 +52,10 @@ const LINES = {
   tryResult: "Por ejemplo, esta factura de Figma trae un Tax ID falso, y el agente la bloquea.",
   tryReset:
     "Cada PDF indica el resultado esperado. Y con Reiniciar demo vuelves a empezar cuando quieras.",
+  signup:
+    "¿Quieres tu propia cuenta? En Entrar puedes registrarte con tu correo, o continuar con Google.",
+  google:
+    "Con un clic eliges tu cuenta de Google, y vuelves a WinkWink con tu panel privado de facturas.",
   outro: "WinkWink. La inteligencia artificial lee; las reglas deciden.",
 };
 
@@ -80,13 +83,204 @@ const duration = (file) =>
     ]),
   );
 
-function synthesizeVoices() {
-  const durations = {};
-  for (const id of Object.keys(LINES)) {
-    const file = `${BUILD}${id}.aiff`;
-    sh("say", ["-v", VOICE, "-r", RATE, "-o", file, spoken(id).replace(/…/g, ", ")]);
-    durations[id] = duration(file);
+const TTS_MODEL = process.env["DEMO_TTS_MODEL"] || "gemini-3.8-flash-tts";
+const TTS_VOICE = process.env["DEMO_TTS_VOICE"] || "Kore";
+const CACHE = `${OUT}voice-cache/`;
+
+const hash = (text) =>
+  createHash("sha1").update(`${TTS_MODEL}|${TTS_VOICE}|${text}`).digest("hex").slice(0, 16);
+
+/** Wraps raw 16-bit mono PCM in a WAV header (Gemini may return audio/L16). */
+function pcmToWav(pcm, rate) {
+  const head = Buffer.alloc(44);
+  head.write("RIFF", 0);
+  head.writeUInt32LE(36 + pcm.length, 4);
+  head.write("WAVEfmt ", 8);
+  head.writeUInt32LE(16, 16);
+  head.writeUInt16LE(1, 20);
+  head.writeUInt16LE(1, 22);
+  head.writeUInt32LE(rate, 24);
+  head.writeUInt32LE(rate * 2, 28);
+  head.writeUInt16LE(2, 32);
+  head.writeUInt16LE(16, 34);
+  head.write("data", 36);
+  head.writeUInt32LE(pcm.length, 40);
+  return Buffer.concat([head, pcm]);
+}
+
+async function geminiSpeech(text) {
+  const key = process.env["GEMINI_API_KEY"];
+  if (!key) return null;
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${TTS_MODEL}:generateContent`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-goog-api-key": key },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text }] }],
+          generationConfig: {
+            responseModalities: ["AUDIO"],
+            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: TTS_VOICE } } },
+          },
+        }),
+      },
+    );
+    if (res.status === 429 || res.status >= 500) {
+      await sleep(15000 * (attempt + 1));
+      continue;
+    }
+    if (!res.ok) return null;
+    const json = await res.json();
+    const part = json.candidates?.[0]?.content?.parts?.find((p) => p.inlineData);
+    if (!part) return null;
+    const bytes = Buffer.from(part.inlineData.data, "base64");
+    const mime = part.inlineData.mimeType ?? "";
+    if (mime.includes("wav")) return bytes;
+    const rate = Number(/rate=(\d+)/.exec(mime)?.[1] ?? 24000);
+    return pcmToWav(bytes, rate);
   }
+  return null;
+}
+
+const BATCH_MODEL = process.env["DEMO_TTS_BATCH_MODEL"] || "gemini-2.5-flash-preview-tts";
+
+/** Silences in a WAV as [{ end, dur }] (end in seconds). */
+function silences(file) {
+  const out = execFileSync(
+    "ffmpeg",
+    ["-v", "info", "-i", file, "-af", "silencedetect=n=-38dB:d=0.3", "-f", "null", "-"],
+    {
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  const log = out.toString() + "";
+  return [...log.matchAll(/silence_end: ([0-9.]+) \| silence_duration: ([0-9.]+)/g)].map((m) => ({
+    end: Number(m[1]),
+    dur: Number(m[2]),
+  }));
+}
+
+/**
+ * Picks the sentence boundaries among the detected pauses with dynamic programming: each segment
+ * should last roughly in proportion to its text, and longer pauses are preferred as boundaries.
+ */
+function splitPoints(sil, texts, total) {
+  const chars = texts.map((t) => t.length);
+  const sum = chars.reduce((a, b) => a + b, 0);
+  const expected = chars.map((c) => (c / sum) * total);
+  const mids = sil.map((x) => x.end - x.dur / 2);
+  const n = texts.length;
+  const S = sil.length;
+  const segCost = (j, from, to) => ((to - from - expected[j]) / expected[j]) ** 2;
+  // dp[j][i]: best cost when sentence j ends at pause i (j < n-1)
+  const dp = Array.from({ length: n - 1 }, () => new Array(S).fill(Infinity));
+  const prev = Array.from({ length: n - 1 }, () => new Array(S).fill(-1));
+  for (let i = 0; i < S; i++) dp[0][i] = segCost(0, 0, mids[i]) - 3 * sil[i].dur;
+  for (let j = 1; j < n - 1; j++)
+    for (let i = j; i < S; i++)
+      for (let k = j - 1; k < i; k++) {
+        const c = dp[j - 1][k] + segCost(j, mids[k], mids[i]) - 3 * sil[i].dur;
+        if (c < dp[j][i]) {
+          dp[j][i] = c;
+          prev[j][i] = k;
+        }
+      }
+  let best = -1;
+  let bestCost = Infinity;
+  for (let i = n - 2; i < S; i++) {
+    const c = dp[n - 2][i] + segCost(n - 1, mids[i], total);
+    if (c < bestCost) {
+      bestCost = c;
+      best = i;
+    }
+  }
+  const cuts = [];
+  for (let j = n - 2, i = best; j >= 0; i = prev[j][i], j--) cuts.unshift(mids[i]);
+  return cuts;
+}
+
+/** Whole narration in one Gemini TTS request (cached), split into one clip per line. */
+async function batchVoices(ids, texts) {
+  const key = process.env["GEMINI_API_KEY"];
+  const tag = createHash("sha1")
+    .update(`${BATCH_MODEL}|${TTS_VOICE}|${texts.join("\n")}`)
+    .digest("hex")
+    .slice(0, 16);
+  const cached = `${CACHE}batch-${tag}.wav`;
+  if (!existsSync(cached)) {
+    if (!key) return null;
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${BATCH_MODEL}:generateContent`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-goog-api-key": key },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: texts.join("\n\n") }] }],
+          generationConfig: {
+            responseModalities: ["AUDIO"],
+            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: TTS_VOICE } } },
+          },
+        }),
+      },
+    );
+    if (!res.ok) return null;
+    const part = (await res.json()).candidates?.[0]?.content?.parts?.find((p) => p.inlineData);
+    if (!part) return null;
+    const bytes = Buffer.from(part.inlineData.data, "base64");
+    const mime = part.inlineData.mimeType ?? "";
+    writeFileSync(
+      cached,
+      mime.includes("wav") ? bytes : pcmToWav(bytes, Number(/rate=(\d+)/.exec(mime)?.[1] ?? 24000)),
+    );
+  }
+  const total = duration(cached);
+  const sil = silences(cached);
+  if (sil.length < ids.length - 1) return null;
+  const cuts = [0, ...splitPoints(sil, texts, total), total];
+  const durations = {};
+  ids.forEach((id, i) => {
+    const file = `${BUILD}${id}.wav`;
+    sh("ffmpeg", [
+      "-y",
+      "-v",
+      "error",
+      "-i",
+      cached,
+      "-ss",
+      cuts[i].toFixed(3),
+      "-to",
+      cuts[i + 1].toFixed(3),
+      "-af",
+      "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse",
+      "-ar",
+      "44100",
+      file,
+    ]);
+    durations[id] = duration(file);
+  });
+  return durations;
+}
+
+/** Natural voice from Gemini (one batched request, cached); macOS voice only as a last resort. */
+async function synthesizeVoices() {
+  mkdirSync(CACHE, { recursive: true });
+  const ids = Object.keys(LINES);
+  const texts = ids.map((id) => spoken(id).replace(/…/g, "..."));
+  const batch = await batchVoices(ids, texts);
+  if (batch) {
+    console.log(` voz Gemini ${TTS_VOICE} (${BATCH_MODEL})`);
+    return batch;
+  }
+  console.log(" Gemini TTS no disponible: uso la voz de macOS");
+  const durations = {};
+  ids.forEach((id, i) => {
+    const aiff = `${BUILD}${id}.aiff`;
+    const file = `${BUILD}${id}.wav`;
+    sh("say", ["-v", "Paulina", "-r", "182", "-o", aiff, texts[i].replace(/\.\.\./g, ", ")]);
+    sh("ffmpeg", ["-y", "-v", "error", "-i", aiff, "-ar", "44100", file]);
+    durations[id] = duration(file);
+  });
   return durations;
 }
 
@@ -375,6 +569,32 @@ async function story(page, nar) {
   await pointAt(page, await find(page, button("Reiniciar demo")));
   await voice;
 
+  // Sign up or sign in with Google
+  await page.goto(`${BASE}/login`, { waitUntil: "networkidle0" });
+  await sleep(500);
+  voice = nar.say("signup");
+  await pointAt(page, await find(page, button("Crear cuenta")));
+  await sleep(400);
+  await pointAt(page, await find(page, button("Continuar con Google")));
+  await voice;
+  voice = nar.say("google");
+  const googleButton = await find(page, button("Continuar con Google"));
+  await pointAt(page, googleButton);
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: "networkidle2", timeout: 20000 }).catch(() => {}),
+    googleButton.click(),
+  ]);
+  await sleep(600);
+  await ensureOverlay(page);
+  await page.evaluate((text) => {
+    const el = document.getElementById("ww-caption");
+    el.textContent = text;
+    el.classList.remove("hide");
+  }, shown("google"));
+  await voice;
+  await page.goto(`${BASE}/`, { waitUntil: "networkidle0" });
+  await sleep(400);
+
   // Outro
   await nar.hide();
   await card(
@@ -395,7 +615,7 @@ function mixAudio(cues, videoSeconds) {
   const inputs = ["-i", music];
   const parts = [];
   cues.forEach((c, i) => {
-    inputs.push("-i", `${BUILD}${c.id}.aiff`);
+    inputs.push("-i", `${BUILD}${c.id}.wav`);
     parts.push(
       `[${i + 1}:a]aresample=44100,pan=stereo|c0=c0|c1=c0,adelay=${c.at}|${c.at},volume=1.3[v${i}]`,
     );
@@ -430,7 +650,7 @@ async function run() {
   rmSync(BUILD, { recursive: true, force: true });
   mkdirSync(BUILD, { recursive: true });
   console.log("1/4 voz…");
-  const durations = synthesizeVoices();
+  const durations = await synthesizeVoices();
 
   console.log("2/4 grabando pantalla…");
   const browser = await puppeteer.launch({
@@ -439,6 +659,10 @@ async function run() {
     defaultViewport: { width: W, height: H, deviceScaleFactor: 1 },
   });
   const page = await browser.newPage();
+  const ua = (await browser.userAgent()).replace("HeadlessChrome", "Chrome");
+  await page.setUserAgent(ua);
+  // Captions are injected into pages, including Google's sign-in page, which enforces Trusted Types.
+  await page.setBypassCSP(true);
   await page.evaluateOnNewDocument(() =>
     localStorage.setItem(
       "winkwink-preferences",

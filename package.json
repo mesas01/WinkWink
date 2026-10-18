@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "demo:record": "node scripts/record-demo.mjs",
+    "demo:record": "node --env-file-if-exists=.env scripts/record-demo.mjs",
     "invoices:generate": "node scripts/make-test-invoices.mjs"
   },
   "overrides": {
