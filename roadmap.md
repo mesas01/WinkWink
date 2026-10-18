@@ -1,24 +1,18 @@
-# WinkWink
-- [ ] Add multiple initial supplier-reference invoice uploads and optional Pix/Bre-B QR reference attachments, private storage and metadata comparison for future invoices; finance confirms references, no payment execution.
-- [ ] Find ten safe public invoice examples per demo country (Colombia/Brazil, five merchants each); never reuse exposed personal data or misrepresent synthetic documents as real invoices.
-- [x] Add nine persisted Blinka-context COP/BRL/USDC demo invoices with private synthetic PDFs, simulated bank/Pix/USDC destinations, four employee accounts and company/personal caps. Authenticated approval/escalation/hold, manual hard-cap rejection, supplier review and all four account views verified; no money moves or AI calls in this synthetic path.
-- [x] Implement due dates, finance-confirmed supplier references, atomic per-payment/period budgets and transactional decision records; explain AI calls/tokens separately from charges. Synthetic authenticated approval/read-back and concurrent budget guards verified; no payment execution or identity certification.
-- [x] Research Blinka and official Bre-B/Pix/USDC sources; scope is decision-only, Pix/USDC publicly advertised, Bre-B and public integration API unverified; identified missing due dates and enforced cumulative limits without connecting payments.
-- [x] Add four-step antifraud scan, isolated adulterated INV-003 demo, verified supplier credentials, duplicate detection and non-overridable security blocks; authenticated demo and synthetic upload/read-back verified, 34 tests passed.
-- [x] Add admin-only employee-view preview that hides administration and shows only the account's own invoices; interface narrowing only, roles and row policies unchanged; calculation tests plus signed-in desktop/mobile checks passed.
-- [x] Add admin spend metrics by currency, category, employee and day/half-month/month; seven calculation tests and authenticated empty-data filters, ES/EN and mobile/desktop checks passed. Populated production metrics await invoices.
-- [x] Refine Active Rules supplier form and lists with Apple-inspired flow; allowed/blocked aliases saved and read back with owner session; temporary entries removed; mobile/desktop checks passed.
-- [x] Add admin categories, rules form and persisted evaluation history; use WinkWink in terms and authorization wording. Rule creation/read-back and 390/780/1280px checks passed.
-- [x] Add admin-managed allowed/blocked merchants with explicit aliases and safe descriptor matching; tests cover examples, conflicts and spending limits.
-- [ ] Verify original/history/AI through the owner's signed-in UI — Google account confirmed; authorized document and operational privacy details still needed for real documents.
-- [x] Store and display document-derived supplier, invoice number, issue date and description; missing fields require review; policy tests and live synthetic AI extraction passed.
-- [x] Replace demo role access with authenticated profiles and secure permissions.
-- [x] Implement private invoice originals and automatic upload evaluation.
-- [x] Mobile-safe employee history and admin invoice/rules views implemented.
-- [x] Privacy, terms, cookies, authorization and Colombian legal research.
-- [x] Remove unsupported claims and remote fonts; improve keyboard access and labels.
-- [x] Verify public routes at 390, 780 and 1280px; tests and synthetic AI extraction pass.
-- [x] Verify owner Google session and admin rule creation/read-back; temporary test rule removed.
-- [x] Verify synthetic signed-in invoice read-back and all four demo-account views; employees see only their own invoices and caps. Real-document verification remains blocked by legal/operational requirements below.
-- [ ] Complete privacy contact/address, processor agreements and retention schedule — owner/legal details required; real-document uploads disabled.
-- [x] Assign finance admin to the verified requesting owner's Google account; no self-service promotion added.
+# WinkWink · Roadmap
+
+## Hecho
+
+- [x] Agente en `/agente`: extracción con Gemini, antifraude por cuenta y Tax ID verificados, reglas que fallan cerrado y registro de auditoría tipado con decisiones tachadas.
+- [x] Fallbacks: extracción local de texto y PDFs cuando Gemini no tiene cuota.
+- [x] Roles Empleado / Admin financiero, interfaz bilingüe ES/EN, cámara del celular y webcam.
+- [x] Seguridad del despliegue: límites de uso, código de acceso opcional y encabezados de seguridad.
+- [x] Proyecto propio de Supabase con login con Google y migraciones en `supabase/setup.sql`.
+- [x] Rediseño estilo Apple (vidrio translúcido, animaciones con resortes), 8 PDFs de prueba y video demo narrado.
+
+## Siguiente
+
+- [ ] Persistir facturas y eventos del agente en Supabase, con los mismos tipos del motor.
+- [ ] Pasar la evaluación del panel con login (`/dashboard`) del gateway de Lovable a Gemini.
+- [ ] Límites de uso globales con un almacén compartido (Redis o KV).
+- [ ] Proveedores y reglas desde el registro verificado de Blinka, en lugar de datos de ejemplo.
+- [ ] Datos de contacto de privacidad, acuerdos con encargados y política de retención antes de aceptar documentos reales.

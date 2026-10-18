@@ -4,12 +4,19 @@ import { createClient } from "@supabase/supabase-js";
 // Exercises the installed database guard, not a copy of its calculation.
 const connection = process.env["SUPABASE_DB_URL"];
 describe.skipIf(!connection)("atomic approved-decision reservations", () => {
-  const sql = postgres(connection ?? "", { max: 4 });
-  const admin = createClient(
-    process.env["SUPABASE_URL"] ?? "",
-    process.env["SUPABASE_SERVICE_ROLE_KEY"] ?? "",
-    { auth: { persistSession: false } },
-  );
+  // Vitest still collects a skipped suite, so only build clients when a database is configured.
+  const sql = connection
+    ? postgres(connection, { max: 4 })
+    : (null as unknown as ReturnType<typeof postgres>);
+  const admin = connection
+    ? createClient(
+        process.env["SUPABASE_URL"] ?? "",
+        process.env["SUPABASE_SERVICE_ROLE_KEY"] ?? "",
+        {
+          auth: { persistSession: false },
+        },
+      )
+    : (null as unknown as ReturnType<typeof createClient>);
   let owner = "";
   let vendor = "";
   let confirmed = "";

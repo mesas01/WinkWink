@@ -1,30 +1,39 @@
-<!-- LOVABLE:BEGIN -->
-> [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
->
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
-<!-- LOVABLE:END -->
+# AGENTS.md
 
+Guidance for coding agents working in this repository.
 
-## Application architecture
-- Keep account authorization in Cloud roles and row policies, never persisted UI state, so employees cannot grant themselves administrative access.
-- Store private invoice originals by owner; extract fields server-side and use a deterministic rule engine with fail-closed human review, so AI never controls payments or vendor verification.
-- Persist supplier invoice identifiers separately from internal record IDs and leave absent extracted fields null, so document numbers are never fabricated.
-- Keep protected invoice pages under the authenticated layout and legal/landing/auth pages public, so document access and legal information have separate boundaries.
-- Keep admin category, rule and audit views in the shared authenticated workspace, reading persisted rules and immutable invoice events rather than generating demo history.
-- Calculate admin spend from approved invoice amounts by issue date and currency, paginate authorized source rows independently of inbox limits, and exclude missing fields instead of inferring payments or exchange rates.
-- Keep fonts local and optional trackers absent unless explicitly added with a reviewed consent flow, to minimize third-party data exposure.
-- Keep real-document uploads gated until operator contacts, processor arrangements and retention are verified; document the gate in the policy module.
+## What this is
 
-- Match merchants against admin-confirmed exact aliases or explicit trailing-star prefixes; conflicting matches require review, blocked matches reject, and allowed matches still require financial rules. Preserve the original descriptor and snapshot the canonical match for auditing.
-- An employee-view preview may only narrow what an admin sees; it must never grant access, because authorization lives in Cloud roles and row policies.
-- For challenge decisions, finance confirms supplier tax and invoice references independently; deterministic matching and database-serialized budget reservations govern approvals, while legacy security demos remain isolated and cannot certify identity or fraud.
-- Count budget reservations by approval timestamp in Bogotá calendar periods and currency, not issue-date spend charts; hard limits also bind manual approval to prevent simultaneous overspend.
-- Persist provider-reported AI usage separately from monetary charges and audit decision transitions transactionally, so no synthetic token price or partial decision history is presented as real billing.
-- Apply company and uploader-scoped budgets together inside the serialized database guard, counting only matching uploader reservations for personal caps, so manual and concurrent approvals cannot bypass limits.
-- Keep synthetic transfer scenarios on a separately labeled workspace view with persisted private PDFs, employee accounts and zero AI calls; authorize every evaluation server-side. Account switching requires admin-authorized single-use access, verified synthetic employee-only accounts and explicit confirmation, never client-assigned roles.
-- Store supplier reference attachments privately with admin-only records and server-side extraction; changes invalidate finance confirmation, future decisions compare deterministic metadata and confirmed bank references, and QR attachments never authorize payments or replace invoice attestations. Enforce the synthetic-reference gate with approved file-content hashes until real-document processing is enabled.
+WinkWink: an AI governance and anti-fraud agent for accounts payable on Blinka (30X Hackathon).
+The AI only **extracts** invoice fields; a deterministic engine **decides** (approve, hold,
+security-block, reject) and writes a typed audit log. No money ever moves.
+
+## Layout
+
+- `src/domain/agent/`: pure, deterministic engine (types, bank match, anti-fraud, rules, decision, audit). No I/O.
+- `src/services/`: server-only code. Gemini extraction (`geminiAgent.ts`), server functions, rate limit and access-code guard, PDF text-layer reader.
+- `src/stores/agent-store.ts`: demo state for `/agente` (browser-persisted).
+- `src/components/agent/`, `src/routes/agente.tsx`: the public agent demo.
+- `src/routes/_authenticated/`, `src/lib/invoices.*`: signed-in dashboard on Supabase (auth, RLS, private storage).
+- `supabase/setup.sql`: full database setup for a new Supabase project. `supabase/make-admin.sql`: grant the finance admin role.
+- `test-invoices/`: synthetic PDFs (`npm run invoices:generate`). `scripts/record-demo.mjs`: narrated demo video.
+
+## Commands
+
+```bash
+npm run dev          # http://localhost:8080
+npm test             # vitest
+npm run lint
+npx tsc --noEmit
+npm run build
+```
+
+## Rules
+
+- Keep the AI to extraction. Decisions stay in `src/domain/agent` and must be deterministic and tested.
+- Fail closed: missing data, unknown vendors and unverifiable accounts are held; a bank or tax ID mismatch is a security block that can never be approved.
+- Never say a payment was executed. The approved state is "Aprobada / Approved", never "Paid".
+- Secrets stay server-side (`process.env` in `*.server.ts` or server functions). Never commit `.env`.
+- Roles live in Supabase roles and row policies, never in client state. The `/agente` roles are an explicitly labelled demo.
+- Every user-facing string exists in Spanish (default) and English.
+- UI follows `DESIGN.md` (clean glass): one blue accent, status only in pastel chips, no glass on glass, motion respects reduced-motion.

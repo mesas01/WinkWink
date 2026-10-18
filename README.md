@@ -13,6 +13,14 @@
 
 ### 🌐 [Pruébalo en vivo → winkwink-seven.vercel.app/agente](https://winkwink-seven.vercel.app/agente)
 
+<video src="https://github.com/mesas01/WinkWink/raw/main/docs/demo/winkwink-demo.mp4" controls width="760"></video>
+
+<a href="https://github.com/mesas01/WinkWink/raw/main/docs/demo/winkwink-demo.mp4">
+  <img src="docs/demo/video-poster.jpg" alt="Ver el video demo de WinkWink (2:31, con voz)" width="760">
+</a>
+
+🎬 **[Ver el video demo (2:31, con voz)](https://github.com/mesas01/WinkWink/raw/main/docs/demo/winkwink-demo.mp4)**: una factura legítima aprobada sola, una con la cuenta cambiada bloqueada, el panel de finanzas y cómo probarlo tú mismo.
+
 [![Gemini](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)](https://ai.google.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React%2019-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
@@ -22,7 +30,7 @@
 
 ---
 
-### ⚡ [Qué es](#-qué-es-winkwink) • 🧪 [Pruébalo](#-pruébalo-tú-mismo-en-2-minutos) • 📘 [Especificación](#-especificación-del-agente) • 🖼️ [Capturas](#️-capturas) • 🛠️ [Stack](#️-tech-stack) • 📦 [Instalación](#-instalación) • 👤 [Autor](#-autor)
+### 🎬 [Video](https://github.com/mesas01/WinkWink/raw/main/docs/demo/winkwink-demo.mp4) • ⚡ [Qué es](#-qué-es-winkwink) • 🧪 [Pruébalo](#-pruébalo-tú-mismo-en-2-minutos) • 📘 [Especificación](#-especificación-del-agente) • 🖼️ [Capturas](#️-capturas) • 🛠️ [Stack](#️-tech-stack) • 📦 [Instalación](#-instalación) • 👤 [Autor](#-autor)
 
 </div>
 
@@ -115,7 +123,7 @@ No necesitas cuenta ni instalar nada.
 | **Admin financiero** | Todas las facturas, métricas, reglas activas y proveedores verificados | Todo lo anterior, más aprobar excepciones, rechazar y activar o desactivar reglas |
 | **Agente** | — | Extraer, verificar, decidir y escribir en el registro |
 
-> En la demo pública los roles se simulan en el navegador para que cualquiera pueda probar ambos lados. En la app con login (`/dashboard`), los roles viven en Supabase con *row-level security*.
+> En la demo pública los roles se simulan en el navegador para que cualquiera pueda probar ambos lados. En la app con login (`/dashboard`, con correo o **Google**), los roles viven en Supabase con *row-level security*.
 
 #### 1.3 Entradas
 
@@ -335,7 +343,7 @@ interface AuditEvent {
 | | |
 |---|---|
 | Hosting | **Vercel**, preset Nitro `vercel`, función Node 24. Cada push a `main` se despliega solo |
-| Variables | `GEMINI_API_KEY` (secreta), `GEMINI_MODEL`, `DEMO_ACCESS_CODE` (opcional) y las públicas de Supabase |
+| Variables | `GEMINI_API_KEY` y `SUPABASE_SERVICE_ROLE_KEY` (secretas), `GEMINI_MODEL`, `DEMO_ACCESS_CODE` (opcional) y las públicas de Supabase |
 | URL | https://winkwink-seven.vercel.app |
 
 ---
@@ -347,7 +355,8 @@ interface AuditEvent {
 3. **Agente real:** se diseñó primero el motor determinista (tipos, antifraude, reglas y auditoría) como código puro y testeado, y después se conectó Gemini solo para leer. Como los secretos de Lovable Cloud no estaban disponibles, el agente corre de forma autónoma: server function + estado local.
 4. **Seguridad y despliegue:** límites de uso, código de acceso, encabezados, fallback sin cuota y deploy en Vercel.
 5. **Diseño:** dos iteraciones guiadas por skills de diseño (Impeccable, Emil Kowalski, Apple design y taste-skill) hasta el estilo actual: limpio, con vidrio translúcido y animaciones con resortes.
-6. **Material de prueba:** generador de PDFs sintéticos (`npm run invoices:generate`) y video demo narrado y reproducible (`npm run demo:record`).
+6. **Material de prueba:** generador de PDFs sintéticos (`npm run invoices:generate`) y video demo narrado con voz de Gemini y reproducible (`npm run demo:record`).
+7. **Independencia de Lovable:** proyecto propio de Supabase (migraciones en `supabase/setup.sql`) y login con Google directo por Supabase Auth, sin el relay de Lovable.
 
 Desarrollo asistido por IA con **Claude Code**: cada cambio se verificó con TypeScript, lint, pruebas, build y capturas reales en escritorio y móvil.
 
@@ -357,6 +366,7 @@ Desarrollo asistido por IA con **Claude Code**: cada cambio se verificó con Typ
 - Los límites de uso se cuentan por instancia del servidor; para uno global, un almacén compartido (Redis o KV).
 - Las fotos necesitan Gemini. Los PDFs escaneados sin capa de texto, también.
 - Proveedores y reglas son de ejemplo. En producción vendrían del registro verificado de Blinka.
+- La evaluación automática del panel con login (`/dashboard`) todavía usa el gateway de IA de Lovable, que no está configurado en este despliegue. El agente con Gemini está en `/agente`, y unificar ambos es el siguiente paso (ver [`roadmap.md`](roadmap.md)).
 
 ---
 
@@ -391,7 +401,7 @@ Desarrollo asistido por IA con **Claude Code**: cada cambio se verificó con Typ
 | IA | **Google Gemini** (`gemini-3.8-flash`, configurable) vía REST, JSON con `responseSchema`, reintentos ante 429/503 |
 | Motor de decisión | TypeScript puro y determinista (`src/domain/agent`), **27 tests** del agente, antifraude y PDFs (100 en total) |
 | App | TanStack Start · React 19 · Tailwind v4 · shadcn/Radix · zustand · sonner |
-| Backend existente | Supabase (auth y panel principal) |
+| Backend | Supabase propio: Postgres con RLS, almacenamiento privado y login con correo o Google |
 | Diseño | Estilo Apple: tipografía del sistema, vidrio translúcido, un solo acento azul y animaciones con resortes. Ver [`DESIGN.md`](DESIGN.md) |
 
 La llave de Gemini vive **solo en el servidor** (`.env`, ignorado por git); el navegador nunca la ve.
@@ -411,11 +421,13 @@ La llave de Gemini vive **solo en el servidor** (`.env`, ignorado por git); el n
 git clone https://github.com/mesas01/WinkWink.git
 cd WinkWink
 npm install
-cp .env.example .env      # agrega tu GEMINI_API_KEY
+cp .env.example .env      # completa las variables (ver abajo)
 npm run dev               # abre http://localhost:8080/agente
 ```
 
-Consigue la llave gratis en [Google AI Studio](https://aistudio.google.com/apikey). Sin llave, la demo igual funciona: el agente usa una extracción local de texto y lo indica en pantalla.
+- **Gemini:** consigue la llave gratis en [Google AI Studio](https://aistudio.google.com/apikey) y ponla en `GEMINI_API_KEY`. Sin llave, `/agente` igual funciona con extracción local de texto y PDFs, y lo indica en pantalla.
+- **Supabase** (solo para el panel con login): crea un proyecto, pega [`supabase/setup.sql`](supabase/setup.sql) en el *SQL Editor* y ejecútalo, y copia la URL y la *publishable key* en `.env`. Para hacerte admin usa [`supabase/make-admin.sql`](supabase/make-admin.sql).
+- **Login con Google:** crea un cliente OAuth web en Google Cloud con redirect `https://<tu-proyecto>.supabase.co/auth/v1/callback`, actívalo en *Authentication → Providers → Google* y agrega tu dominio en *URL Configuration*.
 
 ```bash
 npm test                    # motor de decisión, antifraude y PDFs de prueba
