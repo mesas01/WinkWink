@@ -18,7 +18,7 @@ const inputSchema = z
 
 /** Step A on the server: Gemini extraction. The browser never sees the API key. */
 export const extractInvoiceFields = createServerFn({ method: "POST" })
-  .inputValidator((input) => inputSchema.parse(input))
+  .validator((input: unknown) => inputSchema.parse(input))
   .handler(async ({ data }) => {
     const { extractInvoice } = await import("./geminiAgent");
     try {

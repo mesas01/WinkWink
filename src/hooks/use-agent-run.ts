@@ -38,7 +38,7 @@ export function useAgentRun() {
       return result.decision;
     } catch (error) {
       setStep(0);
-      toast.error(error instanceof Error ? error.message : "Error");
+      toast.error(error instanceof Error ? error.message : "Error", { duration: 10_000 });
       return null;
     } finally {
       setRunning(false);

@@ -25,7 +25,7 @@ cp .env.example .env   # add GEMINI_API_KEY (server-only)
 npm run dev            # http://localhost:8080/agente
 ```
 
-`GEMINI_MODEL` is optional (default `gemini-2.5-flash`; Gemini 1.5 Flash has been retired). Without a key, the agent uses labelled local text extraction so the demo still works.
+`GEMINI_MODEL` is optional (default `gemini-3.8-flash`; older Flash models such as 1.5 and 2.5 are no longer offered to new keys). Without a key, the agent uses labelled local text extraction so the demo still works.
 
 ## Checks
 

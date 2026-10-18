@@ -114,7 +114,8 @@ function AgentPage() {
   async function runAllPending() {
     for (const inv of useAgentStore.getState().invoices.filter((i) => !i.decision && i.text)) {
       setSelectedId(inv.id);
-      await agent.run(inv);
+      // Stop at the first failure (e.g. invalid key or model) instead of repeating the same error.
+      if (!(await agent.run(inv))) break;
     }
   }
 

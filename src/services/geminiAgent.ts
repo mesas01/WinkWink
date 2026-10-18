@@ -11,7 +11,7 @@ import { extractOffline } from "@/domain/agent/offline-extract";
  * Server-only: reads GEMINI_API_KEY from the environment and never ships it to the browser.
  * The model only extracts fields. It never decides; the deterministic engine does.
  */
-const DEFAULT_MODEL = "gemini-2.5-flash";
+const DEFAULT_MODEL = "gemini-3.8-flash";
 const ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
 
 export interface InvoiceInput {
@@ -98,12 +98,26 @@ function toExtracted(raw: z.infer<typeof extractionSchema>): ExtractedInvoice {
   };
 }
 
+/** Rate limits and overload are transient on Gemini: retry them with exponential backoff. */
+const RETRYABLE = new Set([429, 500, 503]);
+const RETRY_DELAYS_MS = [800, 1600, 3200, 6400];
+
+async function fetchWithRetry(url: string, init: RequestInit): Promise<Response> {
+  let res = await fetch(url, init);
+  for (const delay of RETRY_DELAYS_MS) {
+    if (!RETRYABLE.has(res.status)) return res;
+    await new Promise((r) => setTimeout(r, delay));
+    res = await fetch(url, init);
+  }
+  return res;
+}
+
 async function callGemini(
   input: InvoiceInput,
   apiKey: string,
   model: string,
 ): Promise<ExtractedInvoice> {
-  const res = await fetch(`${ENDPOINT}/${encodeURIComponent(model)}:generateContent`, {
+  const res = await fetchWithRetry(`${ENDPOINT}/${encodeURIComponent(model)}:generateContent`, {
     method: "POST",
     headers: { "content-type": "application/json", "x-goog-api-key": apiKey },
     body: JSON.stringify(requestBody(input)),
