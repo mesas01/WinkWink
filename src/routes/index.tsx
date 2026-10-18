@@ -40,7 +40,7 @@ const copy = {
     h1b: "Facturas bajo control.",
     sub: "Sube una factura, revisa los datos extraídos y conserva un historial de decisiones. Las excepciones requieren revisión humana. No ejecutamos pagos.",
     cta: "Entrar a WinkWink",
-    cta2: "Ver cómo funciona",
+    cta2: "Probar el agente",
     statement:
       "Una factura. Un documento original. Una decisión revisable. La IA puede equivocarse; tus reglas y la revisión humana mantienen el control.",
     howTitle: "Tres pasos. Una decisión revisable.",
@@ -85,7 +85,7 @@ const copy = {
     h1b: "Invoices under control.",
     sub: "Upload an invoice, inspect extracted fields and keep a decision history. Exceptions require human review. No payments are executed.",
     cta: "Enter WinkWink",
-    cta2: "See how it works",
+    cta2: "Try the agent",
     statement:
       "One invoice. One original document. One reviewable decision. AI can make mistakes; your rules and human review keep you in control.",
     howTitle: "Three steps. A reviewable decision.",
@@ -198,7 +198,7 @@ function Hero({ c, es }: { c: C; es: boolean }) {
             </Link>
           </Button>
           <Button asChild size="lg" variant="outline">
-            <a href="#how">{c.cta2}</a>
+            <Link to="/agente">{c.cta2}</Link>
           </Button>
         </div>
       </div>

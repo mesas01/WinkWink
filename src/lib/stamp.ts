@@ -49,3 +49,19 @@ export function invoiceStampTone(invoice: InvoiceStampInput): StampTone {
       return "pending";
   }
 }
+
+/** Maps an agent decision status to its stamp. No decision yet stamps as pending. */
+export function decisionStampTone(status: string | null): StampTone {
+  switch (status) {
+    case "APPROVED":
+      return "approved";
+    case "HALTED_FOR_REVIEW":
+      return "held";
+    case "SECURITY_BLOCKED":
+      return "blocked";
+    case "REJECTED":
+      return "rejected";
+    default:
+      return "pending";
+  }
+}
