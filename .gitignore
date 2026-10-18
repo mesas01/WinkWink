@@ -47,3 +47,4 @@ demo/*.mp4
 demo/*.webm
 demo/frames/
 demo/contact.png
+demo/build/
