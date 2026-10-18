@@ -45,3 +45,5 @@ dist-ssr
 # Demo video renders
 demo/*.mp4
 demo/*.webm
+demo/frames/
+demo/contact.png
