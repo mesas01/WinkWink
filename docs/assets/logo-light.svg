@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" role="img" aria-label="WinkWink seal">
+  <defs>
+    <path id="ring" d="M120,120 m-82,0 a82,82 0 1,1 164,0 a82,82 0 1,1 -164,0"/>
+  </defs>
+  <g transform="rotate(-8 120 120)">
+    <circle cx="120" cy="120" r="108" fill="none" stroke="#4B3B8F" stroke-width="7"/>
+    <circle cx="120" cy="120" r="97" fill="none" stroke="#4B3B8F" stroke-width="1.5"/>
+    <text font-family="'Courier New', Courier, monospace" font-weight="700" font-size="17" letter-spacing="3.2" fill="#4B3B8F">
+      <textPath href="#ring" startOffset="0">WINKWINK · AGENTE ANTIFRAUDE · BLINKA ·</textPath>
+    </text>
+    <circle cx="120" cy="120" r="62" fill="none" stroke="#4B3B8F" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <path d="M86 116c19 22 49 22 68 0" fill="none" stroke="#1A1A1A" stroke-width="9" stroke-linecap="round"/>
+    <path d="M94 136l-6 9M120 142v11M146 136l6 9" stroke="#1A1A1A" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>
