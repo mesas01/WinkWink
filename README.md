@@ -2,7 +2,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
-  <img src="docs/assets/logo-light.svg" alt="Sello de WinkWink" width="220">
+  <img src="docs/assets/logo-light.svg" alt="Logo de WinkWink" width="140">
 </picture>
 
 # WinkWink
@@ -22,7 +22,7 @@
 
 ---
 
-### ⚡ [Qué es](#-qué-es-winkwink) • 🧠 [Cómo funciona](#-cómo-funciona-el-agente) • 🛡️ [Antifraude](#️-antifraude-el-bloqueo-rojo) • 🧾 [Auditoría](#-explicabilidad-y-auditoría) • 🖼️ [Capturas](#️-capturas) • 🛠️ [Stack](#️-tech-stack) • 📦 [Instalación](#-instalación) • 👤 [Autor](#-autor)
+### ⚡ [Qué es](#-qué-es-winkwink) • 🧪 [Pruébalo](#-pruébalo-tú-mismo-en-2-minutos) • 🧠 [Cómo funciona](#-cómo-funciona-el-agente) • 🛡️ [Antifraude](#️-antifraude-el-bloqueo-rojo) • 🧾 [Auditoría](#-explicabilidad-y-auditoría) • 🖼️ [Capturas](#️-capturas) • 🛠️ [Stack](#️-tech-stack) • 📦 [Instalación](#-instalación) • 👤 [Autor](#-autor)
 
 </div>
 
@@ -34,7 +34,7 @@
 
 Una empresa que paga proveedores en varios países recibe cientos de facturas al mes. Revisarlas a mano es lento, y aprobarlas a ciegas es peligroso: basta **una factura con la cuenta bancaria cambiada** para que el dinero termine en manos de un estafador.
 
-**WinkWink** lee cada factura, verifica que la cuenta coincida con la del proveedor ya validada en Blinka, aplica las reglas de la empresa y **sella** cada factura con su decisión: **APROBADA**, **RETENIDA** o **BLOQUEADA**. Cada decisión trae su porqué en una línea.
+**WinkWink** lee cada factura, verifica que la cuenta coincida con la del proveedor ya validada en Blinka, aplica las reglas de la empresa y marca cada factura con su decisión: **APROBADA**, **RETENIDA** o **BLOQUEADA**. Cada decisión trae su porqué en una línea.
 
 </div>
 
@@ -65,6 +65,32 @@ Cada paso queda en un **registro de auditoría tipado**. Si un admin cambia una 
 
 ---
 
+## 🧪 Pruébalo tú mismo en 2 minutos
+
+No necesitas cuenta ni instalar nada.
+
+1. **Descarga una factura de prueba** de la carpeta [`test-invoices/`](test-invoices). Abre el PDF en GitHub y usa el botón de descarga.
+2. **Abre la demo:** [winkwink-seven.vercel.app/agente](https://winkwink-seven.vercel.app/agente).
+3. **Elige un rol** en la barra superior: **Admin financiero** (ve todo) o **Empleado** (solo sus facturas).
+4. Ve a **Nueva factura** y **sube el PDF** (o toma una foto con la cámara del celular). Luego presiona **Enviar y evaluar**.
+5. Mira cómo el agente recorre los pasos **A → D** y deja su decisión con el porqué. Como admin puedes aprobar una excepción o rechazar, y verás la decisión anterior **tachada** en el registro de auditoría.
+6. **Reiniciar demo** vuelve todo al estado inicial. **Evaluar pendientes** procesa la cola de ejemplo de una vez.
+
+| PDF de prueba | Resultado esperado |
+|---|---|
+| [`01-aws-aprobada.pdf`](test-invoices/01-aws-aprobada.pdf) | 🟩 Aprobada: cuenta verificada y Software < USD 500 |
+| [`02-aws-fraude-cuenta-cambiada.pdf`](test-invoices/02-aws-fraude-cuenta-cambiada.pdf) | 🟥 **Bloqueada**: la cuenta no coincide con la verificada |
+| [`03-figma-fraude-taxid.pdf`](test-invoices/03-figma-fraude-taxid.pdf) | 🟥 **Bloqueada**: el Tax ID no coincide |
+| [`04-uber-viaticos-retenida.pdf`](test-invoices/04-uber-viaticos-retenida.pdf) | 🟨 Retenida: Viáticos supera USD 100 |
+| [`05-uber-taxi-aprobada.pdf`](test-invoices/05-uber-taxi-aprobada.pdf) | 🟩 Aprobada: Viáticos por debajo de USD 100 |
+| [`06-slack-aprobada.pdf`](test-invoices/06-slack-aprobada.pdf) | 🟩 Aprobada |
+| [`07-proveedor-desconocido-retenida.pdf`](test-invoices/07-proveedor-desconocido-retenida.pdf) | 🟨 Retenida: proveedor no verificado |
+| [`08-rappi-brl-sin-regla.pdf`](test-invoices/08-rappi-brl-sin-regla.pdf) | 🟨 Retenida: ninguna regla cubre BRL |
+
+> 💡 Si la cuota gratuita de Gemini se agota, la demo sigue funcionando: lee el texto del PDF en el servidor y lo indica como *"Extracción local"*. Las fotos sí necesitan Gemini.
+
+---
+
 ## 🧠 Cómo funciona el agente
 
 ```mermaid
@@ -72,7 +98,7 @@ flowchart LR
     A[📄 Factura<br/>texto · PDF · imagen] --> B[A · Extracción<br/>Gemini → JSON estricto]
     B --> C{B · Antifraude<br/>¿cuenta = verificada?}
     C -- No --> X[🟥 BLOQUEADA<br/>alerta de seguridad]
-    C -- Proveedor desconocido --> R[🟪 RETENIDA<br/>revisión humana]
+    C -- Proveedor desconocido --> R[🟨 RETENIDA<br/>revisión humana]
     C -- Sí --> D{C · Reglas<br/>de la empresa}
     D -- Cumple --> OK[🟩 APROBADA<br/>automáticamente]
     D -- Excede límite / sin regla --> R
@@ -107,7 +133,7 @@ con la cuenta pre-verificada de AWS en Blinka (Chase ****4321). Pago bloqueado p
 
 - Cada decisión se explica en **una frase** que una persona entiende.
 - El registro es **append-only**: una excepción manual crea un evento nuevo que apunta (`supersedes`) a la decisión que reemplaza, y esa decisión se muestra **tachada**.
-- **Roles**: el **Empleado** ve sus facturas, su sello y su porqué. El **Admin financiero** además ve las reglas, los proveedores verificados, las métricas de autonomía y los botones de excepción.
+- **Roles**: el **Empleado** ve sus facturas, su decisión y su porqué. El **Admin financiero** además ve las reglas, los proveedores verificados, las métricas de autonomía y los botones de excepción.
 - Interfaz bilingüe: **español** (por defecto) e **inglés**.
 
 ---
@@ -141,7 +167,7 @@ con la cuenta pre-verificada de AWS en Blinka (Chase ****4321). Pago bloqueado p
 | Capa | Tecnología |
 |---|---|
 | IA | **Google Gemini** (`gemini-3.8-flash`, configurable) vía REST, JSON con `responseSchema`, reintentos ante 429/503 |
-| Motor de decisión | TypeScript puro y determinista (`src/domain/agent`), **16 tests** propios |
+| Motor de decisión | TypeScript puro y determinista (`src/domain/agent`), **27 tests** del agente, antifraude y PDFs (100 en total) |
 | App | TanStack Start · React 19 · Tailwind v4 · shadcn/Radix · zustand · sonner |
 | Backend existente | Supabase (auth y panel principal) |
 | Diseño | Estilo Apple: tipografía del sistema, vidrio translúcido, un solo acento azul y animaciones con resortes. Ver [`DESIGN.md`](DESIGN.md) |
@@ -167,14 +193,14 @@ cp .env.example .env      # agrega tu GEMINI_API_KEY
 npm run dev               # abre http://localhost:8080/agente
 ```
 
-**Facturas de prueba:** en [`test-invoices/`](test-invoices) hay 8 PDFs sintéticos listos para subir en *Nueva factura* (aprobadas, retenidas y dos fraudes: cuenta cambiada y Tax ID falso). Cada uno indica el resultado esperado en su [README](test-invoices/README.md). Regenéralos con `npm run invoices:generate`.
-
 Consigue la llave gratis en [Google AI Studio](https://aistudio.google.com/apikey). Sin llave, la demo igual funciona: el agente usa una extracción local de texto y lo indica en pantalla.
 
 ```bash
-npm test          # motor de decisión y antifraude
+npm test                    # motor de decisión, antifraude y PDFs de prueba
 npm run lint
 npm run build
+npm run invoices:generate   # regenera los PDFs de test-invoices/
+npm run demo:record         # graba el video demo narrado (macOS + Chrome + ffmpeg)
 ```
 
 ---
