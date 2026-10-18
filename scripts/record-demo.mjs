@@ -16,47 +16,51 @@ const W = 1440;
 const H = 900;
 
 /** The narration. Each line is spoken and shown as a caption while the screen acts it out. */
+/**
+ * The narration. Each line is spoken and shown as a caption while the screen acts it out.
+ * A line can be a string, or { show, say } when the spoken form differs (URLs, file names).
+ */
 const LINES = {
   intro:
-    "Esto es WinkWink: un agente de inteligencia artificial que revisa las facturas de tu empresa en Blinka.",
+    "Esto es WinkWink: un agente de inteligencia artificial que revisa las facturas de tu empresa en Blinka y frena el fraude antes del pago.",
   problem:
     "El fraude más común en cuentas por pagar es una factura real… con la cuenta bancaria cambiada.",
   laura:
-    "Laura, del equipo de ingeniería, necesita pagar la factura de AWS. Solo tiene que subirla.",
-  typing: "Puede escribirla, subir un PDF o tomarle una foto con el celular.",
+    "Laura, de ingeniería, necesita pagar la factura de AWS. Entra como empleada y la sube en PDF.",
   running:
-    "En segundos, el agente la lee, verifica la cuenta contra la registrada en Blinka y aplica las reglas de la empresa.",
+    "El agente la lee, verifica la cuenta contra la registrada en Blinka y aplica las reglas de la empresa.",
   approved:
-    "La cuenta coincide y el monto cumple la política. Aprobada automáticamente, sin esperar a nadie, y con su razón por escrito.",
+    "Todo coincide y el monto cumple la política: aprobada automáticamente, con su razón por escrito.",
   camila: "Ahora llega otra factura de AWS. Parece idéntica… pero pide pagar a una cuenta nueva.",
   blocked:
-    "El agente detecta que la cuenta no coincide con la verificada. Bloqueo rojo inmediato: el pago se niega para prevenir el fraude.",
+    "El agente detecta que la cuenta no coincide con la verificada. Bloqueo inmediato: el pago se niega.",
   admin:
     "Finanzas lo ve al instante. Ni siquiera un administrador puede aprobar esta factura: solo rechazarla.",
-  audit: "Todo queda en un registro de auditoría. La decisión anterior se tacha, nunca se borra.",
-  kpis: "Y el panel muestra la autonomía del agente: cuántas facturas se aprobaron solas, cuántas esperan revisión y cuántos fraudes se frenaron.",
+  audit: "Todo queda en un registro de auditoría: la decisión anterior se tacha, nunca se borra.",
+  kpis: "El panel muestra la autonomía del agente, lo que espera revisión y los fraudes frenados.",
+  rules:
+    "Las reglas son configurables, y lo que ninguna regla cubre queda retenido para una persona.",
+  tryCard: "Ahora, pruébalo tú mismo. Son tres pasos y no necesitas cuenta.",
+  tryStep1: {
+    show: "1 · En GitHub, abre la carpeta test-invoices y descarga una de las ocho facturas de prueba.",
+    say: "Uno: en el repositorio de GitHub, abre la carpeta test invoices y descarga una de las ocho facturas de prueba.",
+  },
+  tryStep2: {
+    show: "2 · Entra a winkwink-seven.vercel.app/agente y elige un rol: Empleado o Admin financiero.",
+    say: "Dos: entra a winkwink seven punto vercel punto app, barra agente, y elige un rol: empleado o administrador financiero.",
+  },
+  tryStep3: "3 · Ve a Nueva factura, sube el PDF y presiona Enviar y evaluar.",
+  tryResult: "Por ejemplo, esta factura de Figma trae un Tax ID falso, y el agente la bloquea.",
+  tryReset:
+    "Cada PDF indica el resultado esperado. Y con Reiniciar demo vuelves a empezar cuando quieras.",
   outro: "WinkWink. La inteligencia artificial lee; las reglas deciden.",
 };
 
-const INVOICE_OK = [
-  "AWS · Infraestructura nube octubre",
-  "Proveedor: AWS",
-  "Categoría: Software",
-  "Total: USD 180.00",
-  "Moneda: USD",
-  "Tax ID: US-998822",
-  "Cuenta bancaria: Chase ****4321",
-].join("\n");
+const shown = (id) => (typeof LINES[id] === "string" ? LINES[id] : LINES[id].show);
+const spoken = (id) => (typeof LINES[id] === "string" ? LINES[id] : LINES[id].say);
 
-const INVOICE_FRAUD = [
-  "AWS · Aviso: nuevos datos de pago",
-  "Proveedor: AWS",
-  "Categoría: Software",
-  "Total: USD 180.00",
-  "Moneda: USD",
-  "Tax ID: US-998822",
-  "Cuenta bancaria: Wells Fargo ****9999",
-].join("\n");
+const PDFS = `${ROOT}test-invoices/`;
+const REPO_PDFS = "https://github.com/mesas01/WinkWink/tree/main/test-invoices";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const sh = (cmd, args) =>
@@ -78,9 +82,9 @@ const duration = (file) =>
 
 function synthesizeVoices() {
   const durations = {};
-  for (const [id, text] of Object.entries(LINES)) {
+  for (const id of Object.keys(LINES)) {
     const file = `${BUILD}${id}.aiff`;
-    sh("say", ["-v", VOICE, "-r", RATE, "-o", file, text.replace(/…/g, ", ")]);
+    sh("say", ["-v", VOICE, "-r", RATE, "-o", file, spoken(id).replace(/…/g, ", ")]);
     durations[id] = duration(file);
   }
   return durations;
@@ -151,7 +155,7 @@ function createNarrator(page, durations) {
         const el = document.getElementById("ww-caption");
         el.textContent = text;
         el.classList.remove("hide");
-      }, LINES[id]);
+      }, shown(id));
       cues.push({ id, at: Date.now() - t0 });
       return sleep(durations[id] * 1000 + 450);
     },
@@ -250,6 +254,19 @@ async function prepare(page) {
   await sleep(500);
 }
 
+async function uploadPdf(page, file) {
+  await click(page, button("Nueva factura"), 300);
+  const input = await find(page, ".//input[@id='invoice-file']");
+  await pointAt(page, input);
+  await input.uploadFile(`${PDFS}${file}`);
+  await pointAt(page, await find(page, `.//form//p[contains(., "${file}")]`));
+}
+
+async function submitAndWait(page, label) {
+  await click(page, button("Enviar y evaluar"), 0);
+  await find(page, `.//article//span[contains(., "${label}")]`);
+}
+
 async function story(page, nar) {
   // Intro over the landing page
   await page.goto(`${BASE}/`, { waitUntil: "networkidle0" });
@@ -260,46 +277,38 @@ async function story(page, nar) {
     "Agente antifraude para cuentas por pagar en Blinka",
     "Reto Blinka · 30X Hackathon",
   );
-  await sleep(1200);
+  await sleep(1000);
   let voice = nar.say("intro");
   await voice;
   await hideCard(page);
   voice = nar.say("problem");
-  await page.evaluate(() => window.scrollTo({ top: 260, behavior: "smooth" }));
-  await sleep(1800);
+  await page.evaluate(() => window.scrollTo({ top: 420, behavior: "smooth" }));
+  await sleep(2200);
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   await voice;
   await click(page, link("Probar el agente"), 900);
 
-  // Case 1: Laura's legitimate invoice is approved automatically
+  // Case 1: Laura's legitimate PDF is approved automatically
   voice = nar.say("laura");
-  await click(page, button("Nueva factura"), 300);
-  await voice;
-  voice = nar.say("typing");
-  await typeInvoice(page, INVOICE_OK);
+  await pointAt(page, await find(page, button("Empleado")));
+  await uploadPdf(page, "01-aws-aprobada.pdf");
   await voice;
   voice = nar.say("running");
-  await click(page, button("Enviar y evaluar"), 0);
+  await submitAndWait(page, "Aprobada");
   await voice;
-  await find(page, ".//article//span[contains(., 'Aprobada')]");
   voice = nar.say("approved");
-  await pointAt(
-    page,
-    await find(page, ".//article//span[contains(., 'Aprobada') or contains(., 'APROBADA')]"),
-  );
+  await pointAt(page, await find(page, ".//article//span[contains(., 'Aprobada')]"));
   await voice;
 
-  // Case 2: Camila's invoice with a changed bank account is blocked
+  // Case 2: Camila's PDF with a changed bank account is blocked
   voice = nar.say("camila");
   const select = await find(page, ".//header//select");
   await pointAt(page, select);
   await page.select("header select", "Camila Torres");
-  await sleep(500);
-  await click(page, button("Nueva factura"), 200);
-  await typeInvoice(page, INVOICE_FRAUD);
+  await sleep(400);
+  await uploadPdf(page, "02-aws-fraude-cuenta-cambiada.pdf");
   await voice;
-  await click(page, button("Enviar y evaluar"), 0);
-  await find(page, ".//article//dl[contains(., 'Verificada en Blinka')]");
+  await submitAndWait(page, "Bloqueada");
   voice = nar.say("blocked");
   await pointAt(page, await find(page, ".//article//dl[contains(., 'Verificada en Blinka')]"));
   await voice;
@@ -307,7 +316,7 @@ async function story(page, nar) {
   // Finance admin: cannot approve, rejects, audit log keeps the history
   voice = nar.say("admin");
   await click(page, button("Admin financiero"), 500);
-  await click(page, row("nuevos datos de pago"), 600);
+  await click(page, row("INV-2026-10419"), 600);
   await pointAt(page, await find(page, ".//article//p[contains(., 'Aprobación bloqueada')]"));
   await voice;
   voice = nar.say("audit");
@@ -324,6 +333,46 @@ async function story(page, nar) {
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   await sleep(700);
   await pointAt(page, await find(page, ".//dl[contains(., 'Autonomía')]"));
+  await voice;
+  voice = nar.say("rules");
+  await click(page, button("Reglas activas"), 400);
+  await pointAt(page, await find(page, ".//main//li[1]//button[@role='switch']"));
+  await voice;
+
+  // Try it yourself
+  await nar.hide();
+  await card(
+    page,
+    "Pruébalo tú mismo",
+    "3 pasos · sin cuenta · sin instalar nada",
+    "winkwink-seven.vercel.app/agente",
+  );
+  voice = nar.say("tryCard");
+  await voice;
+  await page.goto(REPO_PDFS, { waitUntil: "networkidle2" });
+  await sleep(600);
+  voice = nar.say("tryStep1");
+  await pointAt(page, await find(page, ".//a[contains(., '03-figma-fraude-taxid.pdf')]"));
+  await sleep(600);
+  await pointAt(page, await find(page, ".//a[contains(., '02-aws-fraude-cuenta-cambiada.pdf')]"));
+  await voice;
+  await page.goto(`${BASE}/agente`, { waitUntil: "networkidle0" });
+  await sleep(600);
+  voice = nar.say("tryStep2");
+  await pointAt(page, await find(page, button("Empleado")));
+  await sleep(500);
+  await pointAt(page, await find(page, button("Admin financiero")));
+  await voice;
+  voice = nar.say("tryStep3");
+  await uploadPdf(page, "03-figma-fraude-taxid.pdf");
+  await pointAt(page, await find(page, button("Enviar y evaluar")));
+  await voice;
+  await submitAndWait(page, "Bloqueada");
+  voice = nar.say("tryResult");
+  await pointAt(page, await find(page, ".//article//p[contains(., 'Tax ID')]"));
+  await voice;
+  voice = nar.say("tryReset");
+  await pointAt(page, await find(page, button("Reiniciar demo")));
   await voice;
 
   // Outro
