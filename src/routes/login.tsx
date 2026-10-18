@@ -6,6 +6,7 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
+import { socialLoginAvailable } from "@/lib/social-login";
 import "@lovable.dev/cloud-auth-js/styles.css";
 import { useApp } from "@/lib/store";
 import { Logo, LangSwitch, ThemeToggle } from "@/components/blinka";
@@ -222,7 +223,19 @@ function Login() {
         <p role="status" aria-live="polite" className="mt-4 break-words text-sm">
           {message}
         </p>
-        {mode !== "forgot" && (
+        {mode !== "forgot" && !socialLoginAvailable() && (
+          <div className="mt-5 rounded-2xl bg-secondary/60 p-4 text-sm leading-relaxed">
+            <p className="text-muted-foreground">
+              {es
+                ? "El acceso con Google está disponible solo en la versión alojada en Lovable. Aquí puedes entrar con tu correo, o probar el agente sin cuenta."
+                : "Google sign-in is only available on the Lovable-hosted version. Here you can sign in with email, or try the agent without an account."}
+            </p>
+            <Link to="/agente" className="mt-2 inline-flex font-medium text-brand hover:underline">
+              {es ? "Probar el agente sin cuenta →" : "Try the agent without an account →"}
+            </Link>
+          </div>
+        )}
+        {mode !== "forgot" && socialLoginAvailable() && (
           <div className="mt-5 space-y-3">
             <Button
               variant="outline"
