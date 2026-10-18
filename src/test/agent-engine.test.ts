@@ -171,15 +171,3 @@ describe("rate limiter and access code", () => {
     expect(safeEqual("jurado", "jurado-30x")).toBe(false);
   });
 });
-
-import { socialLoginAvailable } from "@/lib/social-login";
-
-describe("social login availability", () => {
-  it("is only offered on Lovable hosting, where the OAuth relay exists", () => {
-    expect(socialLoginAvailable("winkwink.lovable.app")).toBe(true);
-    expect(socialLoginAvailable("id-preview--abc.lovableproject.com")).toBe(true);
-    expect(socialLoginAvailable("winkwink-seven.vercel.app")).toBe(false);
-    expect(socialLoginAvailable("localhost")).toBe(false);
-    expect(socialLoginAvailable("evil-lovable.app")).toBe(false);
-  });
-});

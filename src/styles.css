@@ -325,15 +325,3 @@
     -webkit-backdrop-filter: none !important;
   }
 }
-
-/* Lovable sign-in button, restyled to match the secondary pill button */
-.lovable-auth-button.lovable-auth-button {
-  border-radius: 9999px;
-  border: 1px solid var(--input);
-  background: var(--card);
-  color: var(--foreground);
-  box-shadow: none;
-}
-.lovable-auth-button.lovable-auth-button:hover {
-  background: var(--secondary);
-}

@@ -5,9 +5,6 @@ import { motion } from "framer-motion";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
-import { socialLoginAvailable } from "@/lib/social-login";
-import "@lovable.dev/cloud-auth-js/styles.css";
 import { useApp } from "@/lib/store";
 import { Logo, LangSwitch, ThemeToggle } from "@/components/blinka";
 import { LegalLinks } from "@/components/legal";
@@ -31,6 +28,17 @@ export const Route = createFileRoute("/login")({
   }),
   component: Login,
 });
+function GoogleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden className="size-4">
+      <path
+        fill="#EA4335"
+        d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.8-5.5 3.8-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.2 14.6 2.2 12 2.2 6.6 2.2 2.2 6.6 2.2 12s4.4 9.8 9.8 9.8c5.7 0 9.4-4 9.4-9.6 0-.6-.1-1.1-.2-1.6H12z"
+      />
+    </svg>
+  );
+}
+
 function Login() {
   const es = useApp((s) => s.lang) === "es";
   const nav = useNavigate();
@@ -100,21 +108,16 @@ function Login() {
       setBusy(false);
     }
   }
-  async function social(provider: "google" | "lovable") {
+  /** Google sign-in straight through Supabase Auth. Supabase returns to /login with the session. */
+  async function signInWithGoogle() {
     setBusy(true);
     setMessage("");
-    try {
-      const result = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) throw result.error;
-      if (!result.redirected) {
-        qc.clear();
-        await nav({ to: "/dashboard" });
-      }
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Sign-in failed");
-    } finally {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/login` },
+    });
+    if (error) {
+      setMessage(error.message);
       setBusy(false);
     }
   }
@@ -223,35 +226,18 @@ function Login() {
         <p role="status" aria-live="polite" className="mt-4 break-words text-sm">
           {message}
         </p>
-        {mode !== "forgot" && !socialLoginAvailable() && (
-          <div className="mt-5 rounded-2xl bg-secondary/60 p-4 text-sm leading-relaxed">
-            <p className="text-muted-foreground">
-              {es
-                ? "El acceso con Google está disponible solo en la versión alojada en Lovable. Aquí puedes entrar con tu correo, o probar el agente sin cuenta."
-                : "Google sign-in is only available on the Lovable-hosted version. Here you can sign in with email, or try the agent without an account."}
-            </p>
-            <Link to="/agente" className="mt-2 inline-flex font-medium text-brand hover:underline">
-              {es ? "Probar el agente sin cuenta →" : "Try the agent without an account →"}
-            </Link>
-          </div>
-        )}
-        {mode !== "forgot" && socialLoginAvailable() && (
-          <div className="mt-5 space-y-3">
-            <Button
-              variant="outline"
-              disabled={busy}
-              className="w-full"
-              onClick={() => social("google")}
-            >
+        {mode !== "forgot" && (
+          <div className="mt-5">
+            <Button variant="outline" disabled={busy} className="w-full" onClick={signInWithGoogle}>
+              <GoogleIcon />
               {es ? "Continuar con Google" : "Continue with Google"}
             </Button>
-            <Button
-              disabled={busy}
-              className="lovable-auth-button w-full"
-              onClick={() => social("lovable")}
-            >
-              {es ? "Continuar con Lovable" : "Continue with Lovable"}
-            </Button>
+            <p className="mt-3 text-center text-[13px] text-muted-foreground">
+              {es ? "¿Solo quieres ver el agente? " : "Just want to see the agent? "}
+              <Link to="/agente" className="font-medium text-brand hover:underline">
+                {es ? "Pruébalo sin cuenta" : "Try it without an account"}
+              </Link>
+            </p>
           </div>
         )}
         <div className="mt-5 flex flex-wrap gap-2">
