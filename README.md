@@ -13,13 +13,11 @@
 
 ### 🌐 [Pruébalo en vivo → winkwink-seven.vercel.app/agente](https://winkwink-seven.vercel.app/agente)
 
-<video src="https://github.com/mesas01/WinkWink/raw/main/docs/demo/winkwink-demo.mp4" controls width="760"></video>
-
-<a href="https://github.com/mesas01/WinkWink/raw/main/docs/demo/winkwink-demo.mp4">
+<a href="https://winkwink-seven.vercel.app/demo/winkwink-demo.mp4">
   <img src="docs/demo/video-poster.jpg" alt="Ver el video demo de WinkWink (2:31, con voz)" width="760">
 </a>
 
-🎬 **[Ver el video demo (2:31, con voz)](https://github.com/mesas01/WinkWink/raw/main/docs/demo/winkwink-demo.mp4)**: una factura legítima aprobada sola, una con la cuenta cambiada bloqueada, el panel de finanzas y cómo probarlo tú mismo.
+🎬 **[Ver el video demo (2:31, con voz)](https://winkwink-seven.vercel.app/demo/winkwink-demo.mp4)**: una factura legítima aprobada sola, una con la cuenta cambiada bloqueada, el panel de finanzas y cómo probarlo tú mismo.
 
 [![Gemini](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)](https://ai.google.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -30,7 +28,7 @@
 
 ---
 
-### 🎬 [Video](https://github.com/mesas01/WinkWink/raw/main/docs/demo/winkwink-demo.mp4) • ⚡ [Qué es](#-qué-es-winkwink) • 🧪 [Pruébalo](#-pruébalo-tú-mismo-en-2-minutos) • 📘 [Especificación](#-especificación-del-agente) • 🖼️ [Capturas](#️-capturas) • 🛠️ [Stack](#️-tech-stack) • 📦 [Instalación](#-instalación) • 👤 [Autor](#-autor)
+### 🎬 [Video](https://winkwink-seven.vercel.app/demo/winkwink-demo.mp4) • ⚡ [Qué es](#-qué-es-winkwink) • 🧪 [Pruébalo](#-pruébalo-tú-mismo-en-2-minutos) • 📘 [Especificación](#-especificación-del-agente) • 🖼️ [Capturas](#️-capturas) • 🛠️ [Stack](#️-tech-stack) • 📦 [Instalación](#-instalación) • 👤 [Autor](#-autor)
 
 </div>
 
