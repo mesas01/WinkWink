@@ -25,8 +25,18 @@ const missingFields = (i: ExtractedInvoice): string[] =>
 
 function extractionMessage(r: ExtractionResult): Localized {
   const i = r.invoice;
-  const via = r.source === "gemini" ? `Gemini (${r.model})` : "extracción local";
-  const viaEn = r.source === "gemini" ? `Gemini (${r.model})` : "local extraction";
+  const via =
+    r.source === "gemini"
+      ? `Gemini (${r.model})`
+      : r.source === "fallback"
+        ? "extracción local (Gemini sin cuota o saturado)"
+        : "extracción local";
+  const viaEn =
+    r.source === "gemini"
+      ? `Gemini (${r.model})`
+      : r.source === "fallback"
+        ? "local extraction (Gemini out of quota or overloaded)"
+        : "local extraction";
   const summary = `${i.vendor ?? "?"} · ${i.currency ?? "?"} ${i.amount ?? "?"} · ${i.invoiceBankAccount ?? "—"}`;
   return {
     es: `Datos extraídos con ${via}: ${summary} · ${categoryLabel(i.category, true)}.`,

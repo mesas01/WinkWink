@@ -100,7 +100,7 @@ function toExtracted(raw: z.infer<typeof extractionSchema>): ExtractedInvoice {
 
 /** Rate limits and overload are transient on Gemini: retry them with exponential backoff. */
 const RETRYABLE = new Set([429, 500, 503]);
-const RETRY_DELAYS_MS = [800, 1600, 3200, 6400];
+const RETRY_DELAYS_MS = [700, 1500, 3000];
 
 async function fetchWithRetry(url: string, init: RequestInit): Promise<Response> {
   let res = await fetch(url, init);
@@ -111,6 +111,18 @@ async function fetchWithRetry(url: string, init: RequestInit): Promise<Response>
   }
   return res;
 }
+
+class GeminiHttpError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
+/** Quota and overload errors are transient: the demo degrades to local extraction instead of failing. */
+const isCapacityError = (e: unknown) => e instanceof GeminiHttpError && RETRYABLE.has(e.status);
 
 async function callGemini(
   input: InvoiceInput,
@@ -123,7 +135,10 @@ async function callGemini(
     body: JSON.stringify(requestBody(input)),
   });
   if (!res.ok)
-    throw new Error(`Gemini ${model} respondió ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    throw new GeminiHttpError(
+      res.status,
+      `Gemini ${model} respondió ${res.status}: ${(await res.text()).slice(0, 300)}`,
+    );
   const json = (await res.json()) as {
     candidates?: { content?: { parts?: { text?: string }[] } }[];
   };
@@ -141,5 +156,10 @@ export async function extractInvoice(input: InvoiceInput): Promise<ExtractionRes
     return { invoice: extractOffline(input.text), source: "offline", model: null };
   }
   const model = geminiModel();
-  return { invoice: await callGemini(input, apiKey, model), source: "gemini", model };
+  try {
+    return { invoice: await callGemini(input, apiKey, model), source: "gemini", model };
+  } catch (error) {
+    if (!isCapacityError(error) || !input.text) throw error;
+    return { invoice: extractOffline(input.text), source: "fallback", model };
+  }
 }

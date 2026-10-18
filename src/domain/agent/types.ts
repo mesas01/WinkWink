@@ -26,7 +26,8 @@ export interface ExtractedInvoice {
   dueDate: string | null;
 }
 
-export type ExtractionSource = "gemini" | "offline";
+/** "fallback": Gemini was configured but out of quota or overloaded, so the local parser ran. */
+export type ExtractionSource = "gemini" | "offline" | "fallback";
 
 export interface ExtractionResult {
   invoice: ExtractedInvoice;

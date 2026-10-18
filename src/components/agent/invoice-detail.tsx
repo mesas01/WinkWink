@@ -37,9 +37,13 @@ function ExtractedFields({ invoice, es }: { invoice: AgentInvoice; es: boolean }
   const source =
     invoice.extraction?.source === "gemini"
       ? `Gemini · ${invoice.extraction.model}`
-      : es
-        ? "Extracción local (sin GEMINI_API_KEY)"
-        : "Local extraction (no GEMINI_API_KEY)";
+      : invoice.extraction?.source === "fallback"
+        ? es
+          ? "Extracción local: Gemini sin cuota o saturado en este momento"
+          : "Local extraction: Gemini out of quota or overloaded right now"
+        : es
+          ? "Extracción local (sin GEMINI_API_KEY)"
+          : "Local extraction (no GEMINI_API_KEY)";
   return (
     <div className="mt-5">
       <dl className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm">
